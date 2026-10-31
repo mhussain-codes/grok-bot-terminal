@@ -111,17 +111,22 @@ class BinanceClient:
             return res
         return []
 
-    def place_spot_order(self, symbol: str, side: str, quote_order_qty: float) -> Dict[str, Any]:
+    def place_spot_order(self, symbol: str, side: str, quote_order_qty: Optional[float] = None, quantity: Optional[str] = None) -> Dict[str, Any]:
         """
-        Places a SPOT market order by USDT quote amount (e.g. $5.00 USDT).
-        Binance Spot enforces a minNotional of $5.00 USDT.
+        Places a SPOT market order.
+        - If quote_order_qty is provided (e.g. 5.00 USDT), buys with USDT value.
+        - If quantity is provided (e.g. 0.00012), sells exact base asset coins.
         """
         params = {
             "symbol": symbol,
             "side": side.upper(),
-            "type": "MARKET",
-            "quoteOrderQty": f"{quote_order_qty:.2f}"
+            "type": "MARKET"
         }
+        if quantity:
+            params["quantity"] = str(quantity)
+        elif quote_order_qty is not None:
+            params["quoteOrderQty"] = f"{quote_order_qty:.2f}"
+
         res = self._request(self.spot_base, "/api/v3/order", method="POST", params=params, signed=True)
         if isinstance(res, dict) and res.get("status") in ["FILLED", "NEW"]:
             return {"status": "filled", "order_id": res.get("orderId"), "data": res}
