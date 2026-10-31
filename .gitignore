@@ -1,6 +1,11 @@
+# Secrets & Private Environment variables
 .env
 .env*
 *.env
+.env.local
+
+# Logs and runtime caches
 *.log
 __pycache__/
 *.pyc
+.pytest_cache/

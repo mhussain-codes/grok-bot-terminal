@@ -1,6 +1,6 @@
 """
-Server for Grok Bot Terminal.
-Runs background autonomous agent loop and serves UI on port 8888.
+Server for Grok Bot Terminal - Powered by Binance Quant Engine.
+Zero hardcoded keys: reads exclusively from environment variables or .env.local.
 """
 import os
 import json
@@ -9,13 +9,26 @@ import threading
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import urllib.parse
 from pathlib import Path
-from quant_engine import ProfessionalQuantEngine
+from binance_engine import BinanceTradingEngine
 
-api_key = os.getenv("OKX_API_KEY", "")
-secret_key = os.getenv("OKX_SECRET_KEY", "")
-passphrase = os.getenv("OKX_PASSPHRASE", "")
+# Read keys strictly from Environment Variables (Zero Secrets in code)
+api_key = os.getenv("BINANCE_API_KEY", "")
+secret_key = os.getenv("BINANCE_SECRET_KEY", "")
 
-engine = ProfessionalQuantEngine(api_key, secret_key, passphrase)
+# Load from local .env if present locally
+env_file = Path(__file__).resolve().parent / ".env"
+if env_file.exists():
+    with open(env_file, "r") as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                if k == "BINANCE_API_KEY" and not api_key:
+                    api_key = v.strip()
+                elif k == "BINANCE_SECRET_KEY" and not secret_key:
+                    secret_key = v.strip()
+
+engine = BinanceTradingEngine(api_key, secret_key)
 
 def background_trading_loop():
     while True:
@@ -23,7 +36,7 @@ def background_trading_loop():
             engine.tick()
         except Exception as e:
             print("Engine error:", e)
-        time.sleep(1.0)  # Real-time 1-second cadence
+        time.sleep(1.0)
 
 sim_thread = threading.Thread(target=background_trading_loop, daemon=True)
 sim_thread.start()
@@ -46,8 +59,7 @@ class DeskHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps({"running": engine.running}).encode("utf-8"))
         else:
-            # Serve UI index.html
-            html_file = BASE_DIR / "ui" / "index.html"
+            html_file = BASE_DIR / "index.html"
             if html_file.exists():
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -63,17 +75,16 @@ class DeskHandler(SimpleHTTPRequestHandler):
             length = int(self.headers.get("Content-Length", 0))
             raw = self.rfile.read(length).decode("utf-8")
             data = json.loads(raw) if raw else {}
-            amount = float(data.get("amount", 100.0))
+            amount = float(data.get("amount", 5.0))
             engine.deposit(amount)
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps({"status": "ok", "balance": engine.current_equity}).encode("utf-8"))
 
-def start():
-    port = 8888
+def start(port=8888):
     server = HTTPServer(("", port), DeskHandler)
-    print(f"Grok Bot Terminal running on http://localhost:{port}")
+    print(f"Grok Bot Terminal running live on port {port}")
     server.serve_forever()
 
 if __name__ == "__main__":
