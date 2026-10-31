@@ -13,7 +13,7 @@ from binance_client import BinanceClient
 from binance_alpha import evaluate_binance_quant_signal
 
 class BinanceTradingEngine:
-    def __init__(self, api_key: str = "", secret_key: str = "", default_paper_balance: float = 100.0):
+    def __init__(self, api_key: str = "", secret_key: str = "", default_paper_balance: float = 0.0):
         self.binance = BinanceClient(api_key, secret_key)
         self.running: bool = True
         self.start_time: float = time.time()
@@ -51,7 +51,7 @@ class BinanceTradingEngine:
                 "token": "BINANCE",
                 "pnl": f"${self.current_equity:.2f}",
                 "pnl_num": 0,
-                "reason": f"System online. Paper balance ${self.current_equity:.2f} active on Binance live feeds.",
+                "reason": f"System online. Initial balance ${self.current_equity:.2f}. Awaiting deposit ($1 - $1000 max).",
                 "size": "READY"
             }
         ]
@@ -60,8 +60,8 @@ class BinanceTradingEngine:
             "scanner": {"token": "BTCUSDT", "lp_locked": "Binance Verified"},
             "rug_check": {"status": "STANDBY", "token": "NONE", "filtered_total": 0},
             "sizer": {"pct": "0% eq", "amount_usd": 0.0},
-            "executor": {"status": "SCANNING", "token": "NONE", "pnl": "0.0%"},
-            "logger": {"line": 1, "reason": "Quant engine listening to Binance live orderbook"},
+            "executor": {"status": "STANDBY ($0.00)", "token": "NONE", "pnl": "0.0%"},
+            "logger": {"line": 1, "reason": "Quant engine awaiting deposit or live funds"},
             "equity": {"last_close": "$0.00"}
         }
 
@@ -71,6 +71,17 @@ class BinanceTradingEngine:
         self.trade_duration = 0
 
     def deposit(self, amount: float):
+        if amount <= 0:
+            return
+        # Enforce maximum single deposit of $1000
+        if amount > 1000.0:
+            amount = 1000.0
+        # Enforce maximum total balance limit of $1000
+        if self.current_equity + amount > 1000.0:
+            amount = max(0.0, 1000.0 - self.current_equity)
+        if amount <= 0:
+            return
+
         self.current_equity = round(self.current_equity + amount, 2)
         if self.start_equity == 0:
             self.start_equity = self.current_equity
@@ -82,7 +93,7 @@ class BinanceTradingEngine:
             "token": "USDT",
             "pnl": f"+${amount:.2f}",
             "pnl_num": amount,
-            "reason": f"Capital of ${amount:.2f} credited to paper balance pool.",
+            "reason": f"Capital deposit of ${amount:.2f} credited (Max limit: $1000.00). Trading active.",
             "size": "100%"
         })
 
@@ -113,6 +124,13 @@ class BinanceTradingEngine:
                         "reason": f"Real Binance deposit detected (${real_bal:.2f} USDT). Switched to LIVE order execution!",
                         "size": "100%"
                     })
+
+        # If zero balance and no trade active, wait for deposit
+        if self.current_equity <= 0 and self.active_trade is None:
+            self.pipeline_state["executor"]["status"] = "AWAITING DEPOSIT ($0.00)"
+            self.pipeline_state["executor"]["token"] = "NONE"
+            self.pipeline_state["executor"]["pnl"] = "$0.00"
+            return
 
         # -------------------------------------------------------------
         # 1. POSITION MANAGEMENT (If position is currently open)
@@ -205,8 +223,16 @@ class BinanceTradingEngine:
         self.pipeline_state["rug_check"]["status"] = "PASS"
         self.pipeline_state["rug_check"]["token"] = current_sym
 
-        order_size_usd = round(max(5.0, self.current_equity * 0.20), 2)
-        self.pipeline_state["sizer"]["pct"] = f"{(order_size_usd / self.current_equity) * 100:.0f}% eq"
+        # Dynamic sizing adapted to account capital
+        if self.current_equity <= 5.0:
+            order_size_usd = round(min(self.current_equity, 2.0), 2)
+        elif self.current_equity <= 20.0:
+            order_size_usd = round(self.current_equity * 0.35, 2)
+        else:
+            order_size_usd = round(self.current_equity * 0.20, 2)
+
+        size_pct = round((order_size_usd / self.current_equity) * 100) if self.current_equity > 0 else 0
+        self.pipeline_state["sizer"]["pct"] = f"{size_pct}% eq"
         self.pipeline_state["sizer"]["amount_usd"] = order_size_usd
 
         # Real order vs Paper order

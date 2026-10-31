@@ -394,9 +394,127 @@
     .orange-txt { color: var(--orange-neon); }
     .blue-txt { color: var(--blue-neon); }
     .bold { font-weight: 700; }
+
+    /* Deposit Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+    }
+    .modal-card {
+      background: #14171d;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      width: 92%;
+      max-width: 440px;
+      padding: 22px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.9);
+      animation: modalFadeIn 0.15s ease-out;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #212630;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+    }
+    .modal-close-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .modal-close-btn:hover { color: #fff; }
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .preset-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      padding: 8px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .preset-btn:hover {
+      background: #334155;
+      border-color: #06b6d4;
+      color: #06b6d4;
+    }
+    .modal-input {
+      width: 100%;
+      background: #0c0e12;
+      border: 1px solid #334155;
+      color: #fff;
+      padding: 10px 14px;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 4px;
+      outline: none;
+      margin-top: 4px;
+    }
+    .modal-input:focus {
+      border-color: #10b981;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+    }
   </style>
 </head>
 <body>
+  <!-- Deposit Modal -->
+  <div id="deposit-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span style="font-weight:700; font-size:15px; color:#fff;">💳 DEPOSIT CAPITAL (MAX $1000)</span>
+        <button class="modal-close-btn" id="modal-close">&times;</button>
+      </div>
+      <div style="font-size:12px; color:#94a3b8; margin: 6px 0 14px 0;">
+        Deposit funds to test trading. Enter any amount from <b style="color:#10b981;">$1.00</b> up to maximum <b style="color:#f59e0b;">$1,000.00 USD</b>.
+      </div>
+      
+      <div style="font-size:10px; color:#64748b; margin-bottom: 6px; text-transform:uppercase; letter-spacing:0.5px;">Quick Presets:</div>
+      <div class="preset-grid">
+        <button class="preset-btn" data-amt="5" style="border-color:#10b981; color:#10b981;">$5 (Test)</button>
+        <button class="preset-btn" data-amt="10">$10</button>
+        <button class="preset-btn" data-amt="25">$25</button>
+        <button class="preset-btn" data-amt="50">$50</button>
+        <button class="preset-btn" data-amt="100">$100</button>
+        <button class="preset-btn" data-amt="250">$250</button>
+        <button class="preset-btn" data-amt="500">$500</button>
+        <button class="preset-btn" data-amt="1000" style="border-color:#eab308; color:#eab308;">$1000 (MAX)</button>
+      </div>
+
+      <div style="margin-top:12px;">
+        <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:4px;">Deposit Amount ($ USD):</label>
+        <input type="number" id="deposit-input" min="1" max="1000" step="1" value="5" class="modal-input" placeholder="e.g. 5">
+      </div>
+
+      <div id="deposit-error-msg" style="color:#ef4444; font-size:11px; margin-top:8px; min-height:16px; font-weight:600;"></div>
+
+      <div style="display:flex; gap:10px; margin-top:14px;">
+        <button class="action-btn" id="modal-confirm-btn" style="flex:1; background:#065f46; color:#34d399; padding:10px; font-size:12px; font-weight:700;">CONFIRM DEPOSIT</button>
+        <button class="action-btn" id="modal-cancel-btn" style="background:#1e293b; color:#94a3b8; padding:10px; font-size:12px;">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
   <div class="terminal-container">
     <!-- Top Header -->
     <header class="top-bar">
@@ -429,7 +547,7 @@
         <div class="mode-badge-wrap">
           <span class="mode-badge" id="mode-badge-el">paper • binance feed</span>
         </div>
-        <div class="balance-display" id="balance-val">$100.00</div>
+        <div class="balance-display" id="balance-val">$0.00</div>
         <div class="stats-row">
           <span class="trades-stat" id="trades-count">0 trades</span>
           <span class="wins-stat" id="wins-count">0 wins</span>
@@ -645,14 +763,14 @@
           <div class="result-amounts">
             <div class="amount-col">
               <span class="lbl">START</span>
-              <span class="val" id="start-bal-val">$100.00</span>
+              <span class="val" id="start-bal-val">$0.00</span>
             </div>
             <div class="progress-bar-wrap">
               <div class="progress-fill" id="prog-fill"></div>
             </div>
             <div class="amount-col">
               <span class="lbl">NOW</span>
-              <span class="val green-txt bold" id="now-bal-val">$100.00</span>
+              <span class="val green-txt bold" id="now-bal-val">$0.00</span>
             </div>
           </div>
           <div class="record-stat" id="record-stat-val">0 W / 0 L</div>
@@ -677,8 +795,8 @@
     const STATE = {
       running: true,
       seconds: 0,
-      balance: 100.0,
-      startBalance: 100.0,
+      balance: 0.0,
+      startBalance: 0.0,
       trades: 0,
       wins: 0,
       losses: 0,
@@ -741,6 +859,19 @@
       if (!STATE.running) return;
       STATE.seconds++;
 
+      // If zero balance and no trade active, wait for deposit
+      if (STATE.balance <= 0 && !STATE.activeTrade) {
+        document.getElementById("active-symbol").textContent = "WAITING DEPOSIT";
+        document.getElementById("active-side").textContent = "$0.00";
+        document.getElementById("active-pnl").textContent = "deposit to start";
+        document.getElementById("active-current").textContent = "-";
+        document.getElementById("exec-node-sub").textContent = "STANDBY";
+        document.getElementById("exec-pill").textContent = "AWAITING DEPOSIT • $0.00 BALANCE";
+        document.getElementById("trade-open-badge").style.display = "none";
+        render();
+        return;
+      }
+
       // 1. Manage Active Trade
       if (STATE.activeTrade) {
         STATE.tradeDuration++;
@@ -778,8 +909,8 @@
           STATE.tradeDuration = 0;
         }
       } 
-      // 2. Open New Trade (Every 3-4 seconds when flat)
-      else if (STATE.seconds % 3 === 0) {
+      // 2. Open New Trade (Every 3-4 seconds when flat and balance > 0)
+      else if (STATE.seconds % 3 === 0 && STATE.balance > 0) {
         STATE.pairIdx = (STATE.pairIdx + 1) % STATE.pairs.length;
         const current = STATE.pairs[STATE.pairIdx];
         
@@ -795,7 +926,20 @@
           SPY: `[SPY] Whale Bid Volume Absorption Triggered [PAPER LIVE EXEC]`
         };
 
-        const sizeUsd = +(STATE.balance * 0.20).toFixed(2);
+        // Position sizing adapted to capital (supports micro-testing e.g. $5)
+        let sizeUsd = 0;
+        let sizePct = 20;
+        if (STATE.balance <= 5.0) {
+          sizeUsd = +(Math.min(STATE.balance, 2.0)).toFixed(2);
+          sizePct = Math.round((sizeUsd / STATE.balance) * 100);
+        } else if (STATE.balance <= 20.0) {
+          sizeUsd = +(STATE.balance * 0.35).toFixed(2);
+          sizePct = Math.round((sizeUsd / STATE.balance) * 100);
+        } else {
+          sizeUsd = +(STATE.balance * 0.20).toFixed(2);
+          sizePct = 20;
+        }
+        if (sizeUsd <= 0) return;
 
         STATE.activeTrade = {
           symbol: current.symbol,
@@ -806,7 +950,7 @@
           pnlPct: 0.0,
           pnlDollars: 0.0,
           sizeUsd: sizeUsd,
-          sizePct: 20,
+          sizePct: sizePct,
           reason: reasons[chosenBot]
         };
 
@@ -851,11 +995,19 @@
         
         document.getElementById("active-entry").textContent = `$${STATE.activeTrade.entryPrice.toLocaleString('en-US')}`;
         document.getElementById("active-current").textContent = `$${STATE.activeTrade.currentPrice.toLocaleString('en-US')}`;
-        document.getElementById("active-size").textContent = `20% ($${STATE.activeTrade.sizeUsd.toFixed(2)})`;
+        document.getElementById("active-size").textContent = `${STATE.activeTrade.sizePct}% ($${STATE.activeTrade.sizeUsd.toFixed(2)})`;
         document.getElementById("active-reason").textContent = STATE.activeTrade.reason;
         document.getElementById("exec-node-sub").textContent = `LIVE ${STATE.activeTrade.symbol}`;
         document.getElementById("exec-pill").textContent = `EXECUTOR • ENTERED ${STATE.activeTrade.symbol}`;
         document.getElementById("trade-open-badge").style.display = "inline-block";
+      } else if (STATE.balance <= 0) {
+        document.getElementById("active-symbol").textContent = "WAITING DEPOSIT";
+        document.getElementById("active-side").textContent = "$0.00";
+        document.getElementById("active-pnl").textContent = "deposit to trade";
+        document.getElementById("active-current").textContent = "-";
+        document.getElementById("exec-node-sub").textContent = "STANDBY";
+        document.getElementById("exec-pill").textContent = "AWAITING DEPOSIT • $0.00 BALANCE";
+        document.getElementById("trade-open-badge").style.display = "none";
       } else {
         document.getElementById("active-symbol").textContent = "FLAT";
         document.getElementById("active-side").textContent = "-";
@@ -892,15 +1044,64 @@
       }).join("");
     }
 
-    // Deposit Button
+    // Deposit Modal Controller
+    const modal = document.getElementById("deposit-modal");
+    const modalInput = document.getElementById("deposit-input");
+    const errorMsg = document.getElementById("deposit-error-msg");
+
     document.getElementById("deposit-btn").addEventListener("click", () => {
-      const amt = prompt("Enter paper deposit amount ($):", "50");
-      if (amt && !isNaN(amt)) {
-        const val = parseFloat(amt);
-        STATE.balance = +(STATE.balance + val).toFixed(2);
-        logEvent("DEPOSIT", "DESK", "USDT", `+$${val.toFixed(2)}`, "User manual deposit credited to bankroll", "100%");
-        render();
+      modal.style.display = "flex";
+      modalInput.value = "5";
+      errorMsg.textContent = "";
+      modalInput.focus();
+    });
+
+    document.getElementById("modal-close").addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+    document.getElementById("modal-cancel-btn").addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+
+    // Preset buttons
+    document.querySelectorAll(".preset-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        modalInput.value = btn.getAttribute("data-amt");
+        errorMsg.textContent = "";
+      });
+    });
+
+    // Confirm Deposit (Strict limit: Min $1, Max $1000)
+    document.getElementById("modal-confirm-btn").addEventListener("click", async () => {
+      const rawVal = parseFloat(modalInput.value);
+      if (isNaN(rawVal) || rawVal < 1) {
+        errorMsg.textContent = "⚠️ Minimum deposit amount is $1.00 USD!";
+        return;
       }
+      if (rawVal > 1000) {
+        errorMsg.textContent = "⚠️ Maximum deposit limit is $1,000.00 USD!";
+        return;
+      }
+      if (STATE.balance + rawVal > 1000) {
+        errorMsg.textContent = `⚠️ Total balance cannot exceed $1,000.00 USD! (Current: $${STATE.balance.toFixed(2)})`;
+        return;
+      }
+
+      const val = +rawVal.toFixed(2);
+      STATE.balance = +(STATE.balance + val).toFixed(2);
+      if (STATE.startBalance === 0) STATE.startBalance = STATE.balance;
+      logEvent("DEPOSIT", "DESK", "USDT", `+$${val.toFixed(2)}`, `Capital deposit credited ($${val.toFixed(2)}). Trading active.`, "100%");
+      modal.style.display = "none";
+      render();
+
+      // If running with local python server, notify backend
+      try {
+        await fetch("/api/deposit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: val })
+        });
+      } catch (e) {}
     });
 
     // Toggle Pause/Resume Button
@@ -912,7 +1113,7 @@
     });
 
     // Initial event & start loop
-    logEvent("INITIALIZE", "BINANCE_DESK", "BINANCE", "$100.00", "24/7 AI Desk initialized on Binance Live Feeds", "READY");
+    logEvent("INITIALIZE", "BINANCE_DESK", "BINANCE", "$0.00", "24/7 AI Desk online. Initial balance $0.00. Ready for deposit ($1 - $1000).", "READY");
     setInterval(tradingTick, 1000);
     render();
   </script>

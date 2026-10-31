@@ -76,6 +76,8 @@ class DeskHandler(SimpleHTTPRequestHandler):
             raw = self.rfile.read(length).decode("utf-8")
             data = json.loads(raw) if raw else {}
             amount = float(data.get("amount", 5.0))
+            if amount > 1000.0:
+                amount = 1000.0
             engine.deposit(amount)
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
