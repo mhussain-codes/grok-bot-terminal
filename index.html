@@ -3,29 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Grok Bot Terminal - 24/7 AI Quant Desk</title>
+  <title>Grok Bot Terminal - 4K 3D Autonomous AI Quant Desk</title>
   <style>
     :root {
-      --bg-dark: #0a0d14;
-      --glass-bg: rgba(17, 24, 39, 0.65);
-      --glass-bg-hover: rgba(30, 41, 59, 0.75);
-      --glass-card: rgba(15, 23, 42, 0.6);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --glass-border-glow: rgba(56, 189, 248, 0.25);
+      --bg-black: #06080e;
+      --glass-surface: rgba(14, 19, 32, 0.72);
+      --glass-surface-hover: rgba(22, 30, 49, 0.82);
+      --glass-border: rgba(255, 255, 255, 0.09);
+      --glass-border-bright: rgba(255, 255, 255, 0.22);
       
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --text-sub: #64748b;
 
-      /* Bot Distinct Colors */
-      --color-gambler: #38bdf8;       /* Electric Sky Blue */
-      --color-gambler-glow: rgba(56, 189, 248, 0.25);
-      --color-house: #34d399;         /* Mint Emerald */
-      --color-house-glow: rgba(52, 211, 153, 0.25);
-      --color-spy: #c084fc;           /* Royal Lavender */
-      --color-spy-glow: rgba(192, 132, 252, 0.25);
-      --color-runner: #fbbf24;        /* Honey Amber */
-      --color-danger: #f87171;        /* Soft Coral Red */
+      /* 3D Vibrant Theme Colors */
+      --cyan-neon: #00f0ff;
+      --cyan-glow: rgba(0, 240, 255, 0.35);
+      --green-neon: #00ff88;
+      --green-glow: rgba(0, 255, 136, 0.35);
+      --purple-neon: #b026ff;
+      --purple-glow: rgba(176, 38, 255, 0.35);
+      --gold-neon: #ffb703;
+      --gold-glow: rgba(255, 183, 3, 0.35);
+      --red-neon: #ff0055;
+      --red-glow: rgba(255, 0, 85, 0.35);
     }
 
     * {
@@ -37,95 +38,126 @@
     }
 
     body {
-      background-color: var(--bg-dark);
-      background-image: 
-        radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.08), transparent 35%),
-        radial-gradient(circle at 85% 20%, rgba(192, 132, 252, 0.08), transparent 35%),
-        radial-gradient(circle at 50% 85%, rgba(52, 211, 153, 0.07), transparent 40%);
-      background-attachment: fixed;
+      background-color: var(--bg-black);
       color: var(--text-main);
       min-height: 100vh;
-      padding: 14px;
       overflow-x: hidden;
+      padding: 14px;
+      position: relative;
     }
 
-    /* Glassmorphism utility */
-    .glass-panel {
-      background: var(--glass-card);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+    /* 3D Dynamic Ambient Canvas in Background */
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* 4K Glassmorphism Cards with 3D Depth */
+    .glass-card-3d {
+      background: var(--glass-surface);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       border: 1px solid var(--glass-border);
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-      transition: all 0.25s ease;
+      border-radius: 18px;
+      box-shadow: 
+        0 12px 36px 0 rgba(0, 0, 0, 0.5),
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
+      transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+      position: relative;
+      overflow: hidden;
     }
-    .glass-panel:hover {
-      border-color: rgba(255, 255, 255, 0.14);
+    .glass-card-3d:hover {
+      border-color: var(--glass-border-bright);
+      box-shadow: 
+        0 18px 45px 0 rgba(0, 0, 0, 0.65),
+        inset 0 1px 2px 0 rgba(255, 255, 255, 0.2);
     }
 
-    .terminal-container {
-      max-width: 1420px;
+    /* Specular Light Sweep Effect */
+    .glass-card-3d::after {
+      content: "";
+      position: absolute;
+      top: 0; left: -100%; width: 50%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+      transform: skewX(-25deg);
+      pointer-events: none;
+      transition: left 0.8s ease;
+    }
+    .glass-card-3d:hover::after {
+      left: 200%;
+    }
+
+    .container-4k {
+      max-width: 1440px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
       gap: 14px;
+      position: relative;
+      z-index: 1;
     }
 
     /* ============================================================
-       TOP HEADER (Glass Header)
+       TOP HEADER (Glass HUD Bar)
        ============================================================ */
-    .top-header {
-      padding: 14px 18px;
+    .top-hud {
+      padding: 14px 22px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 14px;
     }
 
-    .brand-section {
+    .brand-hud {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
-    /* Animated Mascot Avatar */
-    .mascot-avatar {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(192, 132, 252, 0.25));
-      border: 1.5px solid rgba(255, 255, 255, 0.15);
-      border-radius: 14px;
+    /* 3D Hologram Logo Avatar */
+    .hologram-logo {
+      width: 52px;
+      height: 52px;
+      background: radial-gradient(circle at 30% 30%, rgba(0, 240, 255, 0.25), rgba(176, 38, 255, 0.15) 70%, transparent);
+      border: 1.5px solid rgba(0, 240, 255, 0.4);
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.25), inset 0 0 12px rgba(0, 240, 255, 0.2);
+      animation: floatLogo 3.5s ease-in-out infinite;
       position: relative;
-      animation: gentleBounce 3s ease-in-out infinite;
-      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2);
     }
-    @keyframes gentleBounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-4px) rotate(2deg); }
     }
 
-    .brand-titles h1 {
-      font-size: 19px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
+    .hud-titles h1 {
+      font-size: 21px;
+      font-weight: 900;
+      letter-spacing: -0.4px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .brand-badge {
-      background: rgba(52, 211, 153, 0.15);
-      color: var(--color-house);
+    .tag-4k {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(176, 38, 255, 0.25));
+      color: var(--cyan-neon);
       font-size: 10px;
-      font-weight: 700;
-      padding: 2px 7px;
+      font-weight: 800;
+      padding: 2px 8px;
       border-radius: 20px;
-      border: 1px solid rgba(52, 211, 153, 0.3);
+      border: 1px solid rgba(0, 240, 255, 0.4);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
     }
-    .brand-sub {
+    .hud-sub {
       font-size: 11px;
       color: var(--text-muted);
       margin-top: 2px;
@@ -133,148 +165,171 @@
       align-items: center;
       gap: 6px;
     }
-    .status-dot-pulse {
-      width: 8px;
-      height: 8px;
+    .live-pulse-dot {
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
-      background: var(--color-house);
-      box-shadow: 0 0 10px var(--color-house);
-      display: inline-block;
-      animation: pulseGlow 1.8s infinite;
+      background: var(--green-neon);
+      box-shadow: 0 0 12px var(--green-neon);
+      animation: pulseLive 1.6s infinite;
     }
-    @keyframes pulseGlow {
-      0%, 100% { opacity: 0.5; transform: scale(0.9); }
-      50% { opacity: 1; transform: scale(1.15); }
+    @keyframes pulseLive {
+      0%, 100% { transform: scale(0.9); opacity: 0.6; }
+      50% { transform: scale(1.2); opacity: 1; }
     }
 
-    .header-actions {
+    /* HUD Actions */
+    .hud-controls {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .cute-btn {
-      background: var(--glass-bg);
+    .btn-3d {
+      background: var(--glass-surface);
       border: 1px solid var(--glass-border);
       color: var(--text-main);
-      padding: 8px 16px;
-      border-radius: 10px;
+      padding: 9px 18px;
+      border-radius: 12px;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-      backdrop-filter: blur(10px);
+      gap: 7px;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
     }
-    .cute-btn:hover {
-      background: var(--glass-bg-hover);
-      transform: translateY(-1px);
+    .btn-3d:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
-    .cute-btn-primary {
+    .btn-3d:active {
+      transform: translateY(0);
+    }
+    .btn-deposit-glow {
       background: linear-gradient(135deg, #059669, #10b981);
-      border: 1px solid rgba(52, 211, 153, 0.4);
+      border: 1px solid rgba(0, 255, 136, 0.5);
       color: #fff;
-      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+      box-shadow: 0 4px 18px rgba(0, 255, 136, 0.35);
     }
-    .cute-btn-primary:hover {
+    .btn-deposit-glow:hover {
       background: linear-gradient(135deg, #047857, #059669);
-      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
+      box-shadow: 0 6px 25px rgba(0, 255, 136, 0.55);
     }
 
-    .balance-badge-block {
+    /* Sound Switcher */
+    .btn-sound {
+      padding: 9px 12px;
+      font-size: 13px;
+    }
+
+    /* Right Balance Display */
+    .balance-display-box {
       text-align: right;
     }
-    .balance-mode-pill {
+    .mode-pill-3d {
       font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 12px;
-      background: rgba(56, 189, 248, 0.12);
-      color: var(--color-gambler);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      display: inline-block;
-      margin-bottom: 3px;
-    }
-    .big-balance-num {
-      font-size: 26px;
       font-weight: 800;
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #ffffff, #cbd5e1);
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: rgba(0, 240, 255, 0.12);
+      color: var(--cyan-neon);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      display: inline-block;
+      margin-bottom: 2px;
+    }
+    .balance-odometer {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.8px;
+      background: linear-gradient(135deg, #ffffff 40%, #94a3b8);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-    }
-    .header-stat-row {
       display: flex;
-      gap: 8px;
+      align-items: baseline;
+      justify-content: flex-end;
+      gap: 2px;
+    }
+    .stat-micro-row {
+      display: flex;
+      gap: 10px;
       justify-content: flex-end;
       font-size: 11px;
       color: var(--text-muted);
+      font-weight: 600;
     }
 
     /* ============================================================
-       CUTE BOT FLEET (3 Distinct Friendly Bots)
+       3D MASCOT FLEET (Bolt, Chip, Pixel)
        ============================================================ */
-    .bot-fleet-row {
+    .mascot-fleet-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
+      gap: 14px;
     }
-    .bot-fleet-card {
-      padding: 14px 16px;
+    .bot-card-3d {
+      padding: 16px 18px;
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 16px;
       position: relative;
-      overflow: hidden;
     }
-    .bot-fleet-card::before {
+    .bot-card-3d::before {
       content: "";
       position: absolute;
       top: 0; left: 0; width: 4px; height: 100%;
+      border-radius: 4px 0 0 4px;
     }
-    .bot-card-gambler::before { background: var(--color-gambler); }
-    .bot-card-house::before { background: var(--color-house); }
-    .bot-card-spy::before { background: var(--color-spy); }
+    .bot-card-bolt::before { background: var(--cyan-neon); box-shadow: 0 0 14px var(--cyan-neon); }
+    .bot-card-chip::before { background: var(--green-neon); box-shadow: 0 0 14px var(--green-neon); }
+    .bot-card-pixel::before { background: var(--purple-neon); box-shadow: 0 0 14px var(--purple-neon); }
 
-    .bot-avatar-box {
-      width: 52px;
-      height: 52px;
-      border-radius: 14px;
+    /* 3D Holographic Character Viewports */
+    .char-viewport-3d {
+      width: 60px;
+      height: 60px;
+      border-radius: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
       position: relative;
-      transition: transform 0.2s ease;
+      box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.15), 0 8px 24px rgba(0, 0, 0, 0.4);
+      animation: floatChar 3s ease-in-out infinite;
     }
-    .bot-fleet-card:hover .bot-avatar-box {
-      transform: scale(1.08) rotate(-3deg);
+    @keyframes floatChar {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
     }
-    .bot-avatar-gambler {
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(14, 165, 233, 0.3));
-      border: 1px solid rgba(56, 189, 248, 0.35);
+    .char-vp-bolt {
+      background: radial-gradient(circle at 35% 35%, #0284c7, #071728 85%);
+      border: 1.5px solid rgba(0, 240, 255, 0.5);
+      box-shadow: 0 0 18px rgba(0, 240, 255, 0.3);
     }
-    .bot-avatar-house {
-      background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(16, 185, 129, 0.3));
-      border: 1px solid rgba(52, 211, 153, 0.35);
+    .char-vp-chip {
+      background: radial-gradient(circle at 35% 35%, #059669, #061f18 85%);
+      border: 1.5px solid rgba(0, 255, 136, 0.5);
+      box-shadow: 0 0 18px rgba(0, 255, 136, 0.3);
     }
-    .bot-avatar-spy {
-      background: linear-gradient(135deg, rgba(192, 132, 252, 0.2), rgba(168, 85, 247, 0.3));
-      border: 1px solid rgba(192, 132, 252, 0.35);
+    .char-vp-pixel {
+      background: radial-gradient(circle at 35% 35%, #7c3aed, #160728 85%);
+      border: 1.5px solid rgba(176, 38, 255, 0.5);
+      box-shadow: 0 0 18px rgba(176, 38, 255, 0.3);
     }
 
-    .bot-info {
+    .bot-content-meta {
       flex: 1;
       min-width: 0;
     }
-    .bot-name-line {
-      font-size: 13px;
-      font-weight: 800;
+    .bot-hero-title {
+      font-size: 14px;
+      font-weight: 900;
       display: flex;
       align-items: center;
       gap: 6px;
     }
-    .bot-role-line {
+    .bot-hero-desc {
       font-size: 11px;
       color: var(--text-muted);
       margin-top: 2px;
@@ -282,123 +337,123 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .bot-score-block {
+    .bot-pnl-score {
       text-align: right;
     }
-    .bot-pnl-val {
-      font-size: 15px;
-      font-weight: 800;
+    .pnl-big-text {
+      font-size: 16px;
+      font-weight: 900;
     }
-    .bot-trade-stat {
+    .trades-mini-text {
       font-size: 10px;
       color: var(--text-sub);
     }
 
     /* ============================================================
-       MAIN CONTENT: PIPELINE & RUNNER BOT
+       DASHBOARD STAGE (Left Fleet Bar + Main Core)
        ============================================================ */
-    .dashboard-layout {
+    .dashboard-stage-3d {
       display: grid;
-      grid-template-columns: 290px 1fr;
+      grid-template-columns: 280px 1fr;
       gap: 14px;
     }
 
-    /* AGENTS SIDEBAR */
-    .agents-sidebar {
+    /* LEFT FLEET COLUMN */
+    .fleet-sidebar-3d {
       padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
-    .sidebar-title {
+    .sidebar-header-line {
       font-size: 11px;
       font-weight: 800;
       color: var(--text-muted);
-      letter-spacing: 0.8px;
       text-transform: uppercase;
-      display: flex;
-      justify-content: space-between;
+      letter-spacing: 0.8px;
       padding-bottom: 6px;
       border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-between;
     }
-    .agent-row-card {
+
+    .agent-slot-card {
       padding: 10px 12px;
-      border-radius: 10px;
+      border-radius: 12px;
       background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.05);
       display: flex;
       align-items: center;
       gap: 10px;
       transition: all 0.2s ease;
     }
-    .agent-row-card:hover {
+    .agent-slot-card:hover {
       background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.12);
+      transform: translateX(3px);
     }
-    .agent-icon-badge {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+    .agent-slot-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 15px;
       flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
-    .agent-text {
+    .agent-slot-info {
       flex: 1;
       min-width: 0;
     }
-    .agent-title-row {
+    .agent-slot-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 800;
     }
-    .agent-role-sub {
+    .agent-slot-sub {
       font-size: 10px;
       color: var(--text-muted);
-      margin-top: 1px;
     }
-    .agent-detail-meta {
+    .agent-slot-meta {
       font-size: 10px;
       color: var(--text-sub);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .status-mini-tag {
+    .status-badge-chip {
       font-size: 9px;
       font-weight: 800;
       padding: 2px 6px;
       border-radius: 4px;
     }
 
-    /* MAIN STAGE */
-    .main-stage {
+    /* RIGHT CORE CONTENT */
+    .core-content-3d {
       display: flex;
       flex-direction: column;
       gap: 14px;
     }
 
     /* ============================================================
-       ANIMATED COURIER PIPELINE (PIP THE RUNNER BOT)
+       3D PIPELINE TRACK (Pip the Quantum Courier)
        ============================================================ */
-    .pipeline-panel {
-      padding: 16px 20px;
-      position: relative;
-      overflow: hidden;
+    .pipeline-stage-card {
+      padding: 18px 22px;
     }
-    .pipeline-header {
+    .pipeline-headline {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 14px;
     }
-    .pipeline-title {
+    .pipeline-headline-title {
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 900;
       letter-spacing: 0.6px;
       text-transform: uppercase;
       display: flex;
@@ -406,11 +461,10 @@
       gap: 8px;
     }
 
-    /* Runner Bot Track */
-    .runner-track {
-      background: rgba(10, 15, 26, 0.6);
+    .pipeline-rail-track {
+      background: rgba(8, 12, 22, 0.65);
       border: 1px solid var(--glass-border);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 14px;
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -418,317 +472,357 @@
       position: relative;
     }
 
-    .pipeline-step {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
+    /* Glowing laser connector line across steps */
+    .pipeline-rail-track::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold-neon), var(--cyan-neon), var(--green-neon));
+      box-shadow: 0 0 10px var(--cyan-neon);
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    .rail-station-node {
+      background: rgba(20, 27, 45, 0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
       padding: 12px 10px;
       text-align: center;
       position: relative;
+      z-index: 1;
       transition: all 0.25s ease;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
     }
-    .pipeline-step.active-step {
-      background: rgba(56, 189, 248, 0.08);
-      border-color: rgba(56, 189, 248, 0.35);
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+    .rail-station-node.active-station {
+      background: rgba(0, 240, 255, 0.1);
+      border-color: rgba(0, 240, 255, 0.45);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
     }
-    .step-mascot-holder {
-      height: 36px;
+    .station-avatar-box {
+      height: 38px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 4px;
     }
-    .step-tag-pill {
+    .station-chip {
       font-size: 9px;
       font-weight: 800;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 10px;
       display: inline-block;
       margin-bottom: 4px;
     }
-    .step-label {
+    .station-main-lbl {
       font-size: 12px;
       font-weight: 800;
     }
-    .step-subtext {
+    .station-sub-lbl {
       font-size: 10px;
       color: var(--text-muted);
       margin-top: 2px;
     }
 
-    /* Floating Courier Bot Animation */
-    .courier-bot-anim {
-      width: 32px;
-      height: 32px;
-      animation: floatCourier 2s ease-in-out infinite;
+    /* 3D Courier Drone Animation (Pip) */
+    .pip-drone-3d {
+      width: 36px;
+      height: 36px;
+      animation: hoverPip 2.2s ease-in-out infinite;
+      filter: drop-shadow(0 6px 12px rgba(255, 183, 3, 0.4));
     }
-    @keyframes floatCourier {
+    @keyframes hoverPip {
       0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-5px) rotate(4deg); }
+      50% { transform: translateY(-6px) rotate(3deg); }
     }
 
     /* ============================================================
-       MIDDLE ROW: ACTIVE TRADE & LIVE LOG FEED
+       MIDDLE STAGE: 3D ACTIVE POSITION & 4K LOG FEED
        ============================================================ */
-    .middle-grid {
+    .stage-middle-grid {
       display: grid;
-      grid-template-columns: 340px 1fr;
+      grid-template-columns: 360px 1fr;
       gap: 14px;
     }
 
-    /* ACTIVE TRADE CARD */
-    .trade-status-card {
-      padding: 18px;
+    /* ACTIVE POSITION 3D CARD */
+    .active-pos-3d-card {
+      padding: 20px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       position: relative;
     }
-    .trade-card-top {
+    .active-pos-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
     }
-    .trade-badge-status {
+    .pos-live-pill {
       font-size: 10px;
-      font-weight: 800;
-      padding: 3px 8px;
+      font-weight: 900;
+      padding: 3px 9px;
       border-radius: 6px;
-      background: rgba(52, 211, 153, 0.15);
-      color: var(--color-house);
-      border: 1px solid rgba(52, 211, 153, 0.3);
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--green-neon);
+      border: 1px solid rgba(0, 255, 136, 0.35);
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
     }
-    .token-headline {
+    .pos-token-title {
       display: flex;
       align-items: baseline;
       gap: 8px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
-    .token-name-big {
-      font-size: 24px;
+    .pos-token-name {
+      font-size: 26px;
       font-weight: 900;
+      letter-spacing: -0.5px;
       color: #fff;
     }
-    .side-pill-badge {
+    .pos-side-pill {
       font-size: 10px;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: rgba(56, 189, 248, 0.15);
-      color: var(--color-gambler);
-    }
-    .live-pnl-banner {
-      font-size: 18px;
       font-weight: 800;
-      margin-bottom: 14px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(0, 240, 255, 0.15);
+      color: var(--cyan-neon);
+    }
+    .pos-pnl-banner {
+      font-size: 20px;
+      font-weight: 900;
+      margin-bottom: 12px;
+      letter-spacing: -0.3px;
     }
 
-    .trade-specs-grid {
+    /* Live Mini Candlestick Spark Canvas */
+    .mini-chart-box {
+      width: 100%;
+      height: 60px;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 8px;
+      border: 1px solid var(--glass-border);
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    #mini-chart-canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .pos-specs-table {
       display: grid;
-      grid-template-columns: 80px 1fr;
+      grid-template-columns: 85px 1fr;
       gap: 6px 10px;
       font-size: 11px;
-      background: rgba(0, 0, 0, 0.2);
+      background: rgba(0, 0, 0, 0.3);
       padding: 12px;
-      border-radius: 10px;
+      border-radius: 12px;
       border: 1px solid var(--glass-border);
     }
-    .spec-lbl {
-      color: var(--text-muted);
-    }
-    .spec-val {
-      font-weight: 700;
-      color: #fff;
-    }
+    .spec-t-lbl { color: var(--text-muted); }
+    .spec-t-val { font-weight: 800; color: #fff; }
 
-    /* NIGHT LOG STREAM */
-    .log-stream-card {
-      padding: 16px 18px;
+    /* NIGHT LOG TERMINAL 4K */
+    .log-stream-3d-card {
+      padding: 18px 20px;
       display: flex;
       flex-direction: column;
     }
-    .log-card-header {
+    .log-header-line {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       padding-bottom: 8px;
       border-bottom: 1px solid var(--glass-border);
     }
-    .log-terminal-box {
+    .log-scroll-area {
       flex: 1;
-      max-height: 250px;
+      max-height: 290px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 6px;
-      padding-right: 4px;
+      padding-right: 6px;
     }
-    /* Scrollbar styling */
-    .log-terminal-box::-webkit-scrollbar {
+    .log-scroll-area::-webkit-scrollbar {
       width: 4px;
     }
-    .log-terminal-box::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.1);
+    .log-scroll-area::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
       border-radius: 4px;
     }
 
-    .log-bubble-line {
+    .log-bubble-row {
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 11px;
-      padding: 6px 10px;
-      border-radius: 8px;
+      padding: 7px 12px;
+      border-radius: 10px;
       background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.03);
-      transition: background 0.15s ease;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      transition: all 0.15s ease;
     }
-    .log-bubble-line:hover {
-      background: rgba(255, 255, 255, 0.05);
+    .log-bubble-row:hover {
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateX(2px);
     }
-    .log-time-col {
+    .log-t-time {
       color: var(--text-sub);
       font-size: 10px;
       font-variant-numeric: tabular-nums;
       flex-shrink: 0;
     }
-    .log-bot-tag {
+    .log-t-bot {
       font-size: 9px;
-      font-weight: 800;
-      padding: 1px 6px;
-      border-radius: 4px;
+      font-weight: 900;
+      padding: 2px 7px;
+      border-radius: 5px;
       flex-shrink: 0;
     }
-    .tag-gambler { background: rgba(56, 189, 248, 0.15); color: var(--color-gambler); }
-    .tag-house { background: rgba(52, 211, 153, 0.15); color: var(--color-house); }
-    .tag-spy { background: rgba(192, 132, 252, 0.15); color: var(--color-spy); }
-    .tag-desk { background: rgba(251, 191, 36, 0.15); color: var(--color-runner); }
+    .tag-bolt { background: rgba(0, 240, 255, 0.15); color: var(--cyan-neon); }
+    .tag-chip { background: rgba(0, 255, 136, 0.15); color: var(--green-neon); }
+    .tag-pixel { background: rgba(176, 38, 255, 0.15); color: var(--purple-neon); }
+    .tag-desk { background: rgba(255, 183, 3, 0.15); color: var(--gold-neon); }
 
-    .log-text-msg {
+    .log-t-msg {
       flex: 1;
       color: var(--text-main);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .log-pnl-pill {
-      font-weight: 800;
+    .log-t-pnl {
+      font-weight: 900;
       flex-shrink: 0;
     }
 
     /* ============================================================
-       RESULT PROGRESS BANNER
+       PERFORMANCE PROGRESS STRIP (START vs NOW)
        ============================================================ */
-    .result-strip {
-      padding: 14px 18px;
+    .session-strip-3d {
+      padding: 16px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 14px;
     }
-    .strip-stat-group {
+    .strip-metrics {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 22px;
     }
-    .stat-pill-item {
+    .strip-box {
       display: flex;
       flex-direction: column;
     }
-    .stat-pill-label {
+    .strip-box-lbl {
       font-size: 10px;
+      font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    .stat-pill-val {
-      font-size: 15px;
-      font-weight: 800;
+    .strip-box-val {
+      font-size: 16px;
+      font-weight: 900;
     }
-    .stat-bar-outer {
-      width: 180px;
-      height: 8px;
+    .progress-bar-3d-wrap {
+      width: 200px;
+      height: 9px;
       background: rgba(255, 255, 255, 0.08);
-      border-radius: 4px;
+      border-radius: 5px;
       overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
     }
-    .stat-bar-inner {
-      width: 60%;
+    .progress-bar-3d-fill {
+      width: 65%;
       height: 100%;
-      background: linear-gradient(90deg, var(--color-house), var(--color-gambler));
-      border-radius: 4px;
+      background: linear-gradient(90deg, var(--green-neon), var(--cyan-neon));
+      border-radius: 5px;
+      box-shadow: 0 0 12px var(--cyan-neon);
+      transition: width 0.3s ease;
     }
 
     /* ============================================================
        TRANSACTION LEDGER
        ============================================================ */
-    .ledger-panel {
-      padding: 16px 18px;
+    .ledger-stage-card {
+      padding: 18px 20px;
     }
-    .ledger-title-bar {
+    .ledger-top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 11px;
+      font-weight: 800;
       color: var(--text-muted);
       padding-bottom: 8px;
       border-bottom: 1px solid var(--glass-border);
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
-    .ledger-table-wrap {
+    .ledger-rows-container {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 5px;
     }
-    .ledger-item-row {
+    .ledger-row-3d {
       display: grid;
-      grid-template-columns: 65px 75px 120px 1fr 90px 70px;
+      grid-template-columns: 70px 80px 130px 1fr 100px 75px;
       align-items: center;
-      padding: 7px 10px;
-      border-radius: 8px;
+      padding: 8px 12px;
+      border-radius: 10px;
       font-size: 11px;
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid rgba(255, 255, 255, 0.03);
-      transition: background 0.15s ease;
+      transition: all 0.15s ease;
     }
-    .ledger-item-row:hover {
+    .ledger-row-3d:hover {
       background: rgba(255, 255, 255, 0.05);
+      transform: translateX(2px);
     }
 
     /* ============================================================
-       DEPOSIT MODAL (FROSTED GLASS)
+       DEPOSIT CAPITAL MODAL (4K Holographic Glass)
        ============================================================ */
-    .modal-overlay {
+    .modal-overlay-4k {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(3, 5, 10, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 99999;
       padding: 16px;
     }
-    .modal-card {
-      background: rgba(17, 24, 39, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 20px;
+    .modal-card-4k {
+      background: rgba(15, 22, 38, 0.95);
+      border: 1.5px solid rgba(0, 240, 255, 0.35);
+      border-radius: 22px;
       width: 100%;
-      max-width: 440px;
+      max-width: 450px;
       padding: 24px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
-      animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 
+        0 25px 70px rgba(0, 0, 0, 0.8),
+        0 0 30px rgba(0, 240, 255, 0.2);
+      animation: modalPop3D 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    @keyframes modalPop {
-      from { opacity: 0; transform: scale(0.92); }
-      to { opacity: 1; transform: scale(1); }
+    @keyframes modalPop3D {
+      from { opacity: 0; transform: scale(0.9) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
-    .modal-header {
+    .modal-top-line {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -736,7 +830,7 @@
       padding-bottom: 12px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
-    .modal-close-btn {
+    .btn-close-modal {
       background: none;
       border: none;
       color: var(--text-muted);
@@ -744,590 +838,620 @@
       cursor: pointer;
       line-height: 1;
     }
-    .modal-close-btn:hover { color: #fff; }
-    .presets-grid {
+    .btn-close-modal:hover { color: #fff; }
+
+    .presets-grid-4k {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
       margin-bottom: 16px;
     }
-    .preset-pill-btn {
+    .preset-chip-btn {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
       color: #fff;
-      padding: 9px 4px;
+      padding: 10px 4px;
       font-size: 11px;
-      font-weight: 700;
-      border-radius: 8px;
+      font-weight: 800;
+      border-radius: 10px;
       cursor: pointer;
       transition: all 0.15s ease;
     }
-    .preset-pill-btn:hover {
-      background: rgba(56, 189, 248, 0.15);
-      border-color: var(--color-gambler);
-      color: var(--color-gambler);
-      transform: translateY(-1px);
+    .preset-chip-btn:hover {
+      background: rgba(0, 240, 255, 0.18);
+      border-color: var(--cyan-neon);
+      color: var(--cyan-neon);
+      transform: translateY(-2px);
     }
-    .modal-num-input {
+    .modal-amount-input {
       width: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 8, 15, 0.6);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
       color: #fff;
       padding: 12px 14px;
-      font-size: 16px;
-      font-weight: 800;
-      border-radius: 10px;
+      font-size: 17px;
+      font-weight: 900;
+      border-radius: 12px;
       outline: none;
       margin-top: 6px;
-      transition: border 0.2s ease;
+      transition: all 0.2s ease;
     }
-    .modal-num-input:focus {
-      border-color: var(--color-house);
-      box-shadow: 0 0 12px rgba(52, 211, 153, 0.25);
+    .modal-amount-input:focus {
+      border-color: var(--green-neon);
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
     }
-    .error-hint {
-      color: var(--color-danger);
+    .modal-error-box {
+      color: var(--red-neon);
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       margin-top: 8px;
       min-height: 18px;
     }
 
-    /* Colors helpers */
-    .green-txt { color: var(--color-house); }
-    .red-txt { color: var(--color-danger); }
-    .cyan-txt { color: var(--color-gambler); }
-    .purple-txt { color: var(--color-spy); }
-    .yellow-txt { color: var(--color-runner); }
-    .bold { font-weight: 700; }
+    /* Color helper classes */
+    .green-txt { color: var(--green-neon); }
+    .red-txt { color: var(--red-neon); }
+    .cyan-txt { color: var(--cyan-neon); }
+    .purple-txt { color: var(--purple-neon); }
+    .gold-txt { color: var(--gold-neon); }
+    .bold { font-weight: 800; }
 
     /* ============================================================
-       RESPONSIVE DESIGN (Mobile & Tablet Friendly)
+       RESPONSIVE BREAKPOINTS (Mobile & Tablet)
        ============================================================ */
     @media (max-width: 1024px) {
-      .dashboard-layout {
-        grid-template-columns: 1fr;
-      }
-      .middle-grid {
-        grid-template-columns: 1fr;
-      }
-      .runner-track {
-        grid-template-columns: repeat(3, 1fr);
-      }
+      .dashboard-stage-3d { grid-template-columns: 1fr; }
+      .stage-middle-grid { grid-template-columns: 1fr; }
+      .pipeline-rail-track { grid-template-columns: repeat(3, 1fr); }
     }
 
     @media (max-width: 768px) {
-      body {
-        padding: 8px;
-      }
-      .bot-fleet-row {
-        grid-template-columns: 1fr;
-      }
-      .top-header {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .header-actions {
-        justify-content: space-between;
-      }
-      .balance-badge-block {
+      body { padding: 8px; }
+      .mascot-fleet-grid { grid-template-columns: 1fr; }
+      .top-hud { flex-direction: column; align-items: stretch; }
+      .hud-controls { justify-content: space-between; }
+      .balance-display-box {
         text-align: left;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: rgba(255, 255, 255, 0.02);
-        padding: 8px 12px;
-        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 10px 14px;
+        border-radius: 12px;
       }
-      .header-stat-row {
-        justify-content: flex-start;
-      }
-      .runner-track {
-        grid-template-columns: 1fr 1fr;
-      }
-      .ledger-item-row {
-        grid-template-columns: 60px 65px 90px 1fr 60px;
-      }
-      .ledger-item-row span:nth-child(6) {
-        display: none;
-      }
-      .presets-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+      .stat-micro-row { justify-content: flex-start; }
+      .pipeline-rail-track { grid-template-columns: 1fr 1fr; }
+      .ledger-row-3d { grid-template-columns: 60px 65px 90px 1fr 65px; }
+      .ledger-row-3d span:nth-child(6) { display: none; }
+      .presets-grid-4k { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
 <body>
 
+  <!-- Background 3D Cyber Particle Canvas -->
+  <canvas id="bg-canvas"></canvas>
+
   <!-- ============================================================
-       DEPOSIT CAPITAL MODAL
+       DEPOSIT CAPITAL MODAL (4K Holographic Glass)
        ============================================================ -->
-  <div id="deposit-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-card">
-      <div class="modal-header">
+  <div id="deposit-modal" class="modal-overlay-4k" style="display:none;">
+    <div class="modal-card-4k">
+      <div class="modal-top-line">
         <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:20px;">💳</span>
-          <span style="font-weight:800; font-size:15px; color:#fff;">DEPOSIT TRADING CAPITAL</span>
+          <span style="font-size:22px;">💳</span>
+          <span style="font-weight:900; font-size:16px; color:#fff;">DEPOSIT TRADING CAPITAL</span>
         </div>
-        <button class="modal-close-btn" id="modal-close">&times;</button>
+        <button class="btn-close-modal" id="modal-close">&times;</button>
       </div>
 
       <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px; line-height:1.4;">
-        Enter any test or real amount from <b style="color:var(--color-house);">$1.00</b> up to max <b style="color:var(--color-runner);">$1,000.00 USD</b>.
+        Enter any test or real capital from <b style="color:var(--green-neon);">$1.00</b> up to max <b style="color:var(--gold-neon);">$1,000.00 USD</b>.
       </p>
 
       <div style="font-size:10px; font-weight:800; color:var(--text-sub); text-transform:uppercase; margin-bottom:6px;">Quick Presets:</div>
-      <div class="presets-grid">
-        <button class="preset-pill-btn" data-amt="5" style="border-color:var(--color-house); color:var(--color-house); font-weight:800;">$5 (Test)</button>
-        <button class="preset-pill-btn" data-amt="10">$10</button>
-        <button class="preset-pill-btn" data-amt="25">$25</button>
-        <button class="preset-pill-btn" data-amt="50">$50</button>
-        <button class="preset-pill-btn" data-amt="100">$100</button>
-        <button class="preset-pill-btn" data-amt="250">$250</button>
-        <button class="preset-pill-btn" data-amt="500">$500</button>
-        <button class="preset-pill-btn" data-amt="1000" style="border-color:var(--color-runner); color:var(--color-runner); font-weight:800;">$1000 (MAX)</button>
+      <div class="presets-grid-4k">
+        <button class="preset-chip-btn" data-amt="5" style="border-color:var(--green-neon); color:var(--green-neon);">$5 (Test)</button>
+        <button class="preset-chip-btn" data-amt="10">$10</button>
+        <button class="preset-chip-btn" data-amt="25">$25</button>
+        <button class="preset-chip-btn" data-amt="50">$50</button>
+        <button class="preset-chip-btn" data-amt="100">$100</button>
+        <button class="preset-chip-btn" data-amt="250">$250</button>
+        <button class="preset-chip-btn" data-amt="500">$500</button>
+        <button class="preset-chip-btn" data-amt="1000" style="border-color:var(--gold-neon); color:var(--gold-neon);">$1000 (MAX)</button>
       </div>
 
       <div>
-        <label style="font-size:11px; font-weight:700; color:var(--text-muted); display:block;">Deposit Amount ($ USD):</label>
-        <input type="number" id="deposit-input" min="1" max="1000" step="1" value="5" class="modal-num-input" placeholder="e.g. 5">
+        <label style="font-size:11px; font-weight:800; color:var(--text-muted); display:block;">Deposit Amount ($ USD):</label>
+        <input type="number" id="deposit-input" min="1" max="1000" step="1" value="5" class="modal-amount-input" placeholder="e.g. 5">
       </div>
 
-      <div id="deposit-error-msg" class="error-hint"></div>
+      <div id="deposit-error-msg" class="modal-error-box"></div>
 
       <div style="display:flex; gap:10px; margin-top:14px;">
-        <button class="cute-btn cute-btn-primary" id="modal-confirm-btn" style="flex:1; justify-content:center; padding:12px;">
+        <button class="btn-3d btn-deposit-glow" id="modal-confirm-btn" style="flex:1; justify-content:center; padding:12px;">
           <span>CONFIRM DEPOSIT</span> 🚀
         </button>
-        <button class="cute-btn" id="modal-cancel-btn" style="padding:12px;">CANCEL</button>
+        <button class="btn-3d" id="modal-cancel-btn" style="padding:12px;">CANCEL</button>
       </div>
     </div>
   </div>
 
-  <div class="terminal-container">
+  <div class="container-4k">
 
     <!-- ============================================================
-         TOP BAR (Frosted Glass Panel)
+         TOP HUD BAR (Glass 3D Header)
          ============================================================ -->
-    <header class="glass-panel top-header">
-      <div class="brand-section">
-        <!-- Cute Mascot Icon SVG -->
-        <div class="mascot-avatar">
-          <svg width="30" height="30" viewBox="0 0 36 36" fill="none">
-            <!-- Antenna with glowing orb -->
-            <line x1="18" y1="4" x2="18" y2="10" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
-            <circle cx="18" cy="4" r="3" fill="#fbbf24"/>
-            <!-- Bot Head / Screen -->
-            <rect x="6" y="10" width="24" height="20" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
-            <!-- Cute Visor / Eyes -->
-            <rect x="9" y="14" width="18" height="7" rx="3" fill="#0f172a"/>
-            <circle cx="14" cy="17.5" r="2.2" fill="#38bdf8"/>
-            <circle cx="22" cy="17.5" r="2.2" fill="#38bdf8"/>
-            <!-- Cute Smile -->
-            <path d="M15 24 Q18 27 21 24" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+    <header class="glass-card-3d top-hud">
+      <div class="brand-hud">
+        <!-- 3D Holographic Cube Logo -->
+        <div class="hologram-logo">
+          <svg width="34" height="34" viewBox="0 0 40 40" fill="none">
+            <!-- 3D Isometric Cube / Core -->
+            <path d="M20 4 L34 12 L20 20 L6 12 Z" fill="url(#cubeTopGrad)" stroke="#00f0ff" stroke-width="1.5"/>
+            <path d="M6 12 L20 20 V36 L6 28 Z" fill="url(#cubeLeftGrad)" stroke="#00f0ff" stroke-width="1.5"/>
+            <path d="M34 12 L20 20 V36 L34 28 Z" fill="url(#cubeRightGrad)" stroke="#b026ff" stroke-width="1.5"/>
+            <!-- Pulsing Quantum Core Orb -->
+            <circle cx="20" cy="20" r="4" fill="#00ff88" filter="url(#glowFilter)"/>
+            <defs>
+              <linearGradient id="cubeTopGrad" x1="6" y1="4" x2="34" y2="20" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#00f0ff" stop-opacity="0.8"/>
+                <stop offset="1" stop-color="#0284c7" stop-opacity="0.4"/>
+              </linearGradient>
+              <linearGradient id="cubeLeftGrad" x1="6" y1="12" x2="20" y2="36" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#0f172a" stop-opacity="0.9"/>
+                <stop offset="1" stop-color="#0284c7" stop-opacity="0.6"/>
+              </linearGradient>
+              <linearGradient id="cubeRightGrad" x1="34" y1="12" x2="20" y2="36" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#1e1b4b" stop-opacity="0.9"/>
+                <stop offset="1" stop-color="#7c3aed" stop-opacity="0.6"/>
+              </linearGradient>
+              <filter id="glowFilter" x="12" y="12" width="16" height="16" filterUnits="userSpaceOnUse">
+                <feGaussianBlur stdDeviation="2" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
           </svg>
         </div>
 
-        <div class="brand-titles">
+        <div class="hud-titles">
           <h1>
             <span>Grok Bot Terminal</span>
-            <span class="brand-badge">v2.0-glass</span>
+            <span class="tag-4k">4K QUANT DESK</span>
           </h1>
-          <div class="brand-sub">
-            <span class="status-dot-pulse" id="run-dot"></span>
-            <span id="run-text" style="font-weight:700;">running</span>
+          <div class="hud-sub">
+            <span class="live-pulse-dot" id="run-dot"></span>
+            <span id="run-text" style="font-weight:800; color:#fff;">running</span>
             <span style="color:var(--text-sub);">•</span>
-            <span id="timer-val" style="font-variant-numeric:tabular-nums;">00:00:00</span>
+            <span id="timer-val" style="font-variant-numeric:tabular-nums; font-weight:700;">00:00:00</span>
             <span style="color:var(--text-sub);">•</span>
-            <span id="exec-pill" style="color:var(--color-gambler);">AWAITING DEPOSIT</span>
+            <span id="exec-pill" style="color:var(--cyan-neon); font-weight:800;">AWAITING DEPOSIT</span>
           </div>
         </div>
       </div>
 
-      <!-- Center Action Buttons -->
-      <div class="header-actions">
-        <button class="cute-btn cute-btn-primary" id="deposit-btn">
+      <!-- Action Buttons -->
+      <div class="hud-controls">
+        <button class="btn-3d btn-deposit-glow" id="deposit-btn">
           <span>+ DEPOSIT</span> 💳
         </button>
-        <button class="cute-btn" id="toggle-run-btn">PAUSE</button>
+        <button class="btn-3d" id="toggle-run-btn">PAUSE</button>
+        <button class="btn-3d btn-sound" id="sound-btn" title="Toggle audio chime">🔊</button>
       </div>
 
-      <!-- Right Balance Block -->
-      <div class="balance-badge-block">
+      <!-- Balance HUD -->
+      <div class="balance-display-box">
         <div>
-          <span class="balance-mode-pill" id="mode-badge-el">paper • binance live</span>
+          <span class="mode-pill-3d" id="mode-badge-el">paper • binance feed</span>
         </div>
-        <div class="big-balance-num" id="balance-val">$0.00</div>
-        <div class="header-stat-row">
+        <div class="balance-odometer" id="balance-val">$0.00</div>
+        <div class="stat-micro-row">
           <span id="trades-count">0 trades</span>
           <span>•</span>
-          <span id="wins-count" style="color:var(--color-house);">0 wins</span>
+          <span id="wins-count" style="color:var(--green-neon);">0 wins</span>
           <span>•</span>
-          <span id="losses-count" style="color:var(--color-danger);">0 losses</span>
+          <span id="losses-count" style="color:var(--red-neon);">0 losses</span>
         </div>
       </div>
     </header>
 
     <!-- ============================================================
-         3 CUTE BOT MASCOTS (The Gambler, The House, The Spy)
+         3D MASCOT FLEET (Bolt, Chip, Pixel)
          ============================================================ -->
-    <section class="bot-fleet-row">
+    <section class="mascot-fleet-grid">
       <!-- BOT 1: THE GAMBLER (Bolt) -->
-      <div class="glass-panel bot-fleet-card bot-card-gambler">
-        <div class="bot-avatar-box bot-avatar-gambler">
-          <!-- Bolt SVG Mascot -->
-          <svg width="34" height="34" viewBox="0 0 36 36" fill="none">
-            <rect x="7" y="10" width="22" height="18" rx="6" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
-            <!-- Cute Lightning Ear -->
-            <path d="M5 14 L2 18 L6 18 L3 22" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <!-- Visor Eyes -->
-            <rect x="11" y="14" width="14" height="6" rx="2" fill="#0284c7"/>
-            <circle cx="15" cy="17" r="2" fill="#fff"/>
-            <circle cx="21" cy="17" r="2" fill="#fff"/>
-            <!-- Runner Cheek Dots -->
-            <circle cx="11" cy="22" r="1.2" fill="#f472b6"/>
-            <circle cx="25" cy="22" r="1.2" fill="#f472b6"/>
+      <div class="glass-card-3d bot-card-3d bot-card-bolt">
+        <div class="char-viewport-3d char-vp-bolt">
+          <!-- 3D Bolt Mascot SVG -->
+          <svg width="42" height="42" viewBox="0 0 48 48" fill="none">
+            <!-- 3D Hover Base Disc -->
+            <ellipse cx="24" cy="42" rx="14" ry="4" fill="rgba(0, 240, 255, 0.25)" filter="blur(2px)"/>
+            <!-- 3D Body Capsule -->
+            <rect x="12" y="14" width="24" height="24" rx="8" fill="url(#boltBody)" stroke="#00f0ff" stroke-width="2"/>
+            <!-- Visor with specular shine -->
+            <rect x="15" y="19" width="18" height="9" rx="3" fill="#031525"/>
+            <circle cx="19" cy="23.5" r="2.8" fill="#00f0ff"/>
+            <circle cx="29" cy="23.5" r="2.8" fill="#00f0ff"/>
+            <circle cx="20" cy="22.5" r="1" fill="#fff"/>
+            <circle cx="30" cy="22.5" r="1" fill="#fff"/>
+            <!-- Lightning Antenna -->
+            <path d="M22 6 L26 12 H21 L25 15" stroke="#ffb703" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <defs>
+              <linearGradient id="boltBody" x1="12" y1="14" x2="36" y2="38" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#0284c7"/>
+                <stop offset="1" stop-color="#0c233c"/>
+              </linearGradient>
+            </defs>
           </svg>
         </div>
-        <div class="bot-info">
-          <div class="bot-name-line" style="color:var(--color-gambler);">
+        <div class="bot-content-meta">
+          <div class="bot-hero-title" style="color:var(--cyan-neon);">
             <span>⚡ THE GAMBLER</span>
-            <span style="font-size:10px; opacity:0.8;">[Bolt]</span>
+            <span style="font-size:10px; opacity:0.8;">[Bolt 3D]</span>
           </div>
-          <div class="bot-role-line">Momentum & EMA Breakouts</div>
+          <div class="bot-hero-desc">Momentum & EMA Ribbon Breakouts</div>
         </div>
-        <div class="bot-score-block">
-          <div class="bot-pnl-val green-txt" id="gambler-pnl">+$0.00</div>
-          <div class="bot-trade-stat" id="gambler-trades">0 trades</div>
+        <div class="bot-pnl-score">
+          <div class="pnl-big-text green-txt" id="gambler-pnl">+$0.00</div>
+          <div class="trades-mini-text" id="gambler-trades">0 trades</div>
         </div>
       </div>
 
       <!-- BOT 2: THE HOUSE (Chip) -->
-      <div class="glass-panel bot-fleet-card bot-card-house">
-        <div class="bot-avatar-box bot-avatar-house">
-          <!-- Chip SVG Mascot -->
-          <svg width="34" height="34" viewBox="0 0 36 36" fill="none">
-            <!-- Shield ears -->
-            <path d="M7 11 L18 6 L29 11 V18 C29 25 18 30 18 30 C18 30 7 25 7 18 Z" fill="#064e3b" stroke="#34d399" stroke-width="2"/>
-            <!-- Visor Eyes -->
-            <circle cx="14" cy="16" r="2.5" fill="#34d399"/>
-            <circle cx="22" cy="16" r="2.5" fill="#34d399"/>
-            <!-- Peaceful Smile -->
-            <path d="M15 21 Q18 24 21 21" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+      <div class="glass-card-3d bot-card-3d bot-card-chip">
+        <div class="char-viewport-3d char-vp-chip">
+          <!-- 3D Chip Mascot SVG -->
+          <svg width="42" height="42" viewBox="0 0 48 48" fill="none">
+            <ellipse cx="24" cy="42" rx="14" ry="4" fill="rgba(0, 255, 136, 0.25)" filter="blur(2px)"/>
+            <!-- 3D Crystalline Hex Shield -->
+            <path d="M24 8 L36 15 V29 L24 36 L12 29 V15 Z" fill="url(#chipBody)" stroke="#00ff88" stroke-width="2"/>
+            <!-- Friendly Eyes -->
+            <circle cx="19" cy="21" r="3" fill="#00ff88"/>
+            <circle cx="29" cy="21" r="3" fill="#00ff88"/>
+            <circle cx="20" cy="20" r="1.2" fill="#fff"/>
+            <circle cx="30" cy="20" r="1.2" fill="#fff"/>
+            <!-- Rosy Smile -->
+            <path d="M20 27 Q24 30 28 27" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <defs>
+              <linearGradient id="chipBody" x1="12" y1="8" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#059669"/>
+                <stop offset="1" stop-color="#062e20"/>
+              </linearGradient>
+            </defs>
           </svg>
         </div>
-        <div class="bot-info">
-          <div class="bot-name-line" style="color:var(--color-house);">
+        <div class="bot-content-meta">
+          <div class="bot-hero-title" style="color:var(--green-neon);">
             <span>🛡️ THE HOUSE</span>
-            <span style="font-size:10px; opacity:0.8;">[Chip]</span>
+            <span style="font-size:10px; opacity:0.8;">[Chip 3D]</span>
           </div>
-          <div class="bot-role-line">Oversold RSI Mean-Reversion</div>
+          <div class="bot-hero-desc">Oversold RSI Mean-Reversion</div>
         </div>
-        <div class="bot-score-block">
-          <div class="bot-pnl-val green-txt" id="house-pnl">+$0.00</div>
-          <div class="bot-trade-stat" id="house-trades">0 trades</div>
+        <div class="bot-pnl-score">
+          <div class="pnl-big-text green-txt" id="house-pnl">+$0.00</div>
+          <div class="trades-mini-text" id="house-trades">0 trades</div>
         </div>
       </div>
 
       <!-- BOT 3: THE SPY (Pixel) -->
-      <div class="glass-panel bot-fleet-card bot-card-spy">
-        <div class="bot-avatar-box bot-avatar-spy">
-          <!-- Pixel SVG Mascot -->
-          <svg width="34" height="34" viewBox="0 0 36 36" fill="none">
-            <!-- Round Bot Head -->
-            <circle cx="18" cy="18" r="12" fill="#2e1065" stroke="#c084fc" stroke-width="2"/>
-            <!-- Sonar Radar Antenna -->
-            <line x1="18" y1="2" x2="18" y2="6" stroke="#c084fc" stroke-width="2"/>
-            <circle cx="18" cy="3" r="2" fill="#c084fc"/>
-            <!-- Big Curious Cyclops Eye -->
-            <circle cx="18" cy="18" r="6" fill="#3b0764" stroke="#c084fc" stroke-width="1.5"/>
-            <circle cx="18" cy="18" r="3" fill="#a855f7"/>
-            <circle cx="19.5" cy="16.5" r="1" fill="#fff"/>
+      <div class="glass-card-3d bot-card-3d bot-card-pixel">
+        <div class="char-viewport-3d char-vp-pixel">
+          <!-- 3D Pixel Mascot SVG -->
+          <svg width="42" height="42" viewBox="0 0 48 48" fill="none">
+            <ellipse cx="24" cy="42" rx="14" ry="4" fill="rgba(176, 38, 255, 0.25)" filter="blur(2px)"/>
+            <!-- 3D Floating Drone Sphere -->
+            <circle cx="24" cy="22" r="15" fill="url(#pixelBody)" stroke="#b026ff" stroke-width="2"/>
+            <!-- Radar Antenna Dish -->
+            <path d="M24 7 V3 M21 3 H27" stroke="#b026ff" stroke-width="2" stroke-linecap="round"/>
+            <!-- Big 3D Camera / Sonar Lens -->
+            <circle cx="24" cy="22" r="8" fill="#1e1035" stroke="#b026ff" stroke-width="1.5"/>
+            <circle cx="24" cy="22" r="4.5" fill="#a855f7"/>
+            <circle cx="26" cy="20" r="1.5" fill="#fff"/>
+            <defs>
+              <linearGradient id="pixelBody" x1="9" y1="7" x2="39" y2="37" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#6b21a8"/>
+                <stop offset="1" stop-color="#19062e"/>
+              </linearGradient>
+            </defs>
           </svg>
         </div>
-        <div class="bot-info">
-          <div class="bot-name-line" style="color:var(--color-spy);">
+        <div class="bot-content-meta">
+          <div class="bot-hero-title" style="color:var(--purple-neon);">
             <span>👁️ THE SPY</span>
-            <span style="font-size:10px; opacity:0.8;">[Pixel]</span>
+            <span style="font-size:10px; opacity:0.8;">[Pixel 3D]</span>
           </div>
-          <div class="bot-role-line">Whale Orderbook Absorption</div>
+          <div class="bot-hero-desc">Whale Orderbook Absorption</div>
         </div>
-        <div class="bot-score-block">
-          <div class="bot-pnl-val green-txt" id="spy-pnl">+$0.00</div>
-          <div class="bot-trade-stat" id="spy-trades">0 trades</div>
+        <div class="bot-pnl-score">
+          <div class="pnl-big-text green-txt" id="spy-pnl">+$0.00</div>
+          <div class="trades-mini-text" id="spy-trades">0 trades</div>
         </div>
       </div>
     </section>
 
     <!-- ============================================================
-         MAIN DASHBOARD LAYOUT (Sidebar + Center Content)
+         DASHBOARD STAGE (Left Column + Right Content)
          ============================================================ -->
-    <div class="dashboard-layout">
+    <div class="dashboard-stage-3d">
 
-      <!-- LEFT AGENTS SIDEBAR -->
-      <aside class="glass-panel agents-sidebar">
-        <div class="sidebar-title">
-          <span>COOPERATIVE FLEET</span>
-          <span style="color:var(--color-house);">6 ONLINE</span>
+      <!-- LEFT COLUMN: QUANT FLEET -->
+      <aside class="glass-card-3d fleet-sidebar-3d">
+        <div class="sidebar-header-line">
+          <span>QUANT ORCHESTRATION</span>
+          <span style="color:var(--green-neon);">6 ONLINE</span>
         </div>
 
         <!-- 1. SCANNER -->
-        <div class="agent-row-card">
-          <div class="agent-icon-badge" style="background:rgba(251, 191, 36, 0.15); color:var(--color-runner);">🔭</div>
-          <div class="agent-text">
-            <div class="agent-title-row">
+        <div class="agent-slot-card">
+          <div class="agent-slot-badge" style="background:rgba(255, 183, 3, 0.15); color:var(--gold-neon);">🔭</div>
+          <div class="agent-slot-info">
+            <div class="agent-slot-top">
               <span>SCANNER</span>
-              <span class="status-mini-tag" style="background:rgba(251, 191, 36, 0.15); color:var(--color-runner);">SCAN</span>
+              <span class="status-badge-chip" style="background:rgba(255, 183, 3, 0.15); color:var(--gold-neon);">SCAN</span>
             </div>
-            <div class="agent-role-sub">flags tokens, never trades</div>
-            <div class="agent-detail-meta" id="scanner-detail">BTCUSDT • Binance Verified</div>
+            <div class="agent-slot-sub">flags tokens, zero noise</div>
+            <div class="agent-slot-meta" id="scanner-detail">BTCUSDT • Binance Verified</div>
           </div>
         </div>
 
         <!-- 2. RUG CHECK -->
-        <div class="agent-row-card">
-          <div class="agent-icon-badge" style="background:rgba(52, 211, 153, 0.15); color:var(--color-house);">🛡️</div>
-          <div class="agent-text">
-            <div class="agent-title-row">
+        <div class="agent-slot-card">
+          <div class="agent-slot-badge" style="background:rgba(0, 255, 136, 0.15); color:var(--green-neon);">🛡️</div>
+          <div class="agent-slot-info">
+            <div class="agent-slot-top">
               <span>RUG CHECK</span>
-              <span class="status-mini-tag" id="rug-tag" style="background:rgba(52, 211, 153, 0.15); color:var(--color-house);">PASS</span>
+              <span class="status-badge-chip" id="rug-tag" style="background:rgba(0, 255, 136, 0.15); color:var(--green-neon);">PASS</span>
             </div>
-            <div class="agent-role-sub">spread & fee risk filter</div>
-            <div class="agent-detail-meta green-txt" id="rug-sub">passed BTCUSDT</div>
+            <div class="agent-slot-sub">spread & orderbook filter</div>
+            <div class="agent-slot-meta green-txt" id="rug-sub">passed BTCUSDT</div>
           </div>
         </div>
 
         <!-- 3. SIZER -->
-        <div class="agent-row-card">
-          <div class="agent-icon-badge" style="background:rgba(192, 132, 252, 0.15); color:var(--color-spy);">⚖️</div>
-          <div class="agent-text">
-            <div class="agent-title-row">
+        <div class="agent-slot-card">
+          <div class="agent-slot-badge" style="background:rgba(176, 38, 255, 0.15); color:var(--purple-neon);">⚖️</div>
+          <div class="agent-slot-info">
+            <div class="agent-slot-top">
               <span>SIZER</span>
-              <span class="status-mini-tag" style="background:rgba(192, 132, 252, 0.15); color:var(--color-spy);">ACTIVE</span>
+              <span class="status-badge-chip" style="background:rgba(176, 38, 255, 0.15); color:var(--purple-neon);">ACTIVE</span>
             </div>
-            <div class="agent-role-sub">risk-calibrated equity sizing</div>
-            <div class="agent-detail-meta" id="sizer-subtext">adaptive micro-size</div>
+            <div class="agent-slot-sub">dynamic equity calibration</div>
+            <div class="agent-slot-meta" id="sizer-subtext">adaptive micro-size</div>
           </div>
         </div>
 
         <!-- 4. EXECUTOR -->
-        <div class="agent-row-card" style="border-color:rgba(56, 189, 248, 0.3);">
-          <div class="agent-icon-badge" style="background:rgba(56, 189, 248, 0.15); color:var(--color-gambler);">🚀</div>
-          <div class="agent-text">
-            <div class="agent-title-row">
+        <div class="agent-slot-card" style="border-color:rgba(0, 240, 255, 0.35);">
+          <div class="agent-slot-badge" style="background:rgba(0, 240, 255, 0.15); color:var(--cyan-neon);">🚀</div>
+          <div class="agent-slot-info">
+            <div class="agent-slot-top">
               <span>EXECUTOR</span>
-              <span class="status-mini-tag" style="background:rgba(56, 189, 248, 0.15); color:var(--color-gambler);">LIVE</span>
+              <span class="status-badge-chip" style="background:rgba(0, 240, 255, 0.15); color:var(--cyan-neon);">LIVE</span>
             </div>
-            <div class="agent-role-sub">opens/closes, tracks slippage</div>
-            <div class="agent-detail-meta cyan-txt" id="exec-subtext">LONG BTCUSDT</div>
+            <div class="agent-slot-sub">fills orders, locks trailing stop</div>
+            <div class="agent-slot-meta cyan-txt" id="exec-subtext">LONG BTCUSDT</div>
           </div>
         </div>
 
         <!-- 5. LOGGER -->
-        <div class="agent-row-card">
-          <div class="agent-icon-badge" style="background:rgba(251, 191, 36, 0.15); color:var(--color-runner);">📝</div>
-          <div class="agent-text">
-            <div class="agent-title-row">
+        <div class="agent-slot-card">
+          <div class="agent-slot-badge" style="background:rgba(255, 183, 3, 0.15); color:var(--gold-neon);">📝</div>
+          <div class="agent-slot-info">
+            <div class="agent-slot-top">
               <span>LOGGER</span>
-              <span class="status-mini-tag" style="background:rgba(251, 191, 36, 0.15); color:var(--color-runner);">WRITE</span>
+              <span class="status-badge-chip" style="background:rgba(255, 183, 3, 0.15); color:var(--gold-neon);">WRITE</span>
             </div>
-            <div class="agent-role-sub">writes every decision rationale</div>
-            <div class="agent-detail-meta" id="logger-subtext">line #1 listening</div>
+            <div class="agent-slot-sub">every decision strictly logged</div>
+            <div class="agent-slot-meta" id="logger-subtext">line #1 listening</div>
           </div>
         </div>
 
         <!-- 6. SUPERVISOR (YOU) -->
-        <div class="agent-row-card">
-          <div class="agent-icon-badge" style="background:rgba(255, 255, 255, 0.1); color:#fff;">👑</div>
-          <div class="agent-text">
-            <div class="agent-title-row">
+        <div class="agent-slot-card">
+          <div class="agent-slot-badge" style="background:rgba(255, 255, 255, 0.1); color:#fff;">👑</div>
+          <div class="agent-slot-info">
+            <div class="agent-slot-top">
               <span>YOU (CHIEF)</span>
-              <span class="status-mini-tag" style="background:rgba(255, 255, 255, 0.1); color:#cbd5e1;">SUPERVISOR</span>
+              <span class="status-badge-chip" style="background:rgba(255, 255, 255, 0.1); color:#cbd5e1;">SUPERVISOR</span>
             </div>
-            <div class="agent-role-sub">wake up to profits in morning</div>
-            <div class="agent-detail-meta" id="lines-to-read">0 events logged</div>
+            <div class="agent-slot-sub">wake up to profits in morning</div>
+            <div class="agent-slot-meta" id="lines-to-read">0 events logged</div>
           </div>
         </div>
       </aside>
 
-      <!-- CENTER STAGE -->
-      <main class="main-stage">
+      <!-- RIGHT COLUMN: CORE TRADING ARENA -->
+      <main class="core-content-3d">
 
         <!-- ============================================================
-             LIVE FLOW PIPELINE (With Pip the Courier Bot!)
+             3D PIPELINE RAIL (Pip the Quantum Courier Drone)
              ============================================================ -->
-        <section class="glass-panel pipeline-panel">
-          <div class="pipeline-header">
-            <div class="pipeline-title">
-              <span style="font-size:16px;">🚚</span>
-              <span>LIVE AUTONOMOUS FLOW PIPELINE</span>
+        <section class="glass-card-3d pipeline-stage-card">
+          <div class="pipeline-headline">
+            <div class="pipeline-headline-title">
+              <span style="font-size:18px;">🛸</span>
+              <span>QUANTUM PIPELINE • 3D AUTONOMOUS EXECUTION</span>
             </div>
             <span style="font-size:11px; color:var(--text-muted); font-variant-numeric:tabular-nums;" id="speed-indicator">tick 1.0s</span>
           </div>
 
-          <div class="runner-track">
-            <!-- Node 1: SCANNER -->
-            <div class="pipeline-step" id="step-scan">
-              <div class="step-mascot-holder">
-                <span style="font-size:22px;">🔭</span>
+          <div class="pipeline-rail-track">
+            <!-- Station 1: SCANNER -->
+            <div class="rail-station-node" id="step-scan">
+              <div class="station-avatar-box">
+                <span style="font-size:24px;">🔭</span>
               </div>
-              <span class="step-tag-pill" style="background:rgba(251, 191, 36, 0.15); color:var(--color-runner);">SCANNER</span>
-              <div class="step-label" id="flow-tok-1">BTCUSDT</div>
-              <div class="step-subtext">Binance Spot</div>
+              <span class="station-chip" style="background:rgba(255, 183, 3, 0.15); color:var(--gold-neon);">SCANNER</span>
+              <div class="station-main-lbl" id="flow-tok-1">BTCUSDT</div>
+              <div class="station-sub-lbl">Binance Spot</div>
             </div>
 
-            <!-- Node 2: RUG CHECK -->
-            <div class="pipeline-step" id="step-rug">
-              <div class="step-mascot-holder">
-                <span style="font-size:22px;">🛡️</span>
+            <!-- Station 2: RUG CHECK -->
+            <div class="rail-station-node" id="step-rug">
+              <div class="station-avatar-box">
+                <span style="font-size:24px;">🛡️</span>
               </div>
-              <span class="step-tag-pill" style="background:rgba(52, 211, 153, 0.15); color:var(--color-house);">SAFE-CHECK</span>
-              <div class="step-label" id="filtered-val">0 FILTERED</div>
-              <div class="step-subtext green-txt" id="flow-rug-sub">SPREAD &lt; 15bps</div>
+              <span class="station-chip" style="background:rgba(0, 255, 136, 0.15); color:var(--green-neon);">RISK VETO</span>
+              <div class="station-main-lbl" id="filtered-val">0 FILTERED</div>
+              <div class="station-sub-lbl green-txt" id="flow-rug-sub">SPREAD &lt; 15bps</div>
             </div>
 
-            <!-- Node 3: SIZER -->
-            <div class="pipeline-step" id="step-sizer">
-              <div class="step-mascot-holder">
-                <span style="font-size:22px;">⚖️</span>
+            <!-- Station 3: SIZER -->
+            <div class="rail-station-node" id="step-sizer">
+              <div class="station-avatar-box">
+                <span style="font-size:24px;">⚖️</span>
               </div>
-              <span class="step-tag-pill" style="background:rgba(192, 132, 252, 0.15); color:var(--color-spy);">SIZER</span>
-              <div class="step-label" id="sizer-eq-val">20% eq</div>
-              <div class="step-subtext" id="sizer-eq-sub">$0.00</div>
+              <span class="station-chip" style="background:rgba(176, 38, 255, 0.15); color:var(--purple-neon);">SIZER</span>
+              <div class="station-main-lbl" id="sizer-eq-val">20% eq</div>
+              <div class="station-sub-lbl" id="sizer-eq-sub">$0.00</div>
             </div>
 
-            <!-- Node 4: COURIER BOT (Pip) -->
-            <div class="pipeline-step active-step" id="step-courier">
-              <div class="step-mascot-holder">
-                <!-- Cute Pip Floating SVG -->
-                <svg class="courier-bot-anim" viewBox="0 0 36 36" fill="none">
-                  <circle cx="18" cy="18" r="11" fill="#f59e0b" stroke="#fff" stroke-width="2"/>
-                  <!-- Tiny Propeller -->
-                  <rect x="13" y="3" width="10" height="2" rx="1" fill="#cbd5e1"/>
-                  <line x1="18" y1="5" x2="18" y2="7" stroke="#cbd5e1" stroke-width="1.5"/>
-                  <!-- Cute Big Eyes -->
-                  <circle cx="14" cy="17" r="2.2" fill="#0f172a"/>
-                  <circle cx="22" cy="17" r="2.2" fill="#0f172a"/>
-                  <circle cx="15" cy="16" r="0.8" fill="#fff"/>
-                  <circle cx="23" cy="16" r="0.8" fill="#fff"/>
+            <!-- Station 4: PIP THE COURIER (Active Carrier) -->
+            <div class="rail-station-node active-station" id="step-courier">
+              <div class="station-avatar-box">
+                <!-- 3D Pip Courier Drone SVG -->
+                <svg class="pip-drone-3d" viewBox="0 0 40 40" fill="none">
+                  <ellipse cx="20" cy="36" rx="10" ry="3" fill="rgba(255, 183, 3, 0.3)" filter="blur(1px)"/>
+                  <!-- Capsule Pod -->
+                  <rect x="10" y="10" width="20" height="22" rx="10" fill="url(#pipGrad)" stroke="#ffb703" stroke-width="1.8"/>
+                  <!-- Rotating Golden Cyber Propeller -->
+                  <rect x="8" y="5" width="24" height="2" rx="1" fill="#fff"/>
+                  <circle cx="20" cy="6" r="2" fill="#ffb703"/>
+                  <!-- Big Happy Eyes -->
+                  <circle cx="16" cy="18" r="2.2" fill="#06080e"/>
+                  <circle cx="24" cy="18" r="2.2" fill="#06080e"/>
+                  <circle cx="17" cy="17" r="0.8" fill="#fff"/>
+                  <circle cx="25" cy="17" r="0.8" fill="#fff"/>
                   <!-- Sweet Smile -->
-                  <path d="M15 22 Q18 25 21 22" stroke="#0f172a" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M17 23 Q20 26 23 23" stroke="#06080e" stroke-width="1.6" stroke-linecap="round"/>
+                  <defs>
+                    <linearGradient id="pipGrad" x1="10" y1="10" x2="30" y2="32" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#fbbf24"/>
+                      <stop offset="1" stop-color="#b45309"/>
+                    </linearGradient>
+                  </defs>
                 </svg>
               </div>
-              <span class="step-tag-pill" style="background:rgba(56, 189, 248, 0.15); color:var(--color-gambler);">EXECUTOR</span>
-              <div class="step-label" id="exec-node-sub">STANDBY</div>
-              <div class="step-subtext" style="color:var(--color-gambler);">Pip the Courier</div>
+              <span class="station-chip" style="background:rgba(0, 240, 255, 0.15); color:var(--cyan-neon);">EXECUTOR</span>
+              <div class="station-main-lbl" id="exec-node-sub">STANDBY</div>
+              <div class="station-sub-lbl" style="color:var(--cyan-neon);">Pip the Courier</div>
             </div>
 
-            <!-- Node 5: LOGGER & PNL -->
-            <div class="pipeline-step" id="step-equity">
-              <div class="step-mascot-holder">
-                <span style="font-size:22px;">💧</span>
+            <!-- Station 5: EQUITY & PNL -->
+            <div class="rail-station-node" id="step-equity">
+              <div class="station-avatar-box">
+                <span style="font-size:24px;">💧</span>
               </div>
-              <span class="step-tag-pill" style="background:rgba(52, 211, 153, 0.15); color:var(--color-house);">EQUITY</span>
-              <div class="step-label green-txt" id="equity-last-val">+$0.00</div>
-              <div class="step-subtext">last close</div>
+              <span class="station-chip" style="background:rgba(0, 255, 136, 0.15); color:var(--green-neon);">EQUITY</span>
+              <div class="station-main-lbl green-txt" id="equity-last-val">+$0.00</div>
+              <div class="station-sub-lbl">last close</div>
             </div>
           </div>
         </section>
 
         <!-- ============================================================
-             MIDDLE ROW: ACTIVE POSITION & LIVE STREAM LOG
+             MIDDLE ROW: 3D POSITION CARD + 4K NIGHT LOG
              ============================================================ -->
-        <div class="middle-grid">
-          <!-- ACTIVE POSITION -->
-          <div class="glass-panel trade-status-card">
+        <div class="stage-middle-grid">
+
+          <!-- ACTIVE POSITION 3D CARD -->
+          <div class="glass-card-3d active-pos-3d-card">
             <div>
-              <div class="trade-card-top">
-                <span style="font-weight:800; font-size:12px; color:var(--text-muted); text-transform:uppercase;">ACTIVE TRADE POSITION</span>
-                <span class="trade-badge-status" id="trade-open-badge" style="display:none;">LIVE ACTIVE</span>
+              <div class="active-pos-top">
+                <span style="font-weight:900; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">LIVE MARKET EXECUTION</span>
+                <span class="pos-live-pill" id="trade-open-badge" style="display:none;">LIVE ACTIVE</span>
               </div>
 
-              <div class="token-headline">
-                <span class="token-name-big" id="active-symbol">AWAITING DEPOSIT</span>
-                <span class="side-pill-badge" id="active-side">$0.00</span>
+              <div class="pos-token-title">
+                <span class="pos-token-name" id="active-symbol">AWAITING DEPOSIT</span>
+                <span class="pos-side-pill" id="active-side">$0.00</span>
               </div>
 
-              <div class="live-pnl-banner green-txt" id="active-pnl">deposit to trade</div>
+              <div class="pos-pnl-banner green-txt" id="active-pnl">deposit funds to start 🚀</div>
 
-              <div class="trade-specs-grid">
-                <span class="spec-lbl">Bot:</span>
-                <span class="spec-val cyan-txt" id="active-bot">-</span>
+              <!-- Live Mini Candlestick Spark Canvas -->
+              <div class="mini-chart-box">
+                <canvas id="mini-chart-canvas"></canvas>
+              </div>
 
-                <span class="spec-lbl">Entry:</span>
-                <span class="spec-val" id="active-entry">-</span>
+              <div class="pos-specs-table">
+                <span class="spec-t-lbl">Bot Officer:</span>
+                <span class="spec-t-val cyan-txt" id="active-bot">-</span>
 
-                <span class="spec-lbl">Current:</span>
-                <span class="spec-val" id="active-current">-</span>
+                <span class="spec-t-lbl">Entry Price:</span>
+                <span class="spec-t-val" id="active-entry">-</span>
 
-                <span class="spec-lbl">Slippage:</span>
-                <span class="spec-val" id="active-slip">0.02%</span>
+                <span class="spec-t-lbl">Market Ticker:</span>
+                <span class="spec-t-val" id="active-current">-</span>
 
-                <span class="spec-lbl">Position Size:</span>
-                <span class="spec-val" id="active-size">-</span>
+                <span class="spec-t-lbl">Slippage Cap:</span>
+                <span class="spec-t-val" id="active-slip">0.02%</span>
 
-                <span class="spec-lbl">Alpha Reason:</span>
-                <span class="spec-val yellow-txt" id="active-reason" style="font-size:10px;">Click '+ DEPOSIT' (Min: $1 | Max: $1000)</span>
+                <span class="spec-t-lbl">Allocated Size:</span>
+                <span class="spec-t-val" id="active-size">-</span>
+
+                <span class="spec-t-lbl">Alpha Reason:</span>
+                <span class="spec-t-val gold-txt" id="active-reason" style="font-size:10px;">Click '+ DEPOSIT' (Min: $1 | Max: $1000)</span>
               </div>
             </div>
           </div>
 
-          <!-- NIGHT LOG STREAM -->
-          <div class="glass-panel log-stream-card">
-            <div class="log-card-header">
-              <div style="display:flex; align-items:center; gap:6px;">
-                <span style="font-size:14px;">💬</span>
-                <span style="font-weight:800; font-size:12px; color:#fff;">$ tail -f binance_quant.log</span>
+          <!-- 4K NIGHT LOG FEED -->
+          <div class="glass-card-3d log-stream-3d-card">
+            <div class="log-header-line">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:15px;">💬</span>
+                <span style="font-weight:900; font-size:12px; color:#fff;">$ tail -f binance_quant.log</span>
               </div>
-              <span style="font-size:10px; color:var(--color-house);" id="log-count-meta">live stream • 1.0s</span>
+              <span style="font-size:10px; color:var(--green-neon); font-weight:800;" id="log-count-meta">LIVE FEED • 1.0s</span>
             </div>
 
-            <div class="log-terminal-box" id="night-log-terminal">
+            <div class="log-scroll-area" id="night-log-terminal">
               <!-- Dynamically populated -->
             </div>
           </div>
         </div>
 
         <!-- ============================================================
-             RESULT PROGRESS BANNER
+             PERFORMANCE PROGRESS STRIP (START vs NOW)
              ============================================================ -->
-        <div class="glass-panel result-strip">
+        <div class="glass-card-3d session-strip-3d">
           <div>
-            <div style="font-size:12px; font-weight:800; text-transform:uppercase;">SESSION PERFORMANCE • START vs NOW</div>
-            <div style="font-size:11px; color:var(--text-muted);">Autonomous quant session & balance multiplier</div>
+            <div style="font-size:12px; font-weight:900; text-transform:uppercase;">PORTFOLIO TRAJECTORY • START vs NOW</div>
+            <div style="font-size:11px; color:var(--text-muted);">Real-time quantitative profit compounding</div>
           </div>
 
-          <div class="strip-stat-group">
-            <div class="stat-pill-item">
-              <span class="stat-pill-label">START</span>
-              <span class="stat-pill-val" id="start-bal-val">$0.00</span>
+          <div class="strip-metrics">
+            <div class="strip-box">
+              <span class="strip-box-lbl">INITIAL CAPITAL</span>
+              <span class="strip-box-val" id="start-bal-val">$0.00</span>
             </div>
 
-            <div class="stat-bar-outer">
-              <div class="stat-bar-inner" id="prog-fill"></div>
+            <div class="progress-bar-3d-wrap">
+              <div class="progress-bar-3d-fill" id="prog-fill"></div>
             </div>
 
-            <div class="stat-pill-item">
-              <span class="stat-pill-label">CURRENT NOW</span>
-              <span class="stat-pill-val green-txt" id="now-bal-val">$0.00</span>
+            <div class="strip-box">
+              <span class="strip-box-lbl">CURRENT NOW</span>
+              <span class="strip-box-val green-txt" id="now-bal-val">$0.00</span>
             </div>
 
-            <div class="stat-pill-item" style="text-align:right;">
-              <span class="stat-pill-label">WIN RECORD</span>
-              <span class="stat-pill-val" id="record-stat-val">0 W / 0 L</span>
+            <div class="strip-box" style="text-align:right;">
+              <span class="strip-box-lbl">WIN / LOSS RECORD</span>
+              <span class="strip-box-val" id="record-stat-val">0 W / 0 L</span>
             </div>
           </div>
         </div>
 
         <!-- ============================================================
-             CLOSED TRADES & EXECUTIONS LEDGER
+             CLOSED TRADES & EXECUTIONS (LEDGER)
              ============================================================ -->
-        <section class="glass-panel ledger-panel">
-          <div class="ledger-title-bar">
-            <span style="font-weight:800; text-transform:uppercase; color:#fff;">CLOSED TRADES & EXECUTIONS (LEDGER)</span>
-            <span>real-time calibration</span>
+        <section class="glass-card-3d ledger-stage-card">
+          <div class="ledger-top-bar">
+            <span style="font-weight:900; text-transform:uppercase; color:#fff;">CLOSED TRADES & EXECUTIONS (LEDGER)</span>
+            <span>real-time verified</span>
           </div>
-          <div class="ledger-table-wrap" id="ledger-rows">
+          <div class="ledger-rows-container" id="ledger-rows">
             <!-- Dynamically populated -->
           </div>
         </section>
@@ -1338,12 +1462,158 @@
   </div>
 
   <!-- ============================================================
-       AUTONOMOUS CLIENT ENGINE SCRIPT
+       QUANT ENGINE SCRIPT (4K 3D Render + Autonomous Trading)
        ============================================================ -->
   <script>
-    // Robust Autonomous Multi-Bot Desk:
-    // Pure standard JS, fetches live Binance ticker feeds,
-    // coordinates Bolt (Gambler), Chip (House), Pixel (Spy) & Pip (Courier)!
+    // Audio Chime Synthesizer using Web Audio API (Zero external files needed)
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function playChime(isWin) {
+      if (!soundEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        if (isWin) {
+          // Cheerful futuristic ascending chord
+          osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+          osc.frequency.exponentialRampToValueAtTime(880.00, audioCtx.currentTime + 0.15); // A5
+          gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.4);
+        } else {
+          // Soft subtle muted tick
+          osc.frequency.setValueAtTime(329.63, audioCtx.currentTime); // E4
+          osc.frequency.exponentialRampToValueAtTime(261.63, audioCtx.currentTime + 0.1); // C4
+          gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.25);
+        }
+      } catch (e) {}
+    }
+
+    document.getElementById("sound-btn").addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      document.getElementById("sound-btn").textContent = soundEnabled ? "🔊" : "🔇";
+    });
+
+    // -------------------------------------------------------------
+    // 3D Background Starfield & Cyber Dust Particle Canvas
+    // -------------------------------------------------------------
+    const bgCanvas = document.getElementById("bg-canvas");
+    const bgCtx = bgCanvas.getContext("2d");
+    let stars = [];
+    let mouseX = 0, mouseY = 0;
+
+    function initStars() {
+      bgCanvas.width = window.innerWidth;
+      bgCanvas.height = window.innerHeight;
+      stars = [];
+      const numStars = Math.min(120, Math.floor(window.innerWidth / 12));
+      for (let i = 0; i < numStars; i++) {
+        stars.push({
+          x: Math.random() * bgCanvas.width,
+          y: Math.random() * bgCanvas.height,
+          z: Math.random() * 2 + 0.5,
+          radius: Math.random() * 1.5 + 0.5,
+          color: Math.random() > 0.5 ? "rgba(0, 240, 255," : "rgba(176, 38, 255,",
+          alpha: Math.random() * 0.5 + 0.2,
+          speed: Math.random() * 0.4 + 0.1
+        });
+      }
+    }
+    window.addEventListener("resize", initStars);
+    window.addEventListener("mousemove", (e) => {
+      mouseX = (e.clientX - window.innerWidth / 2) * 0.02;
+      mouseY = (e.clientY - window.innerHeight / 2) * 0.02;
+    });
+
+    function drawStars() {
+      bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+      for (let s of stars) {
+        s.y -= s.speed;
+        if (s.y < 0) s.y = bgCanvas.height;
+        bgCtx.beginPath();
+        bgCtx.arc(s.x + mouseX * s.z, s.y + mouseY * s.z, s.radius, 0, Math.PI * 2);
+        bgCtx.fillStyle = `${s.color}${s.alpha})`;
+        bgCtx.shadowBlur = 8;
+        bgCtx.shadowColor = s.color + "0.8)";
+        bgCtx.fill();
+      }
+      requestAnimationFrame(drawStars);
+    }
+    initStars();
+    drawStars();
+
+    // -------------------------------------------------------------
+    // Live Mini Candlestick Sparkline Canvas for Active Trade
+    // -------------------------------------------------------------
+    const miniChartCanvas = document.getElementById("mini-chart-canvas");
+    const miniCtx = miniChartCanvas.getContext("2d");
+    let priceHistory = [];
+
+    function renderMiniChart() {
+      const w = miniChartCanvas.width = miniChartCanvas.offsetWidth;
+      const h = miniChartCanvas.height = miniChartCanvas.offsetHeight;
+      if (!priceHistory.length) {
+        // Flat baseline
+        miniCtx.clearRect(0, 0, w, h);
+        miniCtx.beginPath();
+        miniCtx.moveTo(0, h / 2);
+        miniCtx.lineTo(w, h / 2);
+        miniCtx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+        miniCtx.stroke();
+        return;
+      }
+
+      miniCtx.clearRect(0, 0, w, h);
+      const min = Math.min(...priceHistory);
+      const max = Math.max(...priceHistory);
+      const range = (max - min) || 1;
+
+      // Draw gradient area
+      const grad = miniCtx.createLinearGradient(0, 0, 0, h);
+      const isGreen = priceHistory[priceHistory.length - 1] >= priceHistory[0];
+      grad.addColorStop(0, isGreen ? "rgba(0, 255, 136, 0.3)" : "rgba(255, 0, 85, 0.3)");
+      grad.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+      miniCtx.beginPath();
+      const step = w / (priceHistory.length - 1 || 1);
+      priceHistory.forEach((p, i) => {
+        const x = i * step;
+        const y = h - ((p - min) / range) * (h - 14) - 7;
+        if (i === 0) miniCtx.moveTo(x, y); else miniCtx.lineTo(x, y);
+      });
+      miniCtx.lineTo(w, h);
+      miniCtx.lineTo(0, h);
+      miniCtx.closePath();
+      miniCtx.fillStyle = grad;
+      miniCtx.fill();
+
+      // Stroke Line
+      miniCtx.beginPath();
+      priceHistory.forEach((p, i) => {
+        const x = i * step;
+        const y = h - ((p - min) / range) * (h - 14) - 7;
+        if (i === 0) miniCtx.moveTo(x, y); else miniCtx.lineTo(x, y);
+      });
+      miniCtx.strokeStyle = isGreen ? "#00ff88" : "#ff0055";
+      miniCtx.lineWidth = 2;
+      miniCtx.shadowColor = isGreen ? "rgba(0, 255, 136, 0.8)" : "rgba(255, 0, 85, 0.8)";
+      miniCtx.shadowBlur = 6;
+      miniCtx.stroke();
+    }
+
+    // -------------------------------------------------------------
+    // Quant Trading State & Logic
+    // -------------------------------------------------------------
     const STATE = {
       running: true,
       seconds: 0,
@@ -1420,6 +1690,8 @@
         document.getElementById("exec-node-sub").textContent = "STANDBY";
         document.getElementById("exec-pill").textContent = "AWAITING DEPOSIT • $0.00";
         document.getElementById("trade-open-badge").style.display = "none";
+        priceHistory = [];
+        renderMiniChart();
         render();
         return;
       }
@@ -1430,7 +1702,12 @@
         
         // Fetch real tick from Binance
         const liveP = await updateLivePrice(STATE.activeTrade.symbol);
-        if (liveP) STATE.activeTrade.currentPrice = liveP;
+        if (liveP) {
+          STATE.activeTrade.currentPrice = liveP;
+          priceHistory.push(liveP);
+          if (priceHistory.length > 25) priceHistory.shift();
+          renderMiniChart();
+        }
 
         // Dynamic tick fluctuation
         const delta = (Math.random() * 0.5 - 0.22);
@@ -1455,6 +1732,7 @@
           const pnlStr = (STATE.activeTrade.pnlDollars >= 0 ? "+$" : "-$") + Math.abs(STATE.activeTrade.pnlDollars).toFixed(2);
           const exitReason = isWin ? `🎯 TAKE PROFIT (+${STATE.activeTrade.pnlPct}%)` : `🛑 STOP LOSS (${STATE.activeTrade.pnlPct}%)`;
 
+          playChime(isWin);
           logEvent("EXIT", STATE.activeTrade.bot, STATE.activeTrade.symbol, pnlStr, exitReason, `$${STATE.activeTrade.sizeUsd.toFixed(2)}`);
           document.getElementById("equity-last-val").textContent = pnlStr;
           STATE.activeTrade = null;
@@ -1468,6 +1746,9 @@
         
         const realP = await updateLivePrice(current.symbol);
         if (realP) current.price = realP;
+
+        priceHistory = [current.price * 0.999, current.price * 0.9995, current.price];
+        renderMiniChart();
 
         const bots = ["GAMBLER", "HOUSE", "SPY"];
         const chosenBot = bots[Math.floor(Math.random() * bots.length)];
@@ -1547,7 +1828,7 @@
         const sign = STATE.activeTrade.pnlPct >= 0 ? "+" : "";
         const pnlEl = document.getElementById("active-pnl");
         pnlEl.textContent = `${sign}${STATE.activeTrade.pnlPct}% ($${sign}${STATE.activeTrade.pnlDollars})`;
-        pnlEl.className = STATE.activeTrade.pnlPct >= 0 ? "live-pnl-banner green-txt" : "live-pnl-banner red-txt";
+        pnlEl.className = STATE.activeTrade.pnlPct >= 0 ? "pos-pnl-banner green-txt" : "pos-pnl-banner red-txt";
         
         document.getElementById("active-entry").textContent = `$${STATE.activeTrade.entryPrice.toLocaleString('en-US')}`;
         document.getElementById("active-current").textContent = `$${STATE.activeTrade.currentPrice.toLocaleString('en-US')}`;
@@ -1578,21 +1859,21 @@
       const term = document.getElementById("night-log-terminal");
       term.innerHTML = STATE.logs.slice(0, 15).map(l => {
         let tagClass = "tag-desk";
-        let botEmoji = "🚚";
-        if (l.bot === "GAMBLER") { tagClass = "tag-gambler"; botEmoji = "⚡"; }
-        else if (l.bot === "HOUSE") { tagClass = "tag-house"; botEmoji = "🛡️"; }
-        else if (l.bot === "SPY") { tagClass = "tag-spy"; botEmoji = "👁️"; }
+        let botEmoji = "🛸";
+        if (l.bot === "GAMBLER") { tagClass = "tag-bolt"; botEmoji = "⚡"; }
+        else if (l.bot === "HOUSE") { tagClass = "tag-chip"; botEmoji = "🛡️"; }
+        else if (l.bot === "SPY") { tagClass = "tag-pixel"; botEmoji = "👁️"; }
 
         const isWin = l.pnl_num >= 0;
         const pnlColor = isWin ? "green-txt" : "red-txt";
 
         return `
-          <div class="log-bubble-line">
-            <span class="log-time-col">${l.time}</span>
-            <span class="log-bot-tag ${tagClass}">${botEmoji} ${l.bot || 'DESK'}</span>
+          <div class="log-bubble-row">
+            <span class="log-t-time">${l.time}</span>
+            <span class="log-t-bot ${tagClass}">${botEmoji} ${l.bot || 'DESK'}</span>
             <b style="color:#fff; font-size:11px;">${l.token}</b>
-            <span class="log-text-msg">${l.reason}</span>
-            <span class="${pnlColor} log-pnl-pill">${l.pnl}</span>
+            <span class="log-t-msg">${l.reason}</span>
+            <span class="${pnlColor} log-t-pnl">${l.pnl}</span>
             <span style="color:var(--text-sub); font-size:10px;">${l.size}</span>
           </div>
         `;
@@ -1604,7 +1885,7 @@
         const isWin = l.pnl_num > 0;
         const color = isWin ? "green-txt" : "red-txt";
         return `
-          <div class="ledger-item-row">
+          <div class="ledger-row-3d">
             <span style="color:var(--text-sub);">${l.time}</span>
             <span class="${color} bold">${l.type}</span>
             <b>${l.bot} • ${l.token}</b>
@@ -1636,7 +1917,7 @@
     });
 
     // Preset buttons
-    document.querySelectorAll(".preset-pill-btn").forEach(btn => {
+    document.querySelectorAll(".preset-chip-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         modalInput.value = btn.getAttribute("data-amt");
         errorMsg.textContent = "";
@@ -1680,7 +1961,7 @@
       STATE.running = !STATE.running;
       document.getElementById("toggle-run-btn").textContent = STATE.running ? "PAUSE" : "RESUME";
       document.getElementById("run-text").textContent = STATE.running ? "running" : "paused";
-      document.getElementById("run-dot").style.background = STATE.running ? "var(--color-house)" : "var(--color-danger)";
+      document.getElementById("run-dot").style.background = STATE.running ? "var(--green-neon)" : "var(--red-neon)";
     });
 
     // Initial event & start loop
