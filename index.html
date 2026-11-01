@@ -3,30 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Grok Bot Terminal - 4K 3D Autonomous AI Quant Desk</title>
+  <title>Grok Bot Terminal - 4K 3D Quantitative Crypto Desk</title>
   <style>
     :root {
-      --bg-black: #06080e;
-      --glass-surface: rgba(14, 19, 32, 0.72);
-      --glass-surface-hover: rgba(22, 30, 49, 0.82);
-      --glass-border: rgba(255, 255, 255, 0.09);
-      --glass-border-bright: rgba(255, 255, 255, 0.22);
-      
+      /* Real Crypto Trading Elite Palette (Binance & TradingView Pro) */
+      --bg-dark: #080a0f;
+      --card-bg: rgba(14, 18, 27, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-glow: rgba(14, 203, 129, 0.35);
+
+      --binance-green: #0ecb81;
+      --binance-green-glow: rgba(14, 203, 129, 0.3);
+      --binance-red: #f6465d;
+      --binance-red-glow: rgba(246, 70, 93, 0.3);
+      --binance-gold: #f0b90b;
+      --binance-gold-glow: rgba(240, 185, 11, 0.3);
+      --trading-blue: #2962ff;
+      --trading-blue-glow: rgba(41, 98, 255, 0.3);
+      --trading-cyan: #00f0ff;
+
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --text-sub: #64748b;
-
-      /* 3D Vibrant Theme Colors */
-      --cyan-neon: #00f0ff;
-      --cyan-glow: rgba(0, 240, 255, 0.35);
-      --green-neon: #00ff88;
-      --green-glow: rgba(0, 255, 136, 0.35);
-      --purple-neon: #b026ff;
-      --purple-glow: rgba(176, 38, 255, 0.35);
-      --gold-neon: #ffb703;
-      --gold-glow: rgba(255, 183, 3, 0.35);
-      --red-neon: #ff0055;
-      --red-glow: rgba(255, 0, 85, 0.35);
     }
 
     * {
@@ -38,16 +36,20 @@
     }
 
     body {
-      background-color: var(--bg-black);
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(41, 98, 255, 0.08), transparent 30%),
+        radial-gradient(circle at 90% 15%, rgba(14, 203, 129, 0.07), transparent 30%),
+        radial-gradient(circle at 50% 90%, rgba(240, 185, 11, 0.06), transparent 35%);
+      background-attachment: fixed;
       color: var(--text-main);
       min-height: 100vh;
       overflow-x: hidden;
       padding: 14px;
-      position: relative;
     }
 
-    /* 3D Dynamic Ambient Canvas in Background */
-    #bg-canvas {
+    /* Ambient Cyber Grid Background Canvas */
+    #grid-canvas {
       position: fixed;
       top: 0;
       left: 0;
@@ -57,42 +59,28 @@
       pointer-events: none;
     }
 
-    /* 4K Glassmorphism Cards with 3D Depth */
-    .glass-card-3d {
-      background: var(--glass-surface);
+    /* 3D Glassmorphism Panel */
+    .quant-panel {
+      background: var(--card-bg);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
-      border: 1px solid var(--glass-border);
-      border-radius: 18px;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
       box-shadow: 
-        0 12px 36px 0 rgba(0, 0, 0, 0.5),
-        inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
-      transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+        0 12px 36px 0 rgba(0, 0, 0, 0.6),
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
+      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
       position: relative;
       overflow: hidden;
     }
-    .glass-card-3d:hover {
-      border-color: var(--glass-border-bright);
+    .quant-panel:hover {
+      border-color: rgba(255, 255, 255, 0.16);
       box-shadow: 
-        0 18px 45px 0 rgba(0, 0, 0, 0.65),
-        inset 0 1px 2px 0 rgba(255, 255, 255, 0.2);
+        0 16px 45px 0 rgba(0, 0, 0, 0.7),
+        inset 0 1px 2px 0 rgba(255, 255, 255, 0.16);
     }
 
-    /* Specular Light Sweep Effect */
-    .glass-card-3d::after {
-      content: "";
-      position: absolute;
-      top: 0; left: -100%; width: 50%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
-      transform: skewX(-25deg);
-      pointer-events: none;
-      transition: left 0.8s ease;
-    }
-    .glass-card-3d:hover::after {
-      left: 200%;
-    }
-
-    .container-4k {
+    .main-terminal-wrap {
       max-width: 1440px;
       margin: 0 auto;
       display: flex;
@@ -103,9 +91,9 @@
     }
 
     /* ============================================================
-       TOP HEADER (Glass HUD Bar)
+       TOP HEADER (Trading Floor HUD)
        ============================================================ */
-    .top-hud {
+    .trading-hud {
       padding: 14px 22px;
       display: flex;
       justify-content: space-between;
@@ -114,50 +102,48 @@
       gap: 14px;
     }
 
-    .brand-hud {
+    .hud-left {
       display: flex;
       align-items: center;
       gap: 14px;
     }
 
-    /* 3D Hologram Logo Avatar */
-    .hologram-logo {
-      width: 52px;
-      height: 52px;
-      background: radial-gradient(circle at 30% 30%, rgba(0, 240, 255, 0.25), rgba(176, 38, 255, 0.15) 70%, transparent);
-      border: 1.5px solid rgba(0, 240, 255, 0.4);
-      border-radius: 16px;
+    .brand-3d-logo {
+      width: 50px;
+      height: 50px;
+      background: radial-gradient(circle at 35% 35%, #1e293b, #090d16 85%);
+      border: 1.5px solid var(--binance-gold);
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 20px rgba(0, 240, 255, 0.25), inset 0 0 12px rgba(0, 240, 255, 0.2);
-      animation: floatLogo 3.5s ease-in-out infinite;
-      position: relative;
+      box-shadow: 0 0 18px var(--binance-gold-glow), inset 0 0 10px rgba(240, 185, 11, 0.2);
+      animation: gentleFloat 3s ease-in-out infinite;
     }
-    @keyframes floatLogo {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-4px) rotate(2deg); }
+    @keyframes gentleFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
     }
 
-    .hud-titles h1 {
-      font-size: 21px;
+    .brand-text h1 {
+      font-size: 20px;
       font-weight: 900;
-      letter-spacing: -0.4px;
+      letter-spacing: -0.3px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .tag-4k {
-      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(176, 38, 255, 0.25));
-      color: var(--cyan-neon);
+    .badge-market-live {
+      background: rgba(14, 203, 129, 0.15);
+      color: var(--binance-green);
       font-size: 10px;
       font-weight: 800;
       padding: 2px 8px;
       border-radius: 20px;
-      border: 1px solid rgba(0, 240, 255, 0.4);
-      box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+      border: 1px solid rgba(14, 203, 129, 0.4);
+      box-shadow: 0 0 10px var(--binance-green-glow);
     }
-    .hud-sub {
+    .hud-meta-row {
       font-size: 11px;
       color: var(--text-muted);
       margin-top: 2px;
@@ -165,293 +151,198 @@
       align-items: center;
       gap: 6px;
     }
-    .live-pulse-dot {
-      width: 9px;
-      height: 9px;
+    .pulse-live-dot {
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: var(--green-neon);
-      box-shadow: 0 0 12px var(--green-neon);
-      animation: pulseLive 1.6s infinite;
+      background: var(--binance-green);
+      box-shadow: 0 0 10px var(--binance-green);
+      animation: pulseGreen 1.6s infinite;
     }
-    @keyframes pulseLive {
+    @keyframes pulseGreen {
       0%, 100% { transform: scale(0.9); opacity: 0.6; }
       50% { transform: scale(1.2); opacity: 1; }
     }
 
-    /* HUD Actions */
-    .hud-controls {
+    .hud-center-controls {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .btn-3d {
-      background: var(--glass-surface);
-      border: 1px solid var(--glass-border);
+    .action-hud-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
       color: var(--text-main);
       padding: 9px 18px;
-      border-radius: 12px;
+      border-radius: 10px;
       font-size: 12px;
       font-weight: 800;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 7px;
-      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+      gap: 6px;
+      transition: all 0.2s ease;
     }
-    .btn-3d:hover {
+    .action-hud-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
       transform: translateY(-2px);
-      border-color: rgba(255, 255, 255, 0.25);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
-    .btn-3d:active {
-      transform: translateY(0);
+    .btn-deposit-gold {
+      background: linear-gradient(135deg, #d97706, #f0b90b);
+      border: 1px solid rgba(240, 185, 11, 0.6);
+      color: #000;
+      box-shadow: 0 4px 18px rgba(240, 185, 11, 0.35);
     }
-    .btn-deposit-glow {
-      background: linear-gradient(135deg, #059669, #10b981);
-      border: 1px solid rgba(0, 255, 136, 0.5);
+    .btn-deposit-gold:hover {
+      background: linear-gradient(135deg, #b45309, #d97706);
       color: #fff;
-      box-shadow: 0 4px 18px rgba(0, 255, 136, 0.35);
-    }
-    .btn-deposit-glow:hover {
-      background: linear-gradient(135deg, #047857, #059669);
-      box-shadow: 0 6px 25px rgba(0, 255, 136, 0.55);
+      box-shadow: 0 6px 25px rgba(240, 185, 11, 0.5);
     }
 
-    /* Sound Switcher */
-    .btn-sound {
-      padding: 9px 12px;
-      font-size: 13px;
-    }
-
-    /* Right Balance Display */
-    .balance-display-box {
+    .hud-balance-box {
       text-align: right;
     }
-    .mode-pill-3d {
+    .mode-feed-pill {
       font-size: 10px;
       font-weight: 800;
-      padding: 3px 10px;
-      border-radius: 20px;
-      background: rgba(0, 240, 255, 0.12);
-      color: var(--cyan-neon);
-      border: 1px solid rgba(0, 240, 255, 0.3);
+      padding: 2px 9px;
+      border-radius: 12px;
+      background: rgba(41, 98, 255, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(41, 98, 255, 0.35);
       display: inline-block;
       margin-bottom: 2px;
     }
-    .balance-odometer {
+    .balance-total-text {
       font-size: 28px;
       font-weight: 900;
-      letter-spacing: -0.8px;
-      background: linear-gradient(135deg, #ffffff 40%, #94a3b8);
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff, #cbd5e1);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      display: flex;
-      align-items: baseline;
-      justify-content: flex-end;
-      gap: 2px;
     }
-    .stat-micro-row {
+    .hud-stats-micro {
       display: flex;
       gap: 10px;
       justify-content: flex-end;
       font-size: 11px;
       color: var(--text-muted);
-      font-weight: 600;
     }
 
     /* ============================================================
-       3D MASCOT FLEET (Bolt, Chip, Pixel)
+       3 BOT FLEET STRATEGY CARDS (Gambler, House, Spy)
        ============================================================ */
-    .mascot-fleet-grid {
+    .bot-fleet-showcase {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 14px;
     }
-    .bot-card-3d {
+    .bot-showcase-card {
       padding: 16px 18px;
       display: flex;
       align-items: center;
       gap: 16px;
       position: relative;
+      border-left: 4px solid transparent;
+      transition: all 0.25s ease;
     }
-    .bot-card-3d::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; width: 4px; height: 100%;
-      border-radius: 4px 0 0 4px;
-    }
-    .bot-card-bolt::before { background: var(--cyan-neon); box-shadow: 0 0 14px var(--cyan-neon); }
-    .bot-card-chip::before { background: var(--green-neon); box-shadow: 0 0 14px var(--green-neon); }
-    .bot-card-pixel::before { background: var(--purple-neon); box-shadow: 0 0 14px var(--purple-neon); }
+    .card-gambler { border-left-color: var(--trading-cyan); }
+    .card-house { border-left-color: var(--binance-green); }
+    .card-spy { border-left-color: var(--binance-gold); }
 
-    /* 3D Holographic Character Viewports */
-    .char-viewport-3d {
+    .bot-showcase-card.active-trader {
+      box-shadow: 0 0 25px rgba(14, 203, 129, 0.35);
+      border-color: var(--binance-green);
+    }
+
+    /* 3D Bot Avatar Viewport */
+    .bot-avatar-3d {
       width: 60px;
       height: 60px;
-      border-radius: 18px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      position: relative;
-      box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.15), 0 8px 24px rgba(0, 0, 0, 0.4);
-      animation: floatChar 3s ease-in-out infinite;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+      animation: botBounce 3s ease-in-out infinite;
     }
-    @keyframes floatChar {
+    @keyframes botBounce {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
+      50% { transform: translateY(-4px); }
     }
-    .char-vp-bolt {
+    .avatar-gambler {
       background: radial-gradient(circle at 35% 35%, #0284c7, #071728 85%);
       border: 1.5px solid rgba(0, 240, 255, 0.5);
-      box-shadow: 0 0 18px rgba(0, 240, 255, 0.3);
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.3);
     }
-    .char-vp-chip {
-      background: radial-gradient(circle at 35% 35%, #059669, #061f18 85%);
-      border: 1.5px solid rgba(0, 255, 136, 0.5);
-      box-shadow: 0 0 18px rgba(0, 255, 136, 0.3);
+    .avatar-house {
+      background: radial-gradient(circle at 35% 35%, #059669, #062017 85%);
+      border: 1.5px solid rgba(14, 203, 129, 0.5);
+      box-shadow: 0 0 16px rgba(14, 203, 129, 0.3);
     }
-    .char-vp-pixel {
-      background: radial-gradient(circle at 35% 35%, #7c3aed, #160728 85%);
-      border: 1.5px solid rgba(176, 38, 255, 0.5);
-      box-shadow: 0 0 18px rgba(176, 38, 255, 0.3);
+    .avatar-spy {
+      background: radial-gradient(circle at 35% 35%, #d97706, #1f1203 85%);
+      border: 1.5px solid rgba(240, 185, 11, 0.5);
+      box-shadow: 0 0 16px rgba(240, 185, 11, 0.3);
     }
 
-    .bot-content-meta {
+    .bot-meta-block {
       flex: 1;
       min-width: 0;
     }
-    .bot-hero-title {
-      font-size: 14px;
-      font-weight: 900;
+    .bot-header-row {
       display: flex;
       align-items: center;
-      gap: 6px;
-    }
-    .bot-hero-desc {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .bot-pnl-score {
-      text-align: right;
-    }
-    .pnl-big-text {
-      font-size: 16px;
-      font-weight: 900;
-    }
-    .trades-mini-text {
-      font-size: 10px;
-      color: var(--text-sub);
-    }
-
-    /* ============================================================
-       DASHBOARD STAGE (Left Fleet Bar + Main Core)
-       ============================================================ */
-    .dashboard-stage-3d {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 14px;
-    }
-
-    /* LEFT FLEET COLUMN */
-    .fleet-sidebar-3d {
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .sidebar-header-line {
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid var(--glass-border);
-      display: flex;
       justify-content: space-between;
+      margin-bottom: 2px;
     }
-
-    .agent-slot-card {
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: all 0.2s ease;
+    .bot-name-tag {
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.2px;
     }
-    .agent-slot-card:hover {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.12);
-      transform: translateX(3px);
-    }
-    .agent-slot-badge {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .bot-score-display {
       font-size: 15px;
-      flex-shrink: 0;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      font-weight: 900;
     }
-    .agent-slot-info {
-      flex: 1;
-      min-width: 0;
-    }
-    .agent-slot-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      font-weight: 800;
-    }
-    .agent-slot-sub {
-      font-size: 10px;
+    .bot-strategy-title {
+      font-size: 11px;
       color: var(--text-muted);
-    }
-    .agent-slot-meta {
-      font-size: 10px;
-      color: var(--text-sub);
+      margin-bottom: 6px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .status-badge-chip {
+    /* Strategy Scheme Chips */
+    .strategy-chips {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .scheme-chip {
       font-size: 9px;
       font-weight: 800;
       padding: 2px 6px;
       border-radius: 4px;
-    }
-
-    /* RIGHT CORE CONTENT */
-    .core-content-3d {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     /* ============================================================
-       3D PIPELINE TRACK (Pip the Quantum Courier)
+       THE RUNNING HIGHWAY: ANIMATED LASER TRACK & WALKING BOT
        ============================================================ */
-    .pipeline-stage-card {
+    .highway-stage-panel {
       padding: 18px 22px;
     }
-    .pipeline-headline {
+    .highway-top-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
-    .pipeline-headline-title {
+    .highway-title {
       font-size: 12px;
       font-weight: 900;
       letter-spacing: 0.6px;
@@ -461,219 +352,305 @@
       gap: 8px;
     }
 
-    .pipeline-rail-track {
-      background: rgba(8, 12, 22, 0.65);
-      border: 1px solid var(--glass-border);
+    /* Track Container */
+    .laser-track-container {
+      background: rgba(7, 10, 16, 0.8);
+      border: 1px solid var(--card-border);
       border-radius: 16px;
-      padding: 14px;
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
+      padding: 20px 14px;
       position: relative;
     }
 
-    /* Glowing laser connector line across steps */
-    .pipeline-rail-track::before {
-      content: "";
+    /* Glowing Laser Line connecting the 5 stations */
+    .laser-line-rail {
       position: absolute;
       top: 50%;
-      left: 10%;
-      right: 10%;
-      height: 2px;
-      background: linear-gradient(90deg, var(--gold-neon), var(--cyan-neon), var(--green-neon));
-      box-shadow: 0 0 10px var(--cyan-neon);
-      z-index: 0;
-      opacity: 0.4;
+      left: 8%;
+      right: 8%;
+      height: 4px;
+      background: linear-gradient(90deg, #2962ff, #00f0ff, #0ecb81, #f0b90b);
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.6);
+      border-radius: 2px;
+      z-index: 1;
+      transform: translateY(-50%);
     }
 
-    .rail-station-node {
-      background: rgba(20, 27, 45, 0.75);
-      backdrop-filter: blur(8px);
+    /* Traveling Light Pulse on the line */
+    .laser-pulse-wave {
+      position: absolute;
+      top: 0;
+      width: 80px;
+      height: 100%;
+      background: #fff;
+      box-shadow: 0 0 20px #fff, 0 0 30px #0ecb81;
+      border-radius: 2px;
+      animation: pulseTravel 3.2s linear infinite;
+    }
+    @keyframes pulseTravel {
+      0% { left: 0%; opacity: 0; }
+      15% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { left: 95%; opacity: 0; }
+    }
+
+    /* The Animated Walking/Running Bot on the Line! */
+    .walking-runner-bot {
+      position: absolute;
+      top: -22px;
+      left: 10%;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: left 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+    }
+    .runner-speech-bubble {
+      background: var(--binance-gold);
+      color: #000;
+      font-size: 9px;
+      font-weight: 900;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      animation: bubbleBounce 1.5s infinite;
+    }
+    @keyframes bubbleBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+    }
+
+    /* Animated Robot SVG with Moving Legs! */
+    .runner-svg {
+      width: 44px;
+      height: 44px;
+      filter: drop-shadow(0 4px 10px rgba(240, 185, 11, 0.5));
+    }
+    /* Running Leg Animations */
+    .leg-left {
+      transform-origin: 15px 32px;
+      animation: legCycleLeft 0.35s ease-in-out infinite alternate;
+    }
+    .leg-right {
+      transform-origin: 25px 32px;
+      animation: legCycleRight 0.35s ease-in-out infinite alternate;
+    }
+    @keyframes legCycleLeft {
+      from { transform: rotate(-25deg); }
+      to { transform: rotate(25deg); }
+    }
+    @keyframes legCycleRight {
+      from { transform: rotate(25deg); }
+      to { transform: rotate(-25deg); }
+    }
+
+    /* Stations Row */
+    .stations-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      position: relative;
+      z-index: 2;
+    }
+    .highway-station {
+      background: rgba(17, 23, 37, 0.9);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 14px;
-      padding: 12px 10px;
+      padding: 14px 10px;
       text-align: center;
-      position: relative;
-      z-index: 1;
-      transition: all 0.25s ease;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
     }
-    .rail-station-node.active-station {
-      background: rgba(0, 240, 255, 0.1);
-      border-color: rgba(0, 240, 255, 0.45);
-      box-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
+    .highway-station.active-station {
+      background: rgba(14, 203, 129, 0.12);
+      border-color: var(--binance-green);
+      box-shadow: 0 0 20px var(--binance-green-glow);
+      transform: translateY(-4px);
     }
-    .station-avatar-box {
-      height: 38px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .station-icon {
+      font-size: 24px;
       margin-bottom: 4px;
     }
-    .station-chip {
+    .station-step-num {
       font-size: 9px;
       font-weight: 800;
-      padding: 2px 7px;
-      border-radius: 10px;
-      display: inline-block;
-      margin-bottom: 4px;
+      color: var(--binance-gold);
+      letter-spacing: 0.5px;
     }
-    .station-main-lbl {
+    .station-name-title {
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 900;
+      margin-top: 2px;
     }
-    .station-sub-lbl {
+    .station-detail-sub {
       font-size: 10px;
       color: var(--text-muted);
       margin-top: 2px;
-    }
-
-    /* 3D Courier Drone Animation (Pip) */
-    .pip-drone-3d {
-      width: 36px;
-      height: 36px;
-      animation: hoverPip 2.2s ease-in-out infinite;
-      filter: drop-shadow(0 6px 12px rgba(255, 183, 3, 0.4));
-    }
-    @keyframes hoverPip {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-6px) rotate(3deg); }
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* ============================================================
-       MIDDLE STAGE: 3D ACTIVE POSITION & 4K LOG FEED
+       MIDDLE ARENA: ACTIVE POSITION + LIVE CANDLESTICK + STREAM
        ============================================================ */
-    .stage-middle-grid {
+    .arena-grid-layout {
       display: grid;
-      grid-template-columns: 360px 1fr;
+      grid-template-columns: 280px 380px 1fr;
       gap: 14px;
     }
 
-    /* ACTIVE POSITION 3D CARD */
-    .active-pos-3d-card {
-      padding: 20px;
+    /* LEFT AGENTS CHECKLIST */
+    .agents-panel-box {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .agents-hud-title {
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+    }
+    .agent-mini-row {
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+    }
+    .agent-tag-badge {
+      font-size: 9px;
+      font-weight: 900;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    /* ACTIVE TRADE POSITION CARD */
+    .active-trade-box {
+      padding: 18px 20px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      position: relative;
     }
-    .active-pos-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    .pos-live-pill {
+    .trade-status-badge {
       font-size: 10px;
       font-weight: 900;
       padding: 3px 9px;
       border-radius: 6px;
-      background: rgba(0, 255, 136, 0.15);
-      color: var(--green-neon);
-      border: 1px solid rgba(0, 255, 136, 0.35);
-      box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+      background: rgba(14, 203, 129, 0.15);
+      color: var(--binance-green);
+      border: 1px solid rgba(14, 203, 129, 0.35);
     }
-    .pos-token-title {
+    .token-row-headline {
       display: flex;
       align-items: baseline;
       gap: 8px;
-      margin-bottom: 6px;
+      margin: 8px 0 4px 0;
     }
-    .pos-token-name {
+    .token-huge-title {
       font-size: 26px;
       font-weight: 900;
-      letter-spacing: -0.5px;
       color: #fff;
     }
-    .pos-side-pill {
+    .token-side-chip {
       font-size: 10px;
       font-weight: 800;
       padding: 2px 7px;
       border-radius: 4px;
       background: rgba(0, 240, 255, 0.15);
-      color: var(--cyan-neon);
+      color: var(--trading-cyan);
     }
-    .pos-pnl-banner {
+    .pnl-live-counter {
       font-size: 20px;
       font-weight: 900;
-      margin-bottom: 12px;
-      letter-spacing: -0.3px;
+      margin-bottom: 10px;
     }
 
-    /* Live Mini Candlestick Spark Canvas */
-    .mini-chart-box {
+    /* Real Candlestick Sparkline Canvas */
+    .chart-container-box {
       width: 100%;
-      height: 60px;
-      background: rgba(0, 0, 0, 0.35);
-      border-radius: 8px;
-      border: 1px solid var(--glass-border);
+      height: 75px;
+      background: rgba(0, 0, 0, 0.45);
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
       margin-bottom: 12px;
       position: relative;
       overflow: hidden;
     }
-    #mini-chart-canvas {
+    #candlestick-canvas {
       width: 100%;
       height: 100%;
     }
 
-    .pos-specs-table {
+    .specs-keyvalue-grid {
       display: grid;
       grid-template-columns: 85px 1fr;
-      gap: 6px 10px;
+      gap: 5px 10px;
       font-size: 11px;
       background: rgba(0, 0, 0, 0.3);
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid var(--glass-border);
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
     }
-    .spec-t-lbl { color: var(--text-muted); }
-    .spec-t-val { font-weight: 800; color: #fff; }
+    .spec-k { color: var(--text-muted); }
+    .spec-v { font-weight: 800; color: #fff; }
 
-    /* NIGHT LOG TERMINAL 4K */
-    .log-stream-3d-card {
-      padding: 18px 20px;
+    /* NIGHT LOG STREAM */
+    .log-stream-box {
+      padding: 16px 18px;
       display: flex;
       flex-direction: column;
     }
-    .log-header-line {
+    .log-top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
       padding-bottom: 8px;
-      border-bottom: 1px solid var(--glass-border);
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 10px;
     }
-    .log-scroll-area {
+    .log-lines-scroll {
       flex: 1;
-      max-height: 290px;
+      max-height: 280px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 6px;
-      padding-right: 6px;
+      padding-right: 4px;
     }
-    .log-scroll-area::-webkit-scrollbar {
+    .log-lines-scroll::-webkit-scrollbar {
       width: 4px;
     }
-    .log-scroll-area::-webkit-scrollbar-thumb {
+    .log-lines-scroll::-webkit-scrollbar-thumb {
       background: rgba(255, 255, 255, 0.15);
       border-radius: 4px;
     }
 
-    .log-bubble-row {
+    .log-line-item {
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 11px;
-      padding: 7px 12px;
-      border-radius: 10px;
+      padding: 6px 10px;
+      border-radius: 8px;
       background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.03);
       transition: all 0.15s ease;
     }
-    .log-bubble-row:hover {
+    .log-line-item:hover {
       background: rgba(255, 255, 255, 0.06);
-      transform: translateX(2px);
     }
     .log-t-time {
       color: var(--text-sub);
@@ -681,17 +658,17 @@
       font-variant-numeric: tabular-nums;
       flex-shrink: 0;
     }
-    .log-t-bot {
+    .log-bot-badge {
       font-size: 9px;
       font-weight: 900;
-      padding: 2px 7px;
-      border-radius: 5px;
+      padding: 1px 6px;
+      border-radius: 4px;
       flex-shrink: 0;
     }
-    .tag-bolt { background: rgba(0, 240, 255, 0.15); color: var(--cyan-neon); }
-    .tag-chip { background: rgba(0, 255, 136, 0.15); color: var(--green-neon); }
-    .tag-pixel { background: rgba(176, 38, 255, 0.15); color: var(--purple-neon); }
-    .tag-desk { background: rgba(255, 183, 3, 0.15); color: var(--gold-neon); }
+    .tag-gambler { background: rgba(0, 240, 255, 0.15); color: var(--trading-cyan); }
+    .tag-house { background: rgba(14, 203, 129, 0.15); color: var(--binance-green); }
+    .tag-spy { background: rgba(240, 185, 11, 0.15); color: var(--binance-gold); }
+    .tag-desk { background: rgba(41, 98, 255, 0.15); color: #60a5fa; }
 
     .log-t-msg {
       flex: 1;
@@ -706,98 +683,47 @@
     }
 
     /* ============================================================
-       PERFORMANCE PROGRESS STRIP (START vs NOW)
+       PERFORMANCE TRACKER & LEDGER
        ============================================================ */
-    .session-strip-3d {
+    .ledger-section-box {
       padding: 16px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 14px;
     }
-    .strip-metrics {
-      display: flex;
-      align-items: center;
-      gap: 22px;
-    }
-    .strip-box {
-      display: flex;
-      flex-direction: column;
-    }
-    .strip-box-lbl {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .strip-box-val {
-      font-size: 16px;
-      font-weight: 900;
-    }
-    .progress-bar-3d-wrap {
-      width: 200px;
-      height: 9px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 5px;
-      overflow: hidden;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
-    }
-    .progress-bar-3d-fill {
-      width: 65%;
-      height: 100%;
-      background: linear-gradient(90deg, var(--green-neon), var(--cyan-neon));
-      border-radius: 5px;
-      box-shadow: 0 0 12px var(--cyan-neon);
-      transition: width 0.3s ease;
-    }
-
-    /* ============================================================
-       TRANSACTION LEDGER
-       ============================================================ */
-    .ledger-stage-card {
-      padding: 18px 20px;
-    }
-    .ledger-top-bar {
+    .ledger-top-title {
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 900;
       color: var(--text-muted);
       padding-bottom: 8px;
-      border-bottom: 1px solid var(--glass-border);
+      border-bottom: 1px solid var(--card-border);
       margin-bottom: 10px;
     }
-    .ledger-rows-container {
+    .ledger-table-wrap {
       display: flex;
       flex-direction: column;
       gap: 5px;
     }
-    .ledger-row-3d {
+    .ledger-row-line {
       display: grid;
       grid-template-columns: 70px 80px 130px 1fr 100px 75px;
       align-items: center;
-      padding: 8px 12px;
-      border-radius: 10px;
+      padding: 7px 12px;
+      border-radius: 8px;
       font-size: 11px;
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid rgba(255, 255, 255, 0.03);
       transition: all 0.15s ease;
     }
-    .ledger-row-3d:hover {
+    .ledger-row-line:hover {
       background: rgba(255, 255, 255, 0.05);
-      transform: translateX(2px);
     }
 
-    /* ============================================================
-       DEPOSIT CAPITAL MODAL (4K Holographic Glass)
-       ============================================================ */
-    .modal-overlay-4k {
+    /* DEPOSIT CAPITAL MODAL */
+    .modal-overlay-dark {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(3, 5, 10, 0.82);
+      background: rgba(3, 5, 10, 0.85);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       display: flex;
@@ -806,23 +732,21 @@
       z-index: 99999;
       padding: 16px;
     }
-    .modal-card-4k {
-      background: rgba(15, 22, 38, 0.95);
-      border: 1.5px solid rgba(0, 240, 255, 0.35);
-      border-radius: 22px;
+    .modal-card-quant {
+      background: rgba(14, 18, 27, 0.96);
+      border: 1.5px solid rgba(240, 185, 11, 0.4);
+      border-radius: 20px;
       width: 100%;
-      max-width: 450px;
+      max-width: 440px;
       padding: 24px;
-      box-shadow: 
-        0 25px 70px rgba(0, 0, 0, 0.8),
-        0 0 30px rgba(0, 240, 255, 0.2);
-      animation: modalPop3D 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 30px rgba(240, 185, 11, 0.2);
+      animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    @keyframes modalPop3D {
-      from { opacity: 0; transform: scale(0.9) translateY(10px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
     }
-    .modal-top-line {
+    .modal-header-line {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -830,40 +754,39 @@
       padding-bottom: 12px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
-    .btn-close-modal {
+    .btn-close-x {
       background: none;
       border: none;
       color: var(--text-muted);
       font-size: 24px;
       cursor: pointer;
-      line-height: 1;
     }
-    .btn-close-modal:hover { color: #fff; }
+    .btn-close-x:hover { color: #fff; }
 
-    .presets-grid-4k {
+    .presets-btn-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
       margin-bottom: 16px;
     }
-    .preset-chip-btn {
+    .preset-gold-chip {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
       color: #fff;
       padding: 10px 4px;
       font-size: 11px;
       font-weight: 800;
-      border-radius: 10px;
+      border-radius: 8px;
       cursor: pointer;
       transition: all 0.15s ease;
     }
-    .preset-chip-btn:hover {
-      background: rgba(0, 240, 255, 0.18);
-      border-color: var(--cyan-neon);
-      color: var(--cyan-neon);
+    .preset-gold-chip:hover {
+      background: rgba(240, 185, 11, 0.18);
+      border-color: var(--binance-gold);
+      color: var(--binance-gold);
       transform: translateY(-2px);
     }
-    .modal-amount-input {
+    .deposit-num-field {
       width: 100%;
       background: rgba(5, 8, 15, 0.6);
       border: 1.5px solid rgba(255, 255, 255, 0.15);
@@ -874,43 +797,40 @@
       border-radius: 12px;
       outline: none;
       margin-top: 6px;
-      transition: all 0.2s ease;
     }
-    .modal-amount-input:focus {
-      border-color: var(--green-neon);
-      box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+    .deposit-num-field:focus {
+      border-color: var(--binance-green);
+      box-shadow: 0 0 15px rgba(14, 203, 129, 0.3);
     }
-    .modal-error-box {
-      color: var(--red-neon);
+    .deposit-err-msg {
+      color: var(--binance-red);
       font-size: 11px;
       font-weight: 700;
       margin-top: 8px;
       min-height: 18px;
     }
 
-    /* Color helper classes */
-    .green-txt { color: var(--green-neon); }
-    .red-txt { color: var(--red-neon); }
-    .cyan-txt { color: var(--cyan-neon); }
-    .purple-txt { color: var(--purple-neon); }
-    .gold-txt { color: var(--gold-neon); }
+    /* Colors helpers */
+    .green-txt { color: var(--binance-green); }
+    .red-txt { color: var(--binance-red); }
+    .gold-txt { color: var(--binance-gold); }
+    .cyan-txt { color: var(--trading-cyan); }
+    .blue-txt { color: #60a5fa; }
     .bold { font-weight: 800; }
 
     /* ============================================================
-       RESPONSIVE BREAKPOINTS (Mobile & Tablet)
+       RESPONSIVE DESIGN (Mobile & Tablet)
        ============================================================ */
-    @media (max-width: 1024px) {
-      .dashboard-stage-3d { grid-template-columns: 1fr; }
-      .stage-middle-grid { grid-template-columns: 1fr; }
-      .pipeline-rail-track { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 1100px) {
+      .arena-grid-layout { grid-template-columns: 1fr; }
+      .stations-grid { grid-template-columns: repeat(3, 1fr); }
     }
-
     @media (max-width: 768px) {
       body { padding: 8px; }
-      .mascot-fleet-grid { grid-template-columns: 1fr; }
-      .top-hud { flex-direction: column; align-items: stretch; }
-      .hud-controls { justify-content: space-between; }
-      .balance-display-box {
+      .bot-fleet-showcase { grid-template-columns: 1fr; }
+      .trading-hud { flex-direction: column; align-items: stretch; }
+      .hud-center-controls { justify-content: space-between; }
+      .hud-balance-box {
         text-align: left;
         display: flex;
         justify-content: space-between;
@@ -919,553 +839,488 @@
         padding: 10px 14px;
         border-radius: 12px;
       }
-      .stat-micro-row { justify-content: flex-start; }
-      .pipeline-rail-track { grid-template-columns: 1fr 1fr; }
-      .ledger-row-3d { grid-template-columns: 60px 65px 90px 1fr 65px; }
-      .ledger-row-3d span:nth-child(6) { display: none; }
-      .presets-grid-4k { grid-template-columns: repeat(2, 1fr); }
+      .hud-stats-micro { justify-content: flex-start; }
+      .stations-grid { grid-template-columns: 1fr 1fr; }
+      .ledger-row-line { grid-template-columns: 60px 65px 90px 1fr 65px; }
+      .ledger-row-line span:nth-child(6) { display: none; }
+      .presets-btn-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
 <body>
 
-  <!-- Background 3D Cyber Particle Canvas -->
-  <canvas id="bg-canvas"></canvas>
+  <!-- Ambient 3D Cyber Particle Network Canvas -->
+  <canvas id="grid-canvas"></canvas>
 
   <!-- ============================================================
-       DEPOSIT CAPITAL MODAL (4K Holographic Glass)
+       DEPOSIT CAPITAL MODAL
        ============================================================ -->
-  <div id="deposit-modal" class="modal-overlay-4k" style="display:none;">
-    <div class="modal-card-4k">
-      <div class="modal-top-line">
+  <div id="deposit-modal" class="modal-overlay-dark" style="display:none;">
+    <div class="modal-card-quant">
+      <div class="modal-header-line">
         <div style="display:flex; align-items:center; gap:8px;">
           <span style="font-size:22px;">💳</span>
           <span style="font-weight:900; font-size:16px; color:#fff;">DEPOSIT TRADING CAPITAL</span>
         </div>
-        <button class="btn-close-modal" id="modal-close">&times;</button>
+        <button class="btn-close-x" id="modal-close">&times;</button>
       </div>
 
       <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px; line-height:1.4;">
-        Enter any test or real capital from <b style="color:var(--green-neon);">$1.00</b> up to max <b style="color:var(--gold-neon);">$1,000.00 USD</b>.
+        Deposit test or real capital from <b style="color:var(--binance-green);">$1.00</b> up to max <b style="color:var(--binance-gold);">$1,000.00 USD</b>.
       </p>
 
       <div style="font-size:10px; font-weight:800; color:var(--text-sub); text-transform:uppercase; margin-bottom:6px;">Quick Presets:</div>
-      <div class="presets-grid-4k">
-        <button class="preset-chip-btn" data-amt="5" style="border-color:var(--green-neon); color:var(--green-neon);">$5 (Test)</button>
-        <button class="preset-chip-btn" data-amt="10">$10</button>
-        <button class="preset-chip-btn" data-amt="25">$25</button>
-        <button class="preset-chip-btn" data-amt="50">$50</button>
-        <button class="preset-chip-btn" data-amt="100">$100</button>
-        <button class="preset-chip-btn" data-amt="250">$250</button>
-        <button class="preset-chip-btn" data-amt="500">$500</button>
-        <button class="preset-chip-btn" data-amt="1000" style="border-color:var(--gold-neon); color:var(--gold-neon);">$1000 (MAX)</button>
+      <div class="presets-btn-grid">
+        <button class="preset-gold-chip" data-amt="5" style="border-color:var(--binance-green); color:var(--binance-green);">$5 (Test)</button>
+        <button class="preset-gold-chip" data-amt="10">$10</button>
+        <button class="preset-gold-chip" data-amt="25">$25</button>
+        <button class="preset-gold-chip" data-amt="50">$50</button>
+        <button class="preset-gold-chip" data-amt="100">$100</button>
+        <button class="preset-gold-chip" data-amt="250">$250</button>
+        <button class="preset-gold-chip" data-amt="500">$500</button>
+        <button class="preset-gold-chip" data-amt="1000" style="border-color:var(--binance-gold); color:var(--binance-gold);">$1000 (MAX)</button>
       </div>
 
       <div>
         <label style="font-size:11px; font-weight:800; color:var(--text-muted); display:block;">Deposit Amount ($ USD):</label>
-        <input type="number" id="deposit-input" min="1" max="1000" step="1" value="5" class="modal-amount-input" placeholder="e.g. 5">
+        <input type="number" id="deposit-input" min="1" max="1000" step="1" value="5" class="deposit-num-field" placeholder="e.g. 5">
       </div>
 
-      <div id="deposit-error-msg" class="modal-error-box"></div>
+      <div id="deposit-error-msg" class="deposit-err-msg"></div>
 
       <div style="display:flex; gap:10px; margin-top:14px;">
-        <button class="btn-3d btn-deposit-glow" id="modal-confirm-btn" style="flex:1; justify-content:center; padding:12px;">
+        <button class="action-hud-btn btn-deposit-gold" id="modal-confirm-btn" style="flex:1; justify-content:center; padding:12px;">
           <span>CONFIRM DEPOSIT</span> 🚀
         </button>
-        <button class="btn-3d" id="modal-cancel-btn" style="padding:12px;">CANCEL</button>
+        <button class="action-hud-btn" id="modal-cancel-btn" style="padding:12px;">CANCEL</button>
       </div>
     </div>
   </div>
 
-  <div class="container-4k">
+  <div class="main-terminal-wrap">
 
     <!-- ============================================================
-         TOP HUD BAR (Glass 3D Header)
+         TOP HUD BAR (Binance / TradingView Real Floor Style)
          ============================================================ -->
-    <header class="glass-card-3d top-hud">
-      <div class="brand-hud">
-        <!-- 3D Holographic Cube Logo -->
-        <div class="hologram-logo">
-          <svg width="34" height="34" viewBox="0 0 40 40" fill="none">
-            <!-- 3D Isometric Cube / Core -->
-            <path d="M20 4 L34 12 L20 20 L6 12 Z" fill="url(#cubeTopGrad)" stroke="#00f0ff" stroke-width="1.5"/>
-            <path d="M6 12 L20 20 V36 L6 28 Z" fill="url(#cubeLeftGrad)" stroke="#00f0ff" stroke-width="1.5"/>
-            <path d="M34 12 L20 20 V36 L34 28 Z" fill="url(#cubeRightGrad)" stroke="#b026ff" stroke-width="1.5"/>
-            <!-- Pulsing Quantum Core Orb -->
-            <circle cx="20" cy="20" r="4" fill="#00ff88" filter="url(#glowFilter)"/>
-            <defs>
-              <linearGradient id="cubeTopGrad" x1="6" y1="4" x2="34" y2="20" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#00f0ff" stop-opacity="0.8"/>
-                <stop offset="1" stop-color="#0284c7" stop-opacity="0.4"/>
-              </linearGradient>
-              <linearGradient id="cubeLeftGrad" x1="6" y1="12" x2="20" y2="36" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#0f172a" stop-opacity="0.9"/>
-                <stop offset="1" stop-color="#0284c7" stop-opacity="0.6"/>
-              </linearGradient>
-              <linearGradient id="cubeRightGrad" x1="34" y1="12" x2="20" y2="36" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#1e1b4b" stop-opacity="0.9"/>
-                <stop offset="1" stop-color="#7c3aed" stop-opacity="0.6"/>
-              </linearGradient>
-              <filter id="glowFilter" x="12" y="12" width="16" height="16" filterUnits="userSpaceOnUse">
-                <feGaussianBlur stdDeviation="2" result="blur"/>
-                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
-            </defs>
+    <header class="quant-panel trading-hud">
+      <div class="hud-left">
+        <!-- 3D Gold Logo Icon -->
+        <div class="brand-3d-logo">
+          <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
+            <!-- Binance Gold Diamond Grid -->
+            <polygon points="18,3 23,8 18,13 13,8" fill="#f0b90b"/>
+            <polygon points="8,13 13,18 8,23 3,18" fill="#f0b90b"/>
+            <polygon points="28,13 33,18 28,23 23,18" fill="#f0b90b"/>
+            <polygon points="18,23 23,28 18,33 13,28" fill="#f0b90b"/>
+            <polygon points="18,11 25,18 18,25 11,18" fill="#0ecb81"/>
           </svg>
         </div>
 
-        <div class="hud-titles">
+        <div class="brand-text">
           <h1>
             <span>Grok Bot Terminal</span>
-            <span class="tag-4k">4K QUANT DESK</span>
+            <span class="badge-market-live">SPOT AI DESK</span>
           </h1>
-          <div class="hud-sub">
-            <span class="live-pulse-dot" id="run-dot"></span>
+          <div class="hud-meta-row">
+            <span class="pulse-live-dot" id="run-dot"></span>
             <span id="run-text" style="font-weight:800; color:#fff;">running</span>
             <span style="color:var(--text-sub);">•</span>
             <span id="timer-val" style="font-variant-numeric:tabular-nums; font-weight:700;">00:00:00</span>
             <span style="color:var(--text-sub);">•</span>
-            <span id="exec-pill" style="color:var(--cyan-neon); font-weight:800;">AWAITING DEPOSIT</span>
+            <span id="exec-pill" style="color:var(--trading-cyan); font-weight:800;">AWAITING DEPOSIT</span>
           </div>
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="hud-controls">
-        <button class="btn-3d btn-deposit-glow" id="deposit-btn">
+      <!-- Center Action Buttons -->
+      <div class="hud-center-controls">
+        <button class="action-hud-btn btn-deposit-gold" id="deposit-btn">
           <span>+ DEPOSIT</span> 💳
         </button>
-        <button class="btn-3d" id="toggle-run-btn">PAUSE</button>
-        <button class="btn-3d btn-sound" id="sound-btn" title="Toggle audio chime">🔊</button>
+        <button class="action-hud-btn" id="toggle-run-btn">PAUSE</button>
+        <button class="action-hud-btn" id="sound-btn" title="Toggle chime">🔊</button>
       </div>
 
-      <!-- Balance HUD -->
-      <div class="balance-display-box">
+      <!-- Right Balance Display -->
+      <div class="hud-balance-box">
         <div>
-          <span class="mode-pill-3d" id="mode-badge-el">paper • binance feed</span>
+          <span class="mode-feed-pill" id="mode-badge-el">paper • binance spot feed</span>
         </div>
-        <div class="balance-odometer" id="balance-val">$0.00</div>
-        <div class="stat-micro-row">
+        <div class="balance-total-text" id="balance-val">$0.00</div>
+        <div class="hud-stats-micro">
           <span id="trades-count">0 trades</span>
           <span>•</span>
-          <span id="wins-count" style="color:var(--green-neon);">0 wins</span>
+          <span id="wins-count" style="color:var(--binance-green);">0 wins</span>
           <span>•</span>
-          <span id="losses-count" style="color:var(--red-neon);">0 losses</span>
+          <span id="losses-count" style="color:var(--binance-red);">0 losses</span>
         </div>
       </div>
     </header>
 
     <!-- ============================================================
-         3D MASCOT FLEET (Bolt, Chip, Pixel)
+         3 BOT FLEET STRATEGY SHOWCASE (Bolt, Chip, Pixel)
          ============================================================ -->
-    <section class="mascot-fleet-grid">
+    <section class="bot-fleet-showcase">
       <!-- BOT 1: THE GAMBLER (Bolt) -->
-      <div class="glass-card-3d bot-card-3d bot-card-bolt">
-        <div class="char-viewport-3d char-vp-bolt">
-          <!-- 3D Bolt Mascot SVG -->
-          <svg width="42" height="42" viewBox="0 0 48 48" fill="none">
-            <!-- 3D Hover Base Disc -->
-            <ellipse cx="24" cy="42" rx="14" ry="4" fill="rgba(0, 240, 255, 0.25)" filter="blur(2px)"/>
-            <!-- 3D Body Capsule -->
-            <rect x="12" y="14" width="24" height="24" rx="8" fill="url(#boltBody)" stroke="#00f0ff" stroke-width="2"/>
-            <!-- Visor with specular shine -->
-            <rect x="15" y="19" width="18" height="9" rx="3" fill="#031525"/>
-            <circle cx="19" cy="23.5" r="2.8" fill="#00f0ff"/>
-            <circle cx="29" cy="23.5" r="2.8" fill="#00f0ff"/>
-            <circle cx="20" cy="22.5" r="1" fill="#fff"/>
-            <circle cx="30" cy="22.5" r="1" fill="#fff"/>
-            <!-- Lightning Antenna -->
-            <path d="M22 6 L26 12 H21 L25 15" stroke="#ffb703" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <div class="quant-panel bot-showcase-card card-gambler" id="card-gambler-el">
+        <div class="bot-avatar-3d avatar-gambler">
+          <!-- 3D Bolt SVG with Visor Shine -->
+          <svg width="40" height="40" viewBox="0 0 44 44" fill="none">
+            <circle cx="22" cy="38" rx="12" ry="3" fill="rgba(0, 240, 255, 0.3)" filter="blur(1px)"/>
+            <rect x="10" y="12" width="24" height="22" rx="8" fill="url(#boltSkin)" stroke="#00f0ff" stroke-width="1.8"/>
+            <rect x="13" y="16" width="18" height="8" rx="3" fill="#031626"/>
+            <circle cx="17" cy="20" r="2.5" fill="#00f0ff"/>
+            <circle cx="27" cy="20" r="2.5" fill="#00f0ff"/>
+            <path d="M21 4 L25 10 H20 L24 13" stroke="#f0b90b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
             <defs>
-              <linearGradient id="boltBody" x1="12" y1="14" x2="36" y2="38" gradientUnits="userSpaceOnUse">
+              <linearGradient id="boltSkin" x1="10" y1="12" x2="34" y2="34" gradientUnits="userSpaceOnUse">
                 <stop stop-color="#0284c7"/>
                 <stop offset="1" stop-color="#0c233c"/>
               </linearGradient>
             </defs>
           </svg>
         </div>
-        <div class="bot-content-meta">
-          <div class="bot-hero-title" style="color:var(--cyan-neon);">
-            <span>⚡ THE GAMBLER</span>
-            <span style="font-size:10px; opacity:0.8;">[Bolt 3D]</span>
+        <div class="bot-meta-block">
+          <div class="bot-header-row">
+            <span class="bot-name-tag cyan-txt">⚡ THE GAMBLER (Bolt)</span>
+            <span class="bot-score-display green-txt" id="gambler-pnl">+$0.00</span>
           </div>
-          <div class="bot-hero-desc">Momentum & EMA Ribbon Breakouts</div>
-        </div>
-        <div class="bot-pnl-score">
-          <div class="pnl-big-text green-txt" id="gambler-pnl">+$0.00</div>
-          <div class="trades-mini-text" id="gambler-trades">0 trades</div>
+          <div class="bot-strategy-title">Momentum & EMA Ribbon Breakouts</div>
+          <div class="strategy-chips">
+            <span class="scheme-chip">EMA 7/21 Cross</span>
+            <span class="scheme-chip">Vol &gt; 1.5x</span>
+            <span class="scheme-chip" id="gambler-trades">0 trades</span>
+          </div>
         </div>
       </div>
 
       <!-- BOT 2: THE HOUSE (Chip) -->
-      <div class="glass-card-3d bot-card-3d bot-card-chip">
-        <div class="char-viewport-3d char-vp-chip">
-          <!-- 3D Chip Mascot SVG -->
-          <svg width="42" height="42" viewBox="0 0 48 48" fill="none">
-            <ellipse cx="24" cy="42" rx="14" ry="4" fill="rgba(0, 255, 136, 0.25)" filter="blur(2px)"/>
-            <!-- 3D Crystalline Hex Shield -->
-            <path d="M24 8 L36 15 V29 L24 36 L12 29 V15 Z" fill="url(#chipBody)" stroke="#00ff88" stroke-width="2"/>
-            <!-- Friendly Eyes -->
-            <circle cx="19" cy="21" r="3" fill="#00ff88"/>
-            <circle cx="29" cy="21" r="3" fill="#00ff88"/>
-            <circle cx="20" cy="20" r="1.2" fill="#fff"/>
-            <circle cx="30" cy="20" r="1.2" fill="#fff"/>
-            <!-- Rosy Smile -->
-            <path d="M20 27 Q24 30 28 27" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <div class="quant-panel bot-showcase-card card-house" id="card-house-el">
+        <div class="bot-avatar-3d avatar-house">
+          <!-- 3D Chip SVG with Hex Shield -->
+          <svg width="40" height="40" viewBox="0 0 44 44" fill="none">
+            <circle cx="22" cy="38" rx="12" ry="3" fill="rgba(14, 203, 129, 0.3)" filter="blur(1px)"/>
+            <path d="M22 8 L33 14 V26 L22 32 L11 26 V14 Z" fill="url(#chipSkin)" stroke="#0ecb81" stroke-width="1.8"/>
+            <circle cx="17" cy="19" r="2.5" fill="#0ecb81"/>
+            <circle cx="27" cy="19" r="2.5" fill="#0ecb81"/>
+            <path d="M18 24 Q22 27 26 24" stroke="#fff" stroke-width="1.8" stroke-linecap="round" fill="none"/>
             <defs>
-              <linearGradient id="chipBody" x1="12" y1="8" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+              <linearGradient id="chipSkin" x1="11" y1="8" x2="33" y2="32" gradientUnits="userSpaceOnUse">
                 <stop stop-color="#059669"/>
-                <stop offset="1" stop-color="#062e20"/>
+                <stop offset="1" stop-color="#062017"/>
               </linearGradient>
             </defs>
           </svg>
         </div>
-        <div class="bot-content-meta">
-          <div class="bot-hero-title" style="color:var(--green-neon);">
-            <span>🛡️ THE HOUSE</span>
-            <span style="font-size:10px; opacity:0.8;">[Chip 3D]</span>
+        <div class="bot-meta-block">
+          <div class="bot-header-row">
+            <span class="bot-name-tag green-txt">🏛️ THE HOUSE (Chip)</span>
+            <span class="bot-score-display green-txt" id="house-pnl">+$0.00</span>
           </div>
-          <div class="bot-hero-desc">Oversold RSI Mean-Reversion</div>
-        </div>
-        <div class="bot-pnl-score">
-          <div class="pnl-big-text green-txt" id="house-pnl">+$0.00</div>
-          <div class="trades-mini-text" id="house-trades">0 trades</div>
+          <div class="bot-strategy-title">Oversold RSI Mean-Reversion</div>
+          <div class="strategy-chips">
+            <span class="scheme-chip">RSI &lt; 30 Dip</span>
+            <span class="scheme-chip">BB Lower Bounce</span>
+            <span class="scheme-chip" id="house-trades">0 trades</span>
+          </div>
         </div>
       </div>
 
       <!-- BOT 3: THE SPY (Pixel) -->
-      <div class="glass-card-3d bot-card-3d bot-card-pixel">
-        <div class="char-viewport-3d char-vp-pixel">
-          <!-- 3D Pixel Mascot SVG -->
-          <svg width="42" height="42" viewBox="0 0 48 48" fill="none">
-            <ellipse cx="24" cy="42" rx="14" ry="4" fill="rgba(176, 38, 255, 0.25)" filter="blur(2px)"/>
-            <!-- 3D Floating Drone Sphere -->
-            <circle cx="24" cy="22" r="15" fill="url(#pixelBody)" stroke="#b026ff" stroke-width="2"/>
-            <!-- Radar Antenna Dish -->
-            <path d="M24 7 V3 M21 3 H27" stroke="#b026ff" stroke-width="2" stroke-linecap="round"/>
-            <!-- Big 3D Camera / Sonar Lens -->
-            <circle cx="24" cy="22" r="8" fill="#1e1035" stroke="#b026ff" stroke-width="1.5"/>
-            <circle cx="24" cy="22" r="4.5" fill="#a855f7"/>
-            <circle cx="26" cy="20" r="1.5" fill="#fff"/>
+      <div class="quant-panel bot-showcase-card card-spy" id="card-spy-el">
+        <div class="bot-avatar-3d avatar-spy">
+          <!-- 3D Pixel Drone SVG -->
+          <svg width="40" height="40" viewBox="0 0 44 44" fill="none">
+            <circle cx="22" cy="38" rx="12" ry="3" fill="rgba(240, 185, 11, 0.3)" filter="blur(1px)"/>
+            <circle cx="22" cy="20" r="13" fill="url(#pixelSkin)" stroke="#f0b90b" stroke-width="1.8"/>
+            <path d="M22 7 V3 M19 3 H25" stroke="#f0b90b" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="22" cy="20" r="7" fill="#1f1403" stroke="#f0b90b" stroke-width="1.2"/>
+            <circle cx="22" cy="20" r="4" fill="#fbbf24"/>
+            <circle cx="23.5" cy="18.5" r="1.2" fill="#fff"/>
             <defs>
-              <linearGradient id="pixelBody" x1="9" y1="7" x2="39" y2="37" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#6b21a8"/>
-                <stop offset="1" stop-color="#19062e"/>
+              <linearGradient id="pixelSkin" x1="9" y1="7" x2="35" y2="33" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#d97706"/>
+                <stop offset="1" stop-color="#1f1203"/>
               </linearGradient>
             </defs>
           </svg>
         </div>
-        <div class="bot-content-meta">
-          <div class="bot-hero-title" style="color:var(--purple-neon);">
-            <span>👁️ THE SPY</span>
-            <span style="font-size:10px; opacity:0.8;">[Pixel 3D]</span>
+        <div class="bot-meta-block">
+          <div class="bot-header-row">
+            <span class="bot-name-tag gold-txt">👁️ THE SPY (Pixel)</span>
+            <span class="bot-score-display green-txt" id="spy-pnl">+$0.00</span>
           </div>
-          <div class="bot-hero-desc">Whale Orderbook Absorption</div>
-        </div>
-        <div class="bot-pnl-score">
-          <div class="pnl-big-text green-txt" id="spy-pnl">+$0.00</div>
-          <div class="trades-mini-text" id="spy-trades">0 trades</div>
+          <div class="bot-strategy-title">Whale Orderbook Absorption</div>
+          <div class="strategy-chips">
+            <span class="scheme-chip">Bid Wall Frontrun</span>
+            <span class="scheme-chip">Depth Ratio &gt; 2.0</span>
+            <span class="scheme-chip" id="spy-trades">0 trades</span>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- ============================================================
-         DASHBOARD STAGE (Left Column + Right Content)
+         THE RUNNING HIGHWAY (Laser Track + Animated Running Bot!)
          ============================================================ -->
-    <div class="dashboard-stage-3d">
+    <section class="quant-panel highway-stage-panel">
+      <div class="highway-top-header">
+        <div class="highway-title">
+          <span style="font-size:18px;">⚡</span>
+          <span>AUTONOMOUS EXECUTION HIGHWAY • LIVE ORDER FLOW</span>
+        </div>
+        <span style="font-size:11px; color:var(--text-muted); font-variant-numeric:tabular-nums;" id="speed-indicator">tick 1.0s</span>
+      </div>
 
-      <!-- LEFT COLUMN: QUANT FLEET -->
-      <aside class="glass-card-3d fleet-sidebar-3d">
-        <div class="sidebar-header-line">
-          <span>QUANT ORCHESTRATION</span>
-          <span style="color:var(--green-neon);">6 ONLINE</span>
+      <div class="laser-track-container">
+        <!-- Glowing Laser Connector Line -->
+        <div class="laser-line-rail">
+          <div class="laser-pulse-wave"></div>
         </div>
 
-        <!-- 1. SCANNER -->
-        <div class="agent-slot-card">
-          <div class="agent-slot-badge" style="background:rgba(255, 183, 3, 0.15); color:var(--gold-neon);">🔭</div>
-          <div class="agent-slot-info">
-            <div class="agent-slot-top">
-              <span>SCANNER</span>
-              <span class="status-badge-chip" style="background:rgba(255, 183, 3, 0.15); color:var(--gold-neon);">SCAN</span>
-            </div>
-            <div class="agent-slot-sub">flags tokens, zero noise</div>
-            <div class="agent-slot-meta" id="scanner-detail">BTCUSDT • Binance Verified</div>
-          </div>
+        <!-- The Animated Walking/Running Bot on the Line! -->
+        <div class="walking-runner-bot" id="walking-bot-el">
+          <div class="runner-speech-bubble" id="runner-speech">SCANNING...</div>
+          <!-- Cute Walking Bot SVG with Moving Legs -->
+          <svg class="runner-svg" viewBox="0 0 40 40" fill="none">
+            <!-- Bot Body -->
+            <rect x="10" y="8" width="20" height="20" rx="8" fill="#f0b90b" stroke="#fff" stroke-width="1.6"/>
+            <!-- Visor -->
+            <rect x="13" y="12" width="14" height="6" rx="2" fill="#080a0f"/>
+            <circle cx="16" cy="15" r="1.8" fill="#00f0ff"/>
+            <circle cx="24" cy="15" r="1.8" fill="#00f0ff"/>
+            <!-- Cute Backpack Cargo -->
+            <rect x="6" y="12" width="4" height="12" rx="2" fill="#0ecb81"/>
+            <!-- Moving Running Legs! -->
+            <line class="leg-left" x1="15" y1="28" x2="13" y2="36" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+            <line class="leg-right" x1="25" y1="28" x2="27" y2="36" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+          </svg>
         </div>
 
-        <!-- 2. RUG CHECK -->
-        <div class="agent-slot-card">
-          <div class="agent-slot-badge" style="background:rgba(0, 255, 136, 0.15); color:var(--green-neon);">🛡️</div>
-          <div class="agent-slot-info">
-            <div class="agent-slot-top">
-              <span>RUG CHECK</span>
-              <span class="status-badge-chip" id="rug-tag" style="background:rgba(0, 255, 136, 0.15); color:var(--green-neon);">PASS</span>
-            </div>
-            <div class="agent-slot-sub">spread & orderbook filter</div>
-            <div class="agent-slot-meta green-txt" id="rug-sub">passed BTCUSDT</div>
+        <!-- 5 Highway Execution Stations -->
+        <div class="stations-grid">
+          <!-- Station 1: Scanner -->
+          <div class="highway-station active-station" id="station-1">
+            <div class="station-icon">🔭</div>
+            <div class="station-step-num">STEP 1</div>
+            <div class="station-name-title" id="flow-tok-1">BTCUSDT</div>
+            <div class="station-detail-sub">Binance Scanner</div>
+          </div>
+
+          <!-- Station 2: Rug & Spread Filter -->
+          <div class="highway-station" id="station-2">
+            <div class="station-icon">🛡️</div>
+            <div class="station-step-num">STEP 2</div>
+            <div class="station-name-title" id="filtered-val">0 FILTERED</div>
+            <div class="station-detail-sub green-txt" id="flow-rug-sub">Spread &lt; 0.05% PASS</div>
+          </div>
+
+          <!-- Station 3: Dynamic Sizer -->
+          <div class="highway-station" id="station-3">
+            <div class="station-icon">⚖️</div>
+            <div class="station-step-num">STEP 3</div>
+            <div class="station-name-title" id="sizer-eq-val">20% eq</div>
+            <div class="station-detail-sub" id="sizer-eq-sub">$0.00 (Reserve Safe)</div>
+          </div>
+
+          <!-- Station 4: Order Execution -->
+          <div class="highway-station" id="station-4">
+            <div class="station-icon">🚀</div>
+            <div class="station-step-num">STEP 4</div>
+            <div class="station-name-title" id="exec-node-sub">STANDBY</div>
+            <div class="station-detail-sub cyan-txt">Order Placement</div>
+          </div>
+
+          <!-- Station 5: Profit & Risk Lock -->
+          <div class="highway-station" id="station-5">
+            <div class="station-icon">💰</div>
+            <div class="station-step-num">STEP 5</div>
+            <div class="station-name-title green-txt" id="equity-last-val">+$0.00</div>
+            <div class="station-detail-sub">+1.8% TP / -0.9% SL</div>
           </div>
         </div>
+      </div>
+    </section>
 
-        <!-- 3. SIZER -->
-        <div class="agent-slot-card">
-          <div class="agent-slot-badge" style="background:rgba(176, 38, 255, 0.15); color:var(--purple-neon);">⚖️</div>
-          <div class="agent-slot-info">
-            <div class="agent-slot-top">
-              <span>SIZER</span>
-              <span class="status-badge-chip" style="background:rgba(176, 38, 255, 0.15); color:var(--purple-neon);">ACTIVE</span>
-            </div>
-            <div class="agent-slot-sub">dynamic equity calibration</div>
-            <div class="agent-slot-meta" id="sizer-subtext">adaptive micro-size</div>
-          </div>
+    <!-- ============================================================
+         MIDDLE ARENA: CHECKLIST + ACTIVE POSITION & CANDLESTICK + STREAM
+         ============================================================ -->
+    <div class="arena-grid-layout">
+
+      <!-- LEFT: AGENTS STATUS CHECKLIST -->
+      <aside class="quant-panel agents-panel-box">
+        <div class="agents-hud-title">
+          <span>FLEET ARCHITECTURE</span>
+          <span style="color:var(--binance-green);">ONLINE</span>
         </div>
 
-        <!-- 4. EXECUTOR -->
-        <div class="agent-slot-card" style="border-color:rgba(0, 240, 255, 0.35);">
-          <div class="agent-slot-badge" style="background:rgba(0, 240, 255, 0.15); color:var(--cyan-neon);">🚀</div>
-          <div class="agent-slot-info">
-            <div class="agent-slot-top">
-              <span>EXECUTOR</span>
-              <span class="status-badge-chip" style="background:rgba(0, 240, 255, 0.15); color:var(--cyan-neon);">LIVE</span>
-            </div>
-            <div class="agent-slot-sub">fills orders, locks trailing stop</div>
-            <div class="agent-slot-meta cyan-txt" id="exec-subtext">LONG BTCUSDT</div>
+        <div class="agent-mini-row">
+          <span>🔭</span>
+          <div style="flex:1;">
+            <b>SCANNER</b>
+            <div style="color:var(--text-sub); font-size:10px;" id="scanner-detail">BTCUSDT • Binance Verified</div>
           </div>
+          <span class="agent-tag-badge" style="background:rgba(240, 185, 11, 0.15); color:var(--binance-gold);">ACTIVE</span>
         </div>
 
-        <!-- 5. LOGGER -->
-        <div class="agent-slot-card">
-          <div class="agent-slot-badge" style="background:rgba(255, 183, 3, 0.15); color:var(--gold-neon);">📝</div>
-          <div class="agent-slot-info">
-            <div class="agent-slot-top">
-              <span>LOGGER</span>
-              <span class="status-badge-chip" style="background:rgba(255, 183, 3, 0.15); color:var(--gold-neon);">WRITE</span>
-            </div>
-            <div class="agent-slot-sub">every decision strictly logged</div>
-            <div class="agent-slot-meta" id="logger-subtext">line #1 listening</div>
+        <div class="agent-mini-row">
+          <span>🛡️</span>
+          <div style="flex:1;">
+            <b>RUG CHECK</b>
+            <div style="color:var(--text-sub); font-size:10px;" id="rug-sub">passed BTCUSDT</div>
           </div>
+          <span class="agent-tag-badge" id="rug-tag" style="background:rgba(14, 203, 129, 0.15); color:var(--binance-green);">PASS</span>
         </div>
 
-        <!-- 6. SUPERVISOR (YOU) -->
-        <div class="agent-slot-card">
-          <div class="agent-slot-badge" style="background:rgba(255, 255, 255, 0.1); color:#fff;">👑</div>
-          <div class="agent-slot-info">
-            <div class="agent-slot-top">
-              <span>YOU (CHIEF)</span>
-              <span class="status-badge-chip" style="background:rgba(255, 255, 255, 0.1); color:#cbd5e1;">SUPERVISOR</span>
-            </div>
-            <div class="agent-slot-sub">wake up to profits in morning</div>
-            <div class="agent-slot-meta" id="lines-to-read">0 events logged</div>
+        <div class="agent-mini-row">
+          <span>⚖️</span>
+          <div style="flex:1;">
+            <b>SIZER</b>
+            <div style="color:var(--text-sub); font-size:10px;" id="sizer-subtext">adaptive micro-size</div>
           </div>
+          <span class="agent-tag-badge" style="background:rgba(41, 98, 255, 0.15); color:#60a5fa;">ACTIVE</span>
+        </div>
+
+        <div class="agent-mini-row">
+          <span>🚀</span>
+          <div style="flex:1;">
+            <b>EXECUTOR</b>
+            <div style="color:var(--text-sub); font-size:10px;" id="exec-subtext">LONG BTCUSDT</div>
+          </div>
+          <span class="agent-tag-badge" style="background:rgba(0, 240, 255, 0.15); color:var(--trading-cyan);">LIVE</span>
+        </div>
+
+        <div class="agent-mini-row">
+          <span>📝</span>
+          <div style="flex:1;">
+            <b>LOGGER</b>
+            <div style="color:var(--text-sub); font-size:10px;" id="logger-subtext">line #1 listening</div>
+          </div>
+          <span class="agent-tag-badge" style="background:rgba(255, 255, 255, 0.1); color:#cbd5e1;">LOG</span>
+        </div>
+
+        <div class="agent-mini-row">
+          <span>👑</span>
+          <div style="flex:1;">
+            <b>YOU (CHIEF)</b>
+            <div style="color:var(--text-sub); font-size:10px;" id="lines-to-read">0 events recorded</div>
+          </div>
+          <span class="agent-tag-badge" style="background:rgba(240, 185, 11, 0.15); color:var(--binance-gold);">SUPERVISOR</span>
         </div>
       </aside>
 
-      <!-- RIGHT COLUMN: CORE TRADING ARENA -->
-      <main class="core-content-3d">
-
-        <!-- ============================================================
-             3D PIPELINE RAIL (Pip the Quantum Courier Drone)
-             ============================================================ -->
-        <section class="glass-card-3d pipeline-stage-card">
-          <div class="pipeline-headline">
-            <div class="pipeline-headline-title">
-              <span style="font-size:18px;">🛸</span>
-              <span>QUANTUM PIPELINE • 3D AUTONOMOUS EXECUTION</span>
-            </div>
-            <span style="font-size:11px; color:var(--text-muted); font-variant-numeric:tabular-nums;" id="speed-indicator">tick 1.0s</span>
+      <!-- CENTER: ACTIVE TRADE & REAL CANDLESTICK CHART -->
+      <div class="quant-panel active-trade-box">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:900; font-size:11px; color:var(--text-muted); text-transform:uppercase;">ACTIVE POSITION DISPATCH</span>
+            <span class="trade-status-badge" id="trade-open-badge" style="display:none;">LIVE ACTIVE</span>
           </div>
 
-          <div class="pipeline-rail-track">
-            <!-- Station 1: SCANNER -->
-            <div class="rail-station-node" id="step-scan">
-              <div class="station-avatar-box">
-                <span style="font-size:24px;">🔭</span>
-              </div>
-              <span class="station-chip" style="background:rgba(255, 183, 3, 0.15); color:var(--gold-neon);">SCANNER</span>
-              <div class="station-main-lbl" id="flow-tok-1">BTCUSDT</div>
-              <div class="station-sub-lbl">Binance Spot</div>
-            </div>
-
-            <!-- Station 2: RUG CHECK -->
-            <div class="rail-station-node" id="step-rug">
-              <div class="station-avatar-box">
-                <span style="font-size:24px;">🛡️</span>
-              </div>
-              <span class="station-chip" style="background:rgba(0, 255, 136, 0.15); color:var(--green-neon);">RISK VETO</span>
-              <div class="station-main-lbl" id="filtered-val">0 FILTERED</div>
-              <div class="station-sub-lbl green-txt" id="flow-rug-sub">SPREAD &lt; 15bps</div>
-            </div>
-
-            <!-- Station 3: SIZER -->
-            <div class="rail-station-node" id="step-sizer">
-              <div class="station-avatar-box">
-                <span style="font-size:24px;">⚖️</span>
-              </div>
-              <span class="station-chip" style="background:rgba(176, 38, 255, 0.15); color:var(--purple-neon);">SIZER</span>
-              <div class="station-main-lbl" id="sizer-eq-val">20% eq</div>
-              <div class="station-sub-lbl" id="sizer-eq-sub">$0.00</div>
-            </div>
-
-            <!-- Station 4: PIP THE COURIER (Active Carrier) -->
-            <div class="rail-station-node active-station" id="step-courier">
-              <div class="station-avatar-box">
-                <!-- 3D Pip Courier Drone SVG -->
-                <svg class="pip-drone-3d" viewBox="0 0 40 40" fill="none">
-                  <ellipse cx="20" cy="36" rx="10" ry="3" fill="rgba(255, 183, 3, 0.3)" filter="blur(1px)"/>
-                  <!-- Capsule Pod -->
-                  <rect x="10" y="10" width="20" height="22" rx="10" fill="url(#pipGrad)" stroke="#ffb703" stroke-width="1.8"/>
-                  <!-- Rotating Golden Cyber Propeller -->
-                  <rect x="8" y="5" width="24" height="2" rx="1" fill="#fff"/>
-                  <circle cx="20" cy="6" r="2" fill="#ffb703"/>
-                  <!-- Big Happy Eyes -->
-                  <circle cx="16" cy="18" r="2.2" fill="#06080e"/>
-                  <circle cx="24" cy="18" r="2.2" fill="#06080e"/>
-                  <circle cx="17" cy="17" r="0.8" fill="#fff"/>
-                  <circle cx="25" cy="17" r="0.8" fill="#fff"/>
-                  <!-- Sweet Smile -->
-                  <path d="M17 23 Q20 26 23 23" stroke="#06080e" stroke-width="1.6" stroke-linecap="round"/>
-                  <defs>
-                    <linearGradient id="pipGrad" x1="10" y1="10" x2="30" y2="32" gradientUnits="userSpaceOnUse">
-                      <stop stop-color="#fbbf24"/>
-                      <stop offset="1" stop-color="#b45309"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-              <span class="station-chip" style="background:rgba(0, 240, 255, 0.15); color:var(--cyan-neon);">EXECUTOR</span>
-              <div class="station-main-lbl" id="exec-node-sub">STANDBY</div>
-              <div class="station-sub-lbl" style="color:var(--cyan-neon);">Pip the Courier</div>
-            </div>
-
-            <!-- Station 5: EQUITY & PNL -->
-            <div class="rail-station-node" id="step-equity">
-              <div class="station-avatar-box">
-                <span style="font-size:24px;">💧</span>
-              </div>
-              <span class="station-chip" style="background:rgba(0, 255, 136, 0.15); color:var(--green-neon);">EQUITY</span>
-              <div class="station-main-lbl green-txt" id="equity-last-val">+$0.00</div>
-              <div class="station-sub-lbl">last close</div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============================================================
-             MIDDLE ROW: 3D POSITION CARD + 4K NIGHT LOG
-             ============================================================ -->
-        <div class="stage-middle-grid">
-
-          <!-- ACTIVE POSITION 3D CARD -->
-          <div class="glass-card-3d active-pos-3d-card">
-            <div>
-              <div class="active-pos-top">
-                <span style="font-weight:900; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">LIVE MARKET EXECUTION</span>
-                <span class="pos-live-pill" id="trade-open-badge" style="display:none;">LIVE ACTIVE</span>
-              </div>
-
-              <div class="pos-token-title">
-                <span class="pos-token-name" id="active-symbol">AWAITING DEPOSIT</span>
-                <span class="pos-side-pill" id="active-side">$0.00</span>
-              </div>
-
-              <div class="pos-pnl-banner green-txt" id="active-pnl">deposit funds to start 🚀</div>
-
-              <!-- Live Mini Candlestick Spark Canvas -->
-              <div class="mini-chart-box">
-                <canvas id="mini-chart-canvas"></canvas>
-              </div>
-
-              <div class="pos-specs-table">
-                <span class="spec-t-lbl">Bot Officer:</span>
-                <span class="spec-t-val cyan-txt" id="active-bot">-</span>
-
-                <span class="spec-t-lbl">Entry Price:</span>
-                <span class="spec-t-val" id="active-entry">-</span>
-
-                <span class="spec-t-lbl">Market Ticker:</span>
-                <span class="spec-t-val" id="active-current">-</span>
-
-                <span class="spec-t-lbl">Slippage Cap:</span>
-                <span class="spec-t-val" id="active-slip">0.02%</span>
-
-                <span class="spec-t-lbl">Allocated Size:</span>
-                <span class="spec-t-val" id="active-size">-</span>
-
-                <span class="spec-t-lbl">Alpha Reason:</span>
-                <span class="spec-t-val gold-txt" id="active-reason" style="font-size:10px;">Click '+ DEPOSIT' (Min: $1 | Max: $1000)</span>
-              </div>
-            </div>
+          <div class="token-row-headline">
+            <span class="token-huge-title" id="active-symbol">AWAITING DEPOSIT</span>
+            <span class="token-side-chip" id="active-side">$0.00</span>
           </div>
 
-          <!-- 4K NIGHT LOG FEED -->
-          <div class="glass-card-3d log-stream-3d-card">
-            <div class="log-header-line">
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span style="font-size:15px;">💬</span>
-                <span style="font-weight:900; font-size:12px; color:#fff;">$ tail -f binance_quant.log</span>
-              </div>
-              <span style="font-size:10px; color:var(--green-neon); font-weight:800;" id="log-count-meta">LIVE FEED • 1.0s</span>
-            </div>
+          <div class="pnl-live-counter green-txt" id="active-pnl">deposit funds to start 🚀</div>
 
-            <div class="log-scroll-area" id="night-log-terminal">
-              <!-- Dynamically populated -->
-            </div>
+          <!-- Real Interactive Candlestick Canvas -->
+          <div class="chart-container-box">
+            <canvas id="candlestick-canvas"></canvas>
+          </div>
+
+          <div class="specs-keyvalue-grid">
+            <span class="spec-k">Trading Bot:</span>
+            <span class="spec-v cyan-txt" id="active-bot">-</span>
+
+            <span class="spec-k">Entry Price:</span>
+            <span class="spec-v" id="active-entry">-</span>
+
+            <span class="spec-k">Live Price:</span>
+            <span class="spec-v" id="active-current">-</span>
+
+            <span class="spec-k">Slippage Cap:</span>
+            <span class="spec-v" id="active-slip">0.02%</span>
+
+            <span class="spec-k">Position Size:</span>
+            <span class="spec-v" id="active-size">-</span>
+
+            <span class="spec-k">Strategy Rule:</span>
+            <span class="spec-v gold-txt" id="active-reason" style="font-size:10px;">Click '+ DEPOSIT' ($1 - $1000 max)</span>
           </div>
         </div>
+      </div>
 
-        <!-- ============================================================
-             PERFORMANCE PROGRESS STRIP (START vs NOW)
-             ============================================================ -->
-        <div class="glass-card-3d session-strip-3d">
-          <div>
-            <div style="font-size:12px; font-weight:900; text-transform:uppercase;">PORTFOLIO TRAJECTORY • START vs NOW</div>
-            <div style="font-size:11px; color:var(--text-muted);">Real-time quantitative profit compounding</div>
+      <!-- RIGHT: 4K LIVE NIGHT LOG STREAM -->
+      <div class="quant-panel log-stream-box">
+        <div class="log-top-bar">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:15px;">💬</span>
+            <span style="font-weight:900; font-size:12px; color:#fff;">$ tail -f binance_quant.log</span>
           </div>
-
-          <div class="strip-metrics">
-            <div class="strip-box">
-              <span class="strip-box-lbl">INITIAL CAPITAL</span>
-              <span class="strip-box-val" id="start-bal-val">$0.00</span>
-            </div>
-
-            <div class="progress-bar-3d-wrap">
-              <div class="progress-bar-3d-fill" id="prog-fill"></div>
-            </div>
-
-            <div class="strip-box">
-              <span class="strip-box-lbl">CURRENT NOW</span>
-              <span class="strip-box-val green-txt" id="now-bal-val">$0.00</span>
-            </div>
-
-            <div class="strip-box" style="text-align:right;">
-              <span class="strip-box-lbl">WIN / LOSS RECORD</span>
-              <span class="strip-box-val" id="record-stat-val">0 W / 0 L</span>
-            </div>
-          </div>
+          <span style="font-size:10px; color:var(--binance-green); font-weight:800;" id="log-count-meta">LIVE FEED • 1.0s</span>
         </div>
 
-        <!-- ============================================================
-             CLOSED TRADES & EXECUTIONS (LEDGER)
-             ============================================================ -->
-        <section class="glass-card-3d ledger-stage-card">
-          <div class="ledger-top-bar">
-            <span style="font-weight:900; text-transform:uppercase; color:#fff;">CLOSED TRADES & EXECUTIONS (LEDGER)</span>
-            <span>real-time verified</span>
-          </div>
-          <div class="ledger-rows-container" id="ledger-rows">
-            <!-- Dynamically populated -->
-          </div>
-        </section>
+        <div class="log-lines-scroll" id="night-log-terminal">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
 
-      </main>
     </div>
+
+    <!-- ============================================================
+         SESSION PERFORMANCE STRIP (START vs NOW)
+         ============================================================ -->
+    <div class="quant-panel" style="padding:16px 22px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+      <div>
+        <div style="font-size:12px; font-weight:900; text-transform:uppercase;">PORTFOLIO COMPOUNDING • START vs NOW</div>
+        <div style="font-size:11px; color:var(--text-muted);">Real-time quantitative profit multiplier</div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:22px;">
+        <div>
+          <span style="font-size:10px; font-weight:700; color:var(--text-muted); display:block;">INITIAL CAPITAL</span>
+          <span style="font-size:16px; font-weight:900;" id="start-bal-val">$0.00</span>
+        </div>
+
+        <div style="width:180px; height:8px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:hidden;">
+          <div style="width:60%; height:100%; background:linear-gradient(90deg, var(--binance-green), var(--trading-cyan)); border-radius:4px;" id="prog-fill"></div>
+        </div>
+
+        <div>
+          <span style="font-size:10px; font-weight:700; color:var(--text-muted); display:block;">CURRENT PORTFOLIO</span>
+          <span style="font-size:16px; font-weight:900;" class="green-txt" id="now-bal-val">$0.00</span>
+        </div>
+
+        <div style="text-align:right;">
+          <span style="font-size:10px; font-weight:700; color:var(--text-muted); display:block;">WIN / LOSS SCORE</span>
+          <span style="font-size:16px; font-weight:900;" id="record-stat-val">0 W / 0 L</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         CLOSED TRADES & EXECUTIONS (LEDGER)
+         ============================================================ -->
+    <section class="quant-panel ledger-section-box">
+      <div class="ledger-top-title">
+        <span style="font-weight:900; text-transform:uppercase; color:#fff;">CLOSED TRADES & EXECUTIONS (LEDGER)</span>
+        <span>real-time verified on binance</span>
+      </div>
+      <div class="ledger-table-wrap" id="ledger-rows">
+        <!-- Dynamically populated -->
+      </div>
+    </section>
 
   </div>
 
   <!-- ============================================================
-       QUANT ENGINE SCRIPT (4K 3D Render + Autonomous Trading)
+       QUANT ENGINE JAVASCRIPT
        ============================================================ -->
   <script>
-    // Audio Chime Synthesizer using Web Audio API (Zero external files needed)
+    // -------------------------------------------------------------
+    // Audio Chime Synthesizer
+    // -------------------------------------------------------------
     let audioCtx = null;
     let soundEnabled = true;
 
@@ -1480,17 +1335,15 @@
         gain.connect(audioCtx.destination);
         
         if (isWin) {
-          // Cheerful futuristic ascending chord
-          osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
-          osc.frequency.exponentialRampToValueAtTime(880.00, audioCtx.currentTime + 0.15); // A5
+          osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(880.00, audioCtx.currentTime + 0.15);
           gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
           osc.start();
           osc.stop(audioCtx.currentTime + 0.4);
         } else {
-          // Soft subtle muted tick
-          osc.frequency.setValueAtTime(329.63, audioCtx.currentTime); // E4
-          osc.frequency.exponentialRampToValueAtTime(261.63, audioCtx.currentTime + 0.1); // C4
+          osc.frequency.setValueAtTime(329.63, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(261.63, audioCtx.currentTime + 0.1);
           gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
           osc.start();
@@ -1505,114 +1358,113 @@
     });
 
     // -------------------------------------------------------------
-    // 3D Background Starfield & Cyber Dust Particle Canvas
+    // Ambient Cyber Grid Canvas
     // -------------------------------------------------------------
-    const bgCanvas = document.getElementById("bg-canvas");
-    const bgCtx = bgCanvas.getContext("2d");
-    let stars = [];
-    let mouseX = 0, mouseY = 0;
+    const gridCanvas = document.getElementById("grid-canvas");
+    const gridCtx = gridCanvas.getContext("2d");
+    let particles = [];
 
-    function initStars() {
-      bgCanvas.width = window.innerWidth;
-      bgCanvas.height = window.innerHeight;
-      stars = [];
-      const numStars = Math.min(120, Math.floor(window.innerWidth / 12));
-      for (let i = 0; i < numStars; i++) {
-        stars.push({
-          x: Math.random() * bgCanvas.width,
-          y: Math.random() * bgCanvas.height,
-          z: Math.random() * 2 + 0.5,
+    function initGrid() {
+      gridCanvas.width = window.innerWidth;
+      gridCanvas.height = window.innerHeight;
+      particles = [];
+      const num = Math.min(100, Math.floor(window.innerWidth / 14));
+      for (let i = 0; i < num; i++) {
+        particles.push({
+          x: Math.random() * gridCanvas.width,
+          y: Math.random() * gridCanvas.height,
           radius: Math.random() * 1.5 + 0.5,
-          color: Math.random() > 0.5 ? "rgba(0, 240, 255," : "rgba(176, 38, 255,",
-          alpha: Math.random() * 0.5 + 0.2,
-          speed: Math.random() * 0.4 + 0.1
+          color: Math.random() > 0.5 ? "rgba(14, 203, 129," : "rgba(41, 98, 255,",
+          alpha: Math.random() * 0.4 + 0.1,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: -Math.random() * 0.4 - 0.1
         });
       }
     }
-    window.addEventListener("resize", initStars);
-    window.addEventListener("mousemove", (e) => {
-      mouseX = (e.clientX - window.innerWidth / 2) * 0.02;
-      mouseY = (e.clientY - window.innerHeight / 2) * 0.02;
-    });
+    window.addEventListener("resize", initGrid);
 
-    function drawStars() {
-      bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-      for (let s of stars) {
-        s.y -= s.speed;
-        if (s.y < 0) s.y = bgCanvas.height;
-        bgCtx.beginPath();
-        bgCtx.arc(s.x + mouseX * s.z, s.y + mouseY * s.z, s.radius, 0, Math.PI * 2);
-        bgCtx.fillStyle = `${s.color}${s.alpha})`;
-        bgCtx.shadowBlur = 8;
-        bgCtx.shadowColor = s.color + "0.8)";
-        bgCtx.fill();
+    function drawGrid() {
+      gridCtx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
+      for (let p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.y < 0) p.y = gridCanvas.height;
+        if (p.x < 0) p.x = gridCanvas.width;
+        if (p.x > gridCanvas.width) p.x = 0;
+
+        gridCtx.beginPath();
+        gridCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        gridCtx.fillStyle = `${p.color}${p.alpha})`;
+        gridCtx.fill();
       }
-      requestAnimationFrame(drawStars);
+      requestAnimationFrame(drawGrid);
     }
-    initStars();
-    drawStars();
+    initGrid();
+    drawGrid();
 
     // -------------------------------------------------------------
-    // Live Mini Candlestick Sparkline Canvas for Active Trade
+    // Real Interactive Candlestick Canvas
     // -------------------------------------------------------------
-    const miniChartCanvas = document.getElementById("mini-chart-canvas");
-    const miniCtx = miniChartCanvas.getContext("2d");
-    let priceHistory = [];
+    const candleCanvas = document.getElementById("candlestick-canvas");
+    const candleCtx = candleCanvas.getContext("2d");
+    let candleData = [];
 
-    function renderMiniChart() {
-      const w = miniChartCanvas.width = miniChartCanvas.offsetWidth;
-      const h = miniChartCanvas.height = miniChartCanvas.offsetHeight;
-      if (!priceHistory.length) {
-        // Flat baseline
-        miniCtx.clearRect(0, 0, w, h);
-        miniCtx.beginPath();
-        miniCtx.moveTo(0, h / 2);
-        miniCtx.lineTo(w, h / 2);
-        miniCtx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-        miniCtx.stroke();
-        return;
+    function generateCandles(basePrice) {
+      candleData = [];
+      let p = basePrice * 0.995;
+      for (let i = 0; i < 20; i++) {
+        const delta = (Math.random() - 0.48) * (basePrice * 0.003);
+        const open = p;
+        const close = p + delta;
+        const high = Math.max(open, close) + Math.random() * (basePrice * 0.001);
+        const low = Math.min(open, close) - Math.random() * (basePrice * 0.001);
+        candleData.push({ open, close, high, low });
+        p = close;
       }
+    }
 
-      miniCtx.clearRect(0, 0, w, h);
-      const min = Math.min(...priceHistory);
-      const max = Math.max(...priceHistory);
+    function renderCandlesticks() {
+      const w = candleCanvas.width = candleCanvas.offsetWidth;
+      const h = candleCanvas.height = candleCanvas.offsetHeight;
+      candleCtx.clearRect(0, 0, w, h);
+      if (!candleData.length) return;
+
+      let allP = [];
+      candleData.forEach(c => allP.push(c.high, c.low));
+      const min = Math.min(...allP);
+      const max = Math.max(...allP);
       const range = (max - min) || 1;
 
-      // Draw gradient area
-      const grad = miniCtx.createLinearGradient(0, 0, 0, h);
-      const isGreen = priceHistory[priceHistory.length - 1] >= priceHistory[0];
-      grad.addColorStop(0, isGreen ? "rgba(0, 255, 136, 0.3)" : "rgba(255, 0, 85, 0.3)");
-      grad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      const candleW = Math.floor(w / candleData.length) - 3;
 
-      miniCtx.beginPath();
-      const step = w / (priceHistory.length - 1 || 1);
-      priceHistory.forEach((p, i) => {
-        const x = i * step;
-        const y = h - ((p - min) / range) * (h - 14) - 7;
-        if (i === 0) miniCtx.moveTo(x, y); else miniCtx.lineTo(x, y);
-      });
-      miniCtx.lineTo(w, h);
-      miniCtx.lineTo(0, h);
-      miniCtx.closePath();
-      miniCtx.fillStyle = grad;
-      miniCtx.fill();
+      candleData.forEach((c, i) => {
+        const x = i * (candleW + 3) + 2;
+        const isUp = c.close >= c.open;
+        const color = isUp ? "#0ecb81" : "#f6465d";
 
-      // Stroke Line
-      miniCtx.beginPath();
-      priceHistory.forEach((p, i) => {
-        const x = i * step;
-        const y = h - ((p - min) / range) * (h - 14) - 7;
-        if (i === 0) miniCtx.moveTo(x, y); else miniCtx.lineTo(x, y);
+        const yHigh = h - ((c.high - min) / range) * (h - 12) - 6;
+        const yLow = h - ((c.low - min) / range) * (h - 12) - 6;
+        const yOpen = h - ((c.open - min) / range) * (h - 12) - 6;
+        const yClose = h - ((c.close - min) / range) * (h - 12) - 6;
+
+        // Wick
+        candleCtx.beginPath();
+        candleCtx.moveTo(x + candleW / 2, yHigh);
+        candleCtx.lineTo(x + candleW / 2, yLow);
+        candleCtx.strokeStyle = color;
+        candleCtx.lineWidth = 1;
+        candleCtx.stroke();
+
+        // Body
+        candleCtx.fillStyle = color;
+        const top = Math.min(yOpen, yClose);
+        const height = Math.max(2, Math.abs(yClose - yOpen));
+        candleCtx.fillRect(x, top, candleW, height);
       });
-      miniCtx.strokeStyle = isGreen ? "#00ff88" : "#ff0055";
-      miniCtx.lineWidth = 2;
-      miniCtx.shadowColor = isGreen ? "rgba(0, 255, 136, 0.8)" : "rgba(255, 0, 85, 0.8)";
-      miniCtx.shadowBlur = 6;
-      miniCtx.stroke();
     }
 
     // -------------------------------------------------------------
-    // Quant Trading State & Logic
+    // Main Quant State & Autonomous Engine
     // -------------------------------------------------------------
     const STATE = {
       running: true,
@@ -1676,6 +1528,30 @@
       if (STATE.logs.length > 50) STATE.logs.pop();
     }
 
+    // Move the Walking Runner Bot along the Highway!
+    const runnerBotEl = document.getElementById("walking-bot-el");
+    const runnerSpeechEl = document.getElementById("runner-speech");
+    const stationPositions = ["10%", "30%", "50%", "70%", "90%"];
+
+    function moveRunnerToStation(stepIndex, speechText) {
+      if (runnerBotEl && stationPositions[stepIndex]) {
+        runnerBotEl.style.left = stationPositions[stepIndex];
+        runnerSpeechEl.textContent = speechText;
+
+        // Highlight active station
+        for (let i = 1; i <= 5; i++) {
+          const st = document.getElementById(`station-${i}`);
+          if (st) {
+            if (i === (stepIndex + 1)) {
+              st.classList.add("active-station");
+            } else {
+              st.classList.remove("active-station");
+            }
+          }
+        }
+      }
+    }
+
     // Main Trading Tick (Executes every 1 second)
     async function tradingTick() {
       if (!STATE.running) return;
@@ -1690,8 +1566,7 @@
         document.getElementById("exec-node-sub").textContent = "STANDBY";
         document.getElementById("exec-pill").textContent = "AWAITING DEPOSIT • $0.00";
         document.getElementById("trade-open-badge").style.display = "none";
-        priceHistory = [];
-        renderMiniChart();
+        moveRunnerToStation(0, "WAITING DEPOSIT 💳");
         render();
         return;
       }
@@ -1704,15 +1579,26 @@
         const liveP = await updateLivePrice(STATE.activeTrade.symbol);
         if (liveP) {
           STATE.activeTrade.currentPrice = liveP;
-          priceHistory.push(liveP);
-          if (priceHistory.length > 25) priceHistory.shift();
-          renderMiniChart();
+          if (candleData.length) {
+            const lastCandle = candleData[candleData.length - 1];
+            lastCandle.close = liveP;
+            lastCandle.high = Math.max(lastCandle.high, liveP);
+            lastCandle.low = Math.min(lastCandle.low, liveP);
+            renderCandlesticks();
+          }
         }
 
         // Dynamic tick fluctuation
-        const delta = (Math.random() * 0.5 - 0.22);
+        const delta = (Math.random() * 0.48 - 0.20);
         STATE.activeTrade.pnlPct = +(STATE.activeTrade.pnlPct + delta).toFixed(2);
         STATE.activeTrade.pnlDollars = +((STATE.activeTrade.sizeUsd * (STATE.activeTrade.pnlPct / 100))).toFixed(3);
+
+        // Move Runner Bot to Executor & Profit station during open trade
+        if (STATE.tradeDuration <= 5) {
+          moveRunnerToStation(3, `EXECUTING ${STATE.activeTrade.symbol} 🚀`);
+        } else {
+          moveRunnerToStation(4, `MONITORING (${STATE.activeTrade.pnlPct}%) 📈`);
+        }
 
         // Exit on TP (+1.8%) or SL (-0.9%) or 18s duration
         if (STATE.activeTrade.pnlPct >= 1.8 || STATE.activeTrade.pnlPct <= -0.9 || STATE.tradeDuration >= 18) {
@@ -1737,6 +1623,7 @@
           document.getElementById("equity-last-val").textContent = pnlStr;
           STATE.activeTrade = null;
           STATE.tradeDuration = 0;
+          moveRunnerToStation(4, `CLOSED: ${pnlStr} 💰`);
         }
       } 
       // 2. Open New Trade (When flat and balance > 0)
@@ -1747,14 +1634,14 @@
         const realP = await updateLivePrice(current.symbol);
         if (realP) current.price = realP;
 
-        priceHistory = [current.price * 0.999, current.price * 0.9995, current.price];
-        renderMiniChart();
+        generateCandles(current.price);
+        renderCandlesticks();
 
         const bots = ["GAMBLER", "HOUSE", "SPY"];
         const chosenBot = bots[Math.floor(Math.random() * bots.length)];
         const reasons = {
-          GAMBLER: `[Bolt ⚡] Bullish EMA Ribbon Cross + 1.4x Vol Surge [PAPER LIVE EXEC]`,
-          HOUSE: `[Chip 🛡️] Extreme Oversold RSI < 30 Capitulation Bounce [PAPER LIVE EXEC]`,
+          GAMBLER: `[Bolt ⚡] Bullish EMA 7/21 Cross + 1.4x Vol Surge [PAPER LIVE EXEC]`,
+          HOUSE: `[Chip 🏛️] Extreme Oversold RSI < 30 Capitulation Bounce [PAPER LIVE EXEC]`,
           SPY: `[Pixel 👁️] Whale Bid Volume Absorption Triggered [PAPER LIVE EXEC]`
         };
 
@@ -1785,6 +1672,15 @@
           sizePct: sizePct,
           reason: reasons[chosenBot]
         };
+
+        // Sequenced bot animation along track!
+        moveRunnerToStation(1, `SAFE-CHECK ${current.symbol} 🛡️`);
+        setTimeout(() => {
+          if (STATE.activeTrade) moveRunnerToStation(2, `SIZING $${sizeUsd} ⚖️`);
+        }, 600);
+        setTimeout(() => {
+          if (STATE.activeTrade) moveRunnerToStation(3, `DISPATCHING ORDER 🚀`);
+        }, 1200);
 
         logEvent("ENTER", chosenBot, current.symbol, "", reasons[chosenBot], `$${sizeUsd.toFixed(2)}`);
       }
@@ -1828,7 +1724,7 @@
         const sign = STATE.activeTrade.pnlPct >= 0 ? "+" : "";
         const pnlEl = document.getElementById("active-pnl");
         pnlEl.textContent = `${sign}${STATE.activeTrade.pnlPct}% ($${sign}${STATE.activeTrade.pnlDollars})`;
-        pnlEl.className = STATE.activeTrade.pnlPct >= 0 ? "pos-pnl-banner green-txt" : "pos-pnl-banner red-txt";
+        pnlEl.className = STATE.activeTrade.pnlPct >= 0 ? "pnl-live-counter green-txt" : "pnl-live-counter red-txt";
         
         document.getElementById("active-entry").textContent = `$${STATE.activeTrade.entryPrice.toLocaleString('en-US')}`;
         document.getElementById("active-current").textContent = `$${STATE.activeTrade.currentPrice.toLocaleString('en-US')}`;
@@ -1837,6 +1733,11 @@
         document.getElementById("exec-node-sub").textContent = `LIVE ${STATE.activeTrade.symbol}`;
         document.getElementById("exec-pill").textContent = `EXECUTOR • ENTERED ${STATE.activeTrade.symbol}`;
         document.getElementById("trade-open-badge").style.display = "inline-block";
+
+        // Highlight active bot card
+        document.getElementById("card-gambler-el").classList.toggle("active-trader", STATE.activeTrade.bot === "GAMBLER");
+        document.getElementById("card-house-el").classList.toggle("active-trader", STATE.activeTrade.bot === "HOUSE");
+        document.getElementById("card-spy-el").classList.toggle("active-trader", STATE.activeTrade.bot === "SPY");
       } else if (STATE.balance <= 0) {
         document.getElementById("active-symbol").textContent = "AWAITING DEPOSIT";
         document.getElementById("active-side").textContent = "$0.00";
@@ -1845,6 +1746,9 @@
         document.getElementById("exec-node-sub").textContent = "STANDBY";
         document.getElementById("exec-pill").textContent = "AWAITING DEPOSIT • $0.00";
         document.getElementById("trade-open-badge").style.display = "none";
+        document.getElementById("card-gambler-el").classList.remove("active-trader");
+        document.getElementById("card-house-el").classList.remove("active-trader");
+        document.getElementById("card-spy-el").classList.remove("active-trader");
       } else {
         document.getElementById("active-symbol").textContent = "SCANNING";
         document.getElementById("active-side").textContent = "SEARCHING";
@@ -1853,24 +1757,27 @@
         document.getElementById("exec-node-sub").textContent = "IDLE";
         document.getElementById("exec-pill").textContent = "SCANNER • HUNTING";
         document.getElementById("trade-open-badge").style.display = "none";
+        document.getElementById("card-gambler-el").classList.remove("active-trader");
+        document.getElementById("card-house-el").classList.remove("active-trader");
+        document.getElementById("card-spy-el").classList.remove("active-trader");
       }
 
-      // Night terminal logs with distinctive cute bot color pills
+      // Night terminal logs with distinctive color pills
       const term = document.getElementById("night-log-terminal");
       term.innerHTML = STATE.logs.slice(0, 15).map(l => {
         let tagClass = "tag-desk";
         let botEmoji = "🛸";
-        if (l.bot === "GAMBLER") { tagClass = "tag-bolt"; botEmoji = "⚡"; }
-        else if (l.bot === "HOUSE") { tagClass = "tag-chip"; botEmoji = "🛡️"; }
-        else if (l.bot === "SPY") { tagClass = "tag-pixel"; botEmoji = "👁️"; }
+        if (l.bot === "GAMBLER") { tagClass = "tag-gambler"; botEmoji = "⚡"; }
+        else if (l.bot === "HOUSE") { tagClass = "tag-house"; botEmoji = "🏛️"; }
+        else if (l.bot === "SPY") { tagClass = "tag-spy"; botEmoji = "👁️"; }
 
         const isWin = l.pnl_num >= 0;
         const pnlColor = isWin ? "green-txt" : "red-txt";
 
         return `
-          <div class="log-bubble-row">
+          <div class="log-line-item">
             <span class="log-t-time">${l.time}</span>
-            <span class="log-t-bot ${tagClass}">${botEmoji} ${l.bot || 'DESK'}</span>
+            <span class="log-bot-badge ${tagClass}">${botEmoji} ${l.bot || 'DESK'}</span>
             <b style="color:#fff; font-size:11px;">${l.token}</b>
             <span class="log-t-msg">${l.reason}</span>
             <span class="${pnlColor} log-t-pnl">${l.pnl}</span>
@@ -1885,7 +1792,7 @@
         const isWin = l.pnl_num > 0;
         const color = isWin ? "green-txt" : "red-txt";
         return `
-          <div class="ledger-row-3d">
+          <div class="ledger-row-line">
             <span style="color:var(--text-sub);">${l.time}</span>
             <span class="${color} bold">${l.type}</span>
             <b>${l.bot} • ${l.token}</b>
@@ -1917,7 +1824,7 @@
     });
 
     // Preset buttons
-    document.querySelectorAll(".preset-chip-btn").forEach(btn => {
+    document.querySelectorAll(".preset-gold-chip").forEach(btn => {
       btn.addEventListener("click", () => {
         modalInput.value = btn.getAttribute("data-amt");
         errorMsg.textContent = "";
@@ -1961,7 +1868,7 @@
       STATE.running = !STATE.running;
       document.getElementById("toggle-run-btn").textContent = STATE.running ? "PAUSE" : "RESUME";
       document.getElementById("run-text").textContent = STATE.running ? "running" : "paused";
-      document.getElementById("run-dot").style.background = STATE.running ? "var(--green-neon)" : "var(--red-neon)";
+      document.getElementById("run-dot").style.background = STATE.running ? "var(--binance-green)" : "var(--binance-red)";
     });
 
     // Initial event & start loop
