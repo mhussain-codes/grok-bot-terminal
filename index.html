@@ -6,20 +6,33 @@
   <title>Grok Bot Terminal - Multi-Bot 24/7 Desk</title>
   <style>
     :root {
-      --bg-black: #0c0e12;
-      --card-bg: #14171d;
-      --border-color: #212630;
-      --text-main: #e2e8f0;
-      --text-muted: #718096;
-      --green-neon: #10b981;
-      --green-glow: rgba(16, 185, 129, 0.2);
-      --red-neon: #ef4444;
-      --red-glow: rgba(239, 68, 68, 0.25);
-      --cyan-neon: #06b6d4;
-      --cyan-glow: rgba(6, 182, 212, 0.25);
-      --yellow-neon: #eab308;
-      --purple-neon: #a855f7;
-      --orange-neon: #f97316;
+      --bg-black: #07090e;
+      --card-bg: #0d121d;
+      --card-hover: #121826;
+      --border-color: #1a2336;
+      --border-blue: rgba(59, 130, 246, 0.35);
+      --border-red: rgba(239, 68, 68, 0.35);
+      --text-main: #f1f5f9;
+      --text-muted: #8292ab;
+      --text-sub: #4b586e;
+
+      /* Red & Blue Clean Quant Theme */
+      --neon-blue: #3b82f6;
+      --neon-blue-bright: #60a5fa;
+      --neon-blue-glow: rgba(59, 130, 246, 0.3);
+      --neon-blue-bg: rgba(59, 130, 246, 0.14);
+
+      --neon-red: #ef4444;
+      --neon-red-bright: #f87171;
+      --neon-red-glow: rgba(239, 68, 68, 0.3);
+      --neon-red-bg: rgba(239, 68, 68, 0.14);
+
+      --cyan-neon: #38bdf8;
+      --cyan-glow: rgba(56, 189, 248, 0.25);
+      --green-neon: #38bdf8; /* Clean electric cyan-blue for positive PnL */
+      --yellow-neon: #60a5fa;
+      --purple-neon: #818cf8;
+      --orange-neon: #f87171;
       --blue-neon: #3b82f6;
     }
     * {
@@ -30,6 +43,11 @@
     }
     body {
       background-color: var(--bg-black);
+      background-image: 
+        radial-gradient(circle at 10% 12%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 90% 12%, rgba(239, 68, 68, 0.11) 0%, transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+      background-attachment: fixed;
       color: var(--text-main);
       font-size: 13px;
       overflow-x: hidden;
@@ -61,6 +79,59 @@
       align-items: center;
       justify-content: center;
       gap: 7px;
+      box-shadow: -2px 0 10px rgba(239, 68, 68, 0.35), 2px 0 10px rgba(59, 130, 246, 0.45);
+    }
+
+    /* Cute Mini Bot Mascot (Pure SVG, 0% CPU Load) */
+    .cute-mascot-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(13, 18, 29, 0.9);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 3px 10px 3px 6px;
+      border-radius: 20px;
+      margin-left: 8px;
+      vertical-align: middle;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+    .cute-bot-svg {
+      animation: botHover 3s ease-in-out infinite;
+      transform-origin: center;
+    }
+    @keyframes botHover {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+    }
+    .antenna-beacon {
+      animation: beaconPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes beaconPulse {
+      0%, 100% { opacity: 0.7; filter: drop-shadow(0 0 1px #ef4444); }
+      50% { opacity: 1; filter: drop-shadow(0 0 5px #ef4444); }
+    }
+    .bot-eye-blink {
+      animation: eyeBlink 3.8s infinite;
+      transform-origin: center;
+    }
+    @keyframes eyeBlink {
+      0%, 93%, 100% { transform: scaleY(1); }
+      96% { transform: scaleY(0.12); }
+    }
+    .mascot-label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #f1f5f9;
+    }
+    .mascot-sub {
+      font-size: 8px;
+      background: var(--neon-blue-bg);
+      color: var(--neon-blue-bright);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-weight: 700;
+      border: 1px solid rgba(59, 130, 246, 0.3);
     }
     .avatar-eye {
       width: 4px;
@@ -117,21 +188,36 @@
       gap: 8px;
     }
     .action-btn {
-      background: #1e293b;
-      color: var(--cyan-neon);
-      border: 1px solid var(--border-color);
       padding: 6px 14px;
       border-radius: 4px;
       cursor: pointer;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 11px;
       transition: all 0.2s;
     }
-    .action-btn:hover { background: #334155; }
+    #deposit-btn {
+      background: var(--neon-blue-bg);
+      color: var(--neon-blue-bright);
+      border: 1px solid var(--neon-blue);
+    }
+    #deposit-btn:hover {
+      background: rgba(59, 130, 246, 0.28);
+      box-shadow: 0 0 10px var(--neon-blue-glow);
+    }
+    #toggle-run-btn {
+      background: var(--neon-red-bg);
+      color: var(--neon-red-bright);
+      border: 1px solid var(--neon-red);
+    }
+    #toggle-run-btn:hover {
+      background: rgba(239, 68, 68, 0.28);
+      box-shadow: 0 0 10px var(--neon-red-glow);
+    }
     .header-right { text-align: right; }
     .mode-badge {
-      background: #064e3b;
-      color: var(--green-neon);
+      background: var(--neon-blue-bg);
+      color: var(--neon-blue-bright);
+      border: 1px solid rgba(59, 130, 246, 0.35);
       font-size: 10px;
       padding: 2px 8px;
       border-radius: 10px;
@@ -167,6 +253,25 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .bot-card-fleet.bot-blue-card {
+      border: 1px solid var(--border-blue);
+    }
+    .bot-card-fleet.bot-blue-card:hover {
+      box-shadow: 0 0 12px var(--neon-blue-glow);
+    }
+    .bot-card-fleet.bot-red-card {
+      border: 1px solid var(--border-red);
+    }
+    .bot-card-fleet.bot-red-card:hover {
+      box-shadow: 0 0 12px var(--neon-red-glow);
+    }
+    .bot-card-fleet.bot-hybrid-card {
+      border: 1px solid rgba(129, 140, 248, 0.35);
+    }
+    .bot-card-fleet.bot-hybrid-card:hover {
+      box-shadow: 0 0 12px rgba(129, 140, 248, 0.3);
     }
     .bot-name-tag { font-weight: 800; font-size: 12px; display: flex; align-items: center; gap: 6px; }
 
@@ -361,7 +466,7 @@
       border-radius: 3px;
       overflow: hidden;
     }
-    .progress-fill { width: 85%; height: 100%; background: var(--green-neon); }
+    .progress-fill { width: 85%; height: 100%; background: linear-gradient(90deg, #3b82f6, #ef4444); border-radius: 3px; }
     .record-stat { font-size: 13px; font-weight: 800; color: #fff; }
     .bottom-ledger {
       background: var(--card-bg);
@@ -491,14 +596,14 @@
       
       <div style="font-size:10px; color:#64748b; margin-bottom: 6px; text-transform:uppercase; letter-spacing:0.5px;">Quick Presets:</div>
       <div class="preset-grid">
-        <button class="preset-btn" data-amt="5" style="border-color:#10b981; color:#10b981;">$5 (Test)</button>
+        <button class="preset-btn" data-amt="5" style="border-color:#3b82f6; color:#60a5fa; font-weight:700;">$5 (Test)</button>
         <button class="preset-btn" data-amt="10">$10</button>
         <button class="preset-btn" data-amt="25">$25</button>
         <button class="preset-btn" data-amt="50">$50</button>
         <button class="preset-btn" data-amt="100">$100</button>
         <button class="preset-btn" data-amt="250">$250</button>
         <button class="preset-btn" data-amt="500">$500</button>
-        <button class="preset-btn" data-amt="1000" style="border-color:#eab308; color:#eab308;">$1000 (MAX)</button>
+        <button class="preset-btn" data-amt="1000" style="border-color:#ef4444; color:#f87171; font-weight:700;">$1000 (MAX)</button>
       </div>
 
       <div style="margin-top:12px;">
@@ -509,7 +614,7 @@
       <div id="deposit-error-msg" style="color:#ef4444; font-size:11px; margin-top:8px; min-height:16px; font-weight:600;"></div>
 
       <div style="display:flex; gap:10px; margin-top:14px;">
-        <button class="action-btn" id="modal-confirm-btn" style="flex:1; background:#065f46; color:#34d399; padding:10px; font-size:12px; font-weight:700;">CONFIRM DEPOSIT</button>
+        <button class="action-btn" id="modal-confirm-btn" style="flex:1; background:#1d4ed8; color:#ffffff; padding:10px; font-size:12px; font-weight:700; border:1px solid #3b82f6;">CONFIRM DEPOSIT</button>
         <button class="action-btn" id="modal-cancel-btn" style="background:#1e293b; color:#94a3b8; padding:10px; font-size:12px;">CANCEL</button>
       </div>
     </div>
@@ -524,9 +629,32 @@
           <div class="avatar-eye"></div>
         </div>
         <div class="title-meta">
-          <div class="brand-row">
+          <div class="brand-row" style="display:flex; align-items:center; flex-wrap:wrap; gap:6px;">
             <span class="brand-name">Grok Bot Terminal</span>
             <span class="tag-version">v1.0-night</span>
+            <div class="cute-mascot-chip" title="Active Quant Desk AI Companion">
+              <svg class="cute-bot-svg" width="24" height="24" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Antenna with glowing red beacon -->
+                <path d="M21 11V4" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="21" cy="4" r="3" fill="#ef4444" class="antenna-beacon"/>
+                <!-- Cute Robot Head -->
+                <rect x="7" y="11" width="28" height="23" rx="8" fill="#0c1220" stroke="#3b82f6" stroke-width="2"/>
+                <!-- Screen visor -->
+                <rect x="11" y="15" width="20" height="11" rx="4" fill="#050811"/>
+                <!-- Left Eye: Electric Blue -->
+                <circle cx="16" cy="20.5" r="2.8" fill="#38bdf8" class="bot-eye-blink"/>
+                <!-- Right Eye: Neon Red -->
+                <circle cx="26" cy="20.5" r="2.8" fill="#f87171" class="bot-eye-blink"/>
+                <!-- Cute smile -->
+                <path d="M17 29C19 31 23 31 25 29" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round"/>
+                <!-- Left Ear: Neon Red -->
+                <rect x="4" y="18" width="3" height="9" rx="1.5" fill="#ef4444"/>
+                <!-- Right Ear: Electric Blue -->
+                <rect x="35" y="18" width="3" height="9" rx="1.5" fill="#3b82f6"/>
+              </svg>
+              <span class="mascot-label">CYBER BOT</span>
+              <span class="mascot-sub">ONLINE</span>
+            </div>
           </div>
           <div class="status-row">
             <span class="status-indicator-dot" id="run-dot"></span>
@@ -556,12 +684,12 @@
       </div>
     </header>
 
-    <!-- Multi-Bot Fleet Real-time Overview -->
+    <!-- Multi-Bot Fleet Real-time Overview (Red & Blue Theme) -->
     <div class="bot-fleet-bar">
-      <div class="bot-card-fleet">
+      <div class="bot-card-fleet bot-blue-card">
         <div>
           <div class="bot-name-tag cyan-txt">⚡ BOT 1: THE GAMBLER</div>
-          <div style="color:#94a3b8; font-size:10px;">Momentum & EMA Ribbon Breakout</div>
+          <div style="color:#8292ab; font-size:10px;">Momentum & EMA Ribbon Breakout</div>
         </div>
         <div style="text-align:right;">
           <div class="green-txt bold" id="gambler-pnl">+$0.00</div>
@@ -569,10 +697,10 @@
         </div>
       </div>
 
-      <div class="bot-card-fleet">
+      <div class="bot-card-fleet bot-red-card">
         <div>
-          <div class="bot-name-tag yellow-txt">🏛️ BOT 2: THE HOUSE</div>
-          <div style="color:#94a3b8; font-size:10px;">Oversold RSI Mean-Reversion</div>
+          <div class="bot-name-tag red-txt">🏛️ BOT 2: THE HOUSE</div>
+          <div style="color:#8292ab; font-size:10px;">Oversold RSI Mean-Reversion</div>
         </div>
         <div style="text-align:right;">
           <div class="green-txt bold" id="house-pnl">+$0.00</div>
@@ -580,10 +708,10 @@
         </div>
       </div>
 
-      <div class="bot-card-fleet">
+      <div class="bot-card-fleet bot-hybrid-card">
         <div>
           <div class="bot-name-tag purple-txt">👁️ BOT 3: THE SPY</div>
-          <div style="color:#94a3b8; font-size:10px;">Whale Orderbook Absorption</div>
+          <div style="color:#8292ab; font-size:10px;">Whale Orderbook Absorption</div>
         </div>
         <div style="text-align:right;">
           <div class="green-txt bold" id="spy-pnl">+$0.00</div>
@@ -605,7 +733,7 @@
         <div class="agent-card">
           <div class="agent-header">
             <span class="agent-name">SCANNER</span>
-            <span class="agent-state-tag tag-yellow">SCAN</span>
+            <span class="agent-state-tag tag-blue">SCAN</span>
           </div>
           <div class="agent-role">flags only, never trades</div>
           <div class="agent-detail" id="scanner-detail">BTCUSDT • Binance Verified</div>
@@ -625,7 +753,7 @@
         <div class="agent-card">
           <div class="agent-header">
             <span class="agent-name">SIZER</span>
-            <span class="agent-state-tag tag-purple">ACTIVE</span>
+            <span class="agent-state-tag tag-blue">ACTIVE</span>
           </div>
           <div class="agent-role">sizes from account equity</div>
           <div class="agent-detail">risk cap 20% equity<br><span id="sizer-subtext">20% of $100.00</span></div>
@@ -645,7 +773,7 @@
         <div class="agent-card">
           <div class="agent-header">
             <span class="agent-name">LOGGER</span>
-            <span class="agent-state-tag tag-orange">WRITE</span>
+            <span class="agent-state-tag tag-red">WRITE</span>
           </div>
           <div class="agent-role">writes every decision</div>
           <div class="agent-detail">no trade without a reason<br><span id="logger-subtext">line #1 listening</span></div>
@@ -695,7 +823,7 @@
               <div class="metric-foot">low-edge vetoes</div>
             </div>
             <div class="flow-metric-box">
-              <div class="metric-label purple-txt">◆ SIZER</div>
+              <div class="metric-label blue-txt">◆ SIZER</div>
               <div class="metric-val" id="sizer-eq-val">20% eq</div>
               <div class="metric-foot" id="sizer-eq-sub">$20.00</div>
             </div>
@@ -705,7 +833,7 @@
               <div class="cyan-txt" style="font-size:8px;" id="exec-node-sub">LIVE</div>
             </div>
             <div class="flow-metric-box">
-              <div class="metric-label orange-txt">● LOGGER</div>
+              <div class="metric-label red-txt">● LOGGER</div>
               <div class="metric-val" id="logger-line-val">line #1</div>
               <div class="metric-foot">full calibration</div>
             </div>
