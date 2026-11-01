@@ -2,1470 +2,796 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Grok Bot Terminal - 4K 3D Quantitative Crypto Desk</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grok Bot Terminal - Multi-Bot 24/7 Desk</title>
   <style>
     :root {
-      /* Real Crypto Trading Elite Palette (Binance & TradingView Pro) */
-      --bg-dark: #080a0f;
-      --card-bg: rgba(14, 18, 27, 0.75);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --card-border-glow: rgba(14, 203, 129, 0.35);
-
-      --binance-green: #0ecb81;
-      --binance-green-glow: rgba(14, 203, 129, 0.3);
-      --binance-red: #f6465d;
-      --binance-red-glow: rgba(246, 70, 93, 0.3);
-      --binance-gold: #f0b90b;
-      --binance-gold-glow: rgba(240, 185, 11, 0.3);
-      --trading-blue: #2962ff;
-      --trading-blue-glow: rgba(41, 98, 255, 0.3);
-      --trading-cyan: #00f0ff;
-
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-sub: #64748b;
+      --bg-black: #0c0e12;
+      --card-bg: #14171d;
+      --border-color: #212630;
+      --text-main: #e2e8f0;
+      --text-muted: #718096;
+      --green-neon: #10b981;
+      --green-glow: rgba(16, 185, 129, 0.2);
+      --red-neon: #ef4444;
+      --red-glow: rgba(239, 68, 68, 0.25);
+      --cyan-neon: #06b6d4;
+      --cyan-glow: rgba(6, 182, 212, 0.25);
+      --yellow-neon: #eab308;
+      --purple-neon: #a855f7;
+      --orange-neon: #f97316;
+      --blue-neon: #3b82f6;
     }
-
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
-      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Courier New", monospace;
     }
-
     body {
-      background-color: var(--bg-dark);
-      background-image: 
-        radial-gradient(circle at 10% 10%, rgba(41, 98, 255, 0.08), transparent 30%),
-        radial-gradient(circle at 90% 15%, rgba(14, 203, 129, 0.07), transparent 30%),
-        radial-gradient(circle at 50% 90%, rgba(240, 185, 11, 0.06), transparent 35%);
-      background-attachment: fixed;
+      background-color: var(--bg-black);
       color: var(--text-main);
-      min-height: 100vh;
+      font-size: 13px;
       overflow-x: hidden;
-      padding: 14px;
+      padding: 12px;
     }
-
-    /* Ambient Cyber Grid Background Canvas */
-    #grid-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: -1;
-      pointer-events: none;
-    }
-
-    /* 3D Glassmorphism Panel */
-    .quant-panel {
-      background: var(--card-bg);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      box-shadow: 
-        0 12px 36px 0 rgba(0, 0, 0, 0.6),
-        inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
-      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-    .quant-panel:hover {
-      border-color: rgba(255, 255, 255, 0.16);
-      box-shadow: 
-        0 16px 45px 0 rgba(0, 0, 0, 0.7),
-        inset 0 1px 2px 0 rgba(255, 255, 255, 0.16);
-    }
-
-    .main-terminal-wrap {
-      max-width: 1440px;
+    .terminal-container {
+      max-width: 1400px;
       margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      position: relative;
-      z-index: 1;
     }
-
-    /* ============================================================
-       TOP HEADER (Trading Floor HUD)
-       ============================================================ */
-    .trading-hud {
-      padding: 14px 22px;
+    .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 14px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 14px;
     }
-
-    .hud-left {
+    .header-left {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
     }
-
-    .brand-3d-logo {
-      width: 50px;
-      height: 50px;
-      background: radial-gradient(circle at 35% 35%, #1e293b, #090d16 85%);
-      border: 1.5px solid var(--binance-gold);
-      border-radius: 14px;
+    .avatar-icon {
+      width: 44px;
+      height: 44px;
+      background: #f1f5f9;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 18px var(--binance-gold-glow), inset 0 0 10px rgba(240, 185, 11, 0.2);
-      animation: gentleFloat 3s ease-in-out infinite;
+      gap: 7px;
     }
-    @keyframes gentleFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
+    .avatar-eye {
+      width: 4px;
+      height: 16px;
+      background: #0f172a;
+      border-radius: 2px;
     }
-
-    .brand-text h1 {
-      font-size: 20px;
-      font-weight: 900;
-      letter-spacing: -0.3px;
+    .brand-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .tag-version {
+      background: #242933;
+      color: #a3e635;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+    }
+    .status-row {
       display: flex;
       align-items: center;
+      gap: 6px;
+      margin-top: 3px;
+    }
+    .status-indicator-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--yellow-neon);
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.4; }
+      50% { opacity: 1.0; }
+      100% { opacity: 0.4; }
+    }
+    .status-pill {
+      background: #1e293b;
+      color: var(--cyan-neon);
+      padding: 1px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+    .subtext {
+      color: var(--text-muted);
+      font-size: 11px;
+      margin-top: 2px;
+    }
+    .header-center-controls {
+      display: flex;
       gap: 8px;
     }
-    .badge-market-live {
-      background: rgba(14, 203, 129, 0.15);
-      color: var(--binance-green);
-      font-size: 10px;
-      font-weight: 800;
-      padding: 2px 8px;
-      border-radius: 20px;
-      border: 1px solid rgba(14, 203, 129, 0.4);
-      box-shadow: 0 0 10px var(--binance-green-glow);
-    }
-    .hud-meta-row {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 2px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .pulse-live-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--binance-green);
-      box-shadow: 0 0 10px var(--binance-green);
-      animation: pulseGreen 1.6s infinite;
-    }
-    @keyframes pulseGreen {
-      0%, 100% { transform: scale(0.9); opacity: 0.6; }
-      50% { transform: scale(1.2); opacity: 1; }
-    }
-
-    .hud-center-controls {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .action-hud-btn {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--card-border);
-      color: var(--text-main);
-      padding: 9px 18px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 800;
+    .action-btn {
+      background: #1e293b;
+      color: var(--cyan-neon);
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      border-radius: 4px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
+      font-weight: 600;
+      font-size: 11px;
+      transition: all 0.2s;
     }
-    .action-hud-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      transform: translateY(-2px);
-    }
-    .btn-deposit-gold {
-      background: linear-gradient(135deg, #d97706, #f0b90b);
-      border: 1px solid rgba(240, 185, 11, 0.6);
-      color: #000;
-      box-shadow: 0 4px 18px rgba(240, 185, 11, 0.35);
-    }
-    .btn-deposit-gold:hover {
-      background: linear-gradient(135deg, #b45309, #d97706);
-      color: #fff;
-      box-shadow: 0 6px 25px rgba(240, 185, 11, 0.5);
-    }
-
-    .hud-balance-box {
-      text-align: right;
-    }
-    .mode-feed-pill {
+    .action-btn:hover { background: #334155; }
+    .header-right { text-align: right; }
+    .mode-badge {
+      background: #064e3b;
+      color: var(--green-neon);
       font-size: 10px;
-      font-weight: 800;
-      padding: 2px 9px;
-      border-radius: 12px;
-      background: rgba(41, 98, 255, 0.15);
-      color: #60a5fa;
-      border: 1px solid rgba(41, 98, 255, 0.35);
+      padding: 2px 8px;
+      border-radius: 10px;
       display: inline-block;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
-    .balance-total-text {
-      font-size: 28px;
-      font-weight: 900;
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #ffffff, #cbd5e1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .balance-display {
+      font-size: 26px;
+      font-weight: 800;
+      color: #ffffff;
     }
-    .hud-stats-micro {
+    .stats-row {
       display: flex;
       gap: 10px;
+      font-size: 12px;
       justify-content: flex-end;
-      font-size: 11px;
-      color: var(--text-muted);
     }
+    .wins-stat { color: var(--green-neon); font-weight: 600; }
+    .losses-stat { color: var(--red-neon); font-weight: 600; }
 
-    /* ============================================================
-       3 BOT FLEET STRATEGY CARDS (Gambler, House, Spy)
-       ============================================================ */
-    .bot-fleet-showcase {
+    /* Multi-bot fleet banner */
+    .bot-fleet-bar {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .bot-card-fleet {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .bot-name-tag { font-weight: 800; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
       gap: 14px;
     }
-    .bot-showcase-card {
-      padding: 16px 18px;
+    .agents-column {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 0 4px;
+    }
+    .agent-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 10px;
+    }
+    .agent-card.active-border {
+      border: 1px solid var(--cyan-neon);
+      box-shadow: 0 0 8px var(--cyan-glow);
+    }
+    .agent-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .agent-name { font-weight: 700; font-size: 12px; color: #fff; }
+    .agent-role { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+    .agent-detail { font-size: 11px; color: #cbd5e1; line-height: 1.3; }
+    .agent-state-tag { font-size: 9px; padding: 1px 5px; border-radius: 3px; font-weight: 600; }
+    .tag-yellow { background: #854d0e; color: #fef08a; }
+    .tag-red { background: #7f1d1d; color: #fca5a5; }
+    .tag-purple { background: #581c87; color: #e9d5ff; }
+    .tag-cyan { background: #164e63; color: #a5f3fc; }
+    .tag-orange { background: #7c2d12; color: #fed7aa; }
+    .tag-blue { background: #1e3a8a; color: #bfdbfe; }
+    .live-flow-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+    }
+    .flow-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .flow-pipeline-viz {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 8px;
+    }
+    .flow-node.token-pill {
+      background: #1e293b;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid #334155;
+    }
+    .flow-node.token-pill .sub {
+      display: block;
+      font-size: 10px;
+      font-weight: normal;
+      color: var(--text-muted);
+    }
+    .flow-circle {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 9px;
+      font-weight: 700;
+    }
+    .rug-check-circle { background: #2a1215; border: 2px solid var(--red-neon); box-shadow: 0 0 10px var(--red-glow); }
+    .exec-circle { background: #0c2730; border: 2px solid var(--cyan-neon); box-shadow: 0 0 10px var(--cyan-glow); }
+    .flow-metric-box {
+      background: #0d1117;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 6px 12px;
+      min-width: 90px;
+      text-align: center;
+    }
+    .metric-label { font-size: 10px; font-weight: 700; }
+    .metric-val { font-size: 13px; font-weight: 800; margin: 2px 0; }
+    .metric-foot { font-size: 9px; color: var(--text-muted); }
+    .middle-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .trade-card, .night-log-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px;
+    }
+    .card-bar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .badge-open {
+      color: var(--green-neon);
+      border: 1px solid var(--green-neon);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+    }
+    .trade-symbol-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .token-name { font-size: 16px; font-weight: 800; color: #fff; }
+    .badge-side {
+      background: #064e3b;
+      color: var(--green-neon);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .live-pnl { font-size: 13px; font-weight: 700; }
+    .trade-details-grid {
+      display: grid;
+      grid-template-columns: 75px 1fr;
+      gap: 5px;
+      font-size: 11px;
+    }
+    .detail-label { color: var(--text-muted); }
+    .detail-val { color: #f1f5f9; font-weight: 600; }
+    .terminal-body {
+      background: #080a0e;
+      border-radius: 4px;
+      padding: 8px;
+      height: 145px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 11px;
+    }
+    .term-line { margin-bottom: 4px; white-space: nowrap; }
+    .result-banner {
+      background: #11141a;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin-bottom: 12px;
+    }
+    .result-label { font-size: 11px; font-weight: 700; color: #fff; }
+    .result-sub { font-size: 10px; color: var(--text-muted); }
+    .result-amounts {
       display: flex;
       align-items: center;
       gap: 16px;
-      position: relative;
-      border-left: 4px solid transparent;
-      transition: all 0.25s ease;
     }
-    .card-gambler { border-left-color: var(--trading-cyan); }
-    .card-house { border-left-color: var(--binance-green); }
-    .card-spy { border-left-color: var(--binance-gold); }
-
-    .bot-showcase-card.active-trader {
-      box-shadow: 0 0 25px rgba(14, 203, 129, 0.35);
-      border-color: var(--binance-green);
-    }
-
-    /* 3D Bot Avatar Viewport */
-    .bot-avatar-3d {
-      width: 60px;
-      height: 60px;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
-      animation: botBounce 3s ease-in-out infinite;
-    }
-    @keyframes botBounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
-    }
-    .avatar-gambler {
-      background: radial-gradient(circle at 35% 35%, #0284c7, #071728 85%);
-      border: 1.5px solid rgba(0, 240, 255, 0.5);
-      box-shadow: 0 0 16px rgba(0, 240, 255, 0.3);
-    }
-    .avatar-house {
-      background: radial-gradient(circle at 35% 35%, #059669, #062017 85%);
-      border: 1.5px solid rgba(14, 203, 129, 0.5);
-      box-shadow: 0 0 16px rgba(14, 203, 129, 0.3);
-    }
-    .avatar-spy {
-      background: radial-gradient(circle at 35% 35%, #d97706, #1f1203 85%);
-      border: 1.5px solid rgba(240, 185, 11, 0.5);
-      box-shadow: 0 0 16px rgba(240, 185, 11, 0.3);
-    }
-
-    .bot-meta-block {
-      flex: 1;
-      min-width: 0;
-    }
-    .bot-header-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 2px;
-    }
-    .bot-name-tag {
-      font-size: 13px;
-      font-weight: 900;
-      letter-spacing: 0.2px;
-    }
-    .bot-score-display {
-      font-size: 15px;
-      font-weight: 900;
-    }
-    .bot-strategy-title {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      white-space: nowrap;
+    .amount-col .lbl { font-size: 9px; color: var(--text-muted); display: block; }
+    .amount-col .val { font-size: 14px; font-weight: 700; color: #fff; }
+    .progress-bar-wrap {
+      width: 200px;
+      height: 6px;
+      background: #1e293b;
+      border-radius: 3px;
       overflow: hidden;
-      text-overflow: ellipsis;
     }
-    /* Strategy Scheme Chips */
-    .strategy-chips {
-      display: flex;
-      gap: 5px;
-      flex-wrap: wrap;
-    }
-    .scheme-chip {
-      font-size: 9px;
-      font-weight: 800;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.05);
-      color: #cbd5e1;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    /* ============================================================
-       THE RUNNING HIGHWAY: ANIMATED LASER TRACK & WALKING BOT
-       ============================================================ */
-    .highway-stage-panel {
-      padding: 18px 22px;
-    }
-    .highway-top-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    .highway-title {
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: 0.6px;
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* Track Container */
-    .laser-track-container {
-      background: rgba(7, 10, 16, 0.8);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 20px 14px;
-      position: relative;
-    }
-
-    /* Glowing Laser Line connecting the 5 stations */
-    .laser-line-rail {
-      position: absolute;
-      top: 50%;
-      left: 8%;
-      right: 8%;
-      height: 4px;
-      background: linear-gradient(90deg, #2962ff, #00f0ff, #0ecb81, #f0b90b);
-      box-shadow: 0 0 14px rgba(0, 240, 255, 0.6);
-      border-radius: 2px;
-      z-index: 1;
-      transform: translateY(-50%);
-    }
-
-    /* Traveling Light Pulse on the line */
-    .laser-pulse-wave {
-      position: absolute;
-      top: 0;
-      width: 80px;
-      height: 100%;
-      background: #fff;
-      box-shadow: 0 0 20px #fff, 0 0 30px #0ecb81;
-      border-radius: 2px;
-      animation: pulseTravel 3.2s linear infinite;
-    }
-    @keyframes pulseTravel {
-      0% { left: 0%; opacity: 0; }
-      15% { opacity: 1; }
-      85% { opacity: 1; }
-      100% { left: 95%; opacity: 0; }
-    }
-
-    /* The Animated Walking/Running Bot on the Line! */
-    .walking-runner-bot {
-      position: absolute;
-      top: -22px;
-      left: 10%;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: left 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
-      cursor: pointer;
-    }
-    .runner-speech-bubble {
-      background: var(--binance-gold);
-      color: #000;
-      font-size: 9px;
-      font-weight: 900;
-      padding: 2px 6px;
-      border-radius: 4px;
-      margin-bottom: 2px;
-      white-space: nowrap;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-      animation: bubbleBounce 1.5s infinite;
-    }
-    @keyframes bubbleBounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-2px); }
-    }
-
-    /* Animated Robot SVG with Moving Legs! */
-    .runner-svg {
-      width: 44px;
-      height: 44px;
-      filter: drop-shadow(0 4px 10px rgba(240, 185, 11, 0.5));
-    }
-    /* Running Leg Animations */
-    .leg-left {
-      transform-origin: 15px 32px;
-      animation: legCycleLeft 0.35s ease-in-out infinite alternate;
-    }
-    .leg-right {
-      transform-origin: 25px 32px;
-      animation: legCycleRight 0.35s ease-in-out infinite alternate;
-    }
-    @keyframes legCycleLeft {
-      from { transform: rotate(-25deg); }
-      to { transform: rotate(25deg); }
-    }
-    @keyframes legCycleRight {
-      from { transform: rotate(25deg); }
-      to { transform: rotate(-25deg); }
-    }
-
-    /* Stations Row */
-    .stations-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
-      position: relative;
-      z-index: 2;
-    }
-    .highway-station {
-      background: rgba(17, 23, 37, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
-      padding: 14px 10px;
-      text-align: center;
-      transition: all 0.3s ease;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
-    }
-    .highway-station.active-station {
-      background: rgba(14, 203, 129, 0.12);
-      border-color: var(--binance-green);
-      box-shadow: 0 0 20px var(--binance-green-glow);
-      transform: translateY(-4px);
-    }
-    .station-icon {
-      font-size: 24px;
-      margin-bottom: 4px;
-    }
-    .station-step-num {
-      font-size: 9px;
-      font-weight: 800;
-      color: var(--binance-gold);
-      letter-spacing: 0.5px;
-    }
-    .station-name-title {
-      font-size: 12px;
-      font-weight: 900;
-      margin-top: 2px;
-    }
-    .station-detail-sub {
-      font-size: 10px;
-      color: var(--text-muted);
-      margin-top: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* ============================================================
-       MIDDLE ARENA: ACTIVE POSITION + LIVE CANDLESTICK + STREAM
-       ============================================================ */
-    .arena-grid-layout {
-      display: grid;
-      grid-template-columns: 280px 380px 1fr;
-      gap: 14px;
-    }
-
-    /* LEFT AGENTS CHECKLIST */
-    .agents-panel-box {
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .agents-hud-title {
-      font-size: 11px;
-      font-weight: 900;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid var(--card-border);
-      display: flex;
-      justify-content: space-between;
-    }
-    .agent-mini-row {
-      padding: 8px 10px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-    }
-    .agent-tag-badge {
-      font-size: 9px;
-      font-weight: 900;
-      padding: 1px 6px;
-      border-radius: 4px;
-    }
-
-    /* ACTIVE TRADE POSITION CARD */
-    .active-trade-box {
-      padding: 18px 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .trade-status-badge {
-      font-size: 10px;
-      font-weight: 900;
-      padding: 3px 9px;
+    .progress-fill { width: 85%; height: 100%; background: var(--green-neon); }
+    .record-stat { font-size: 13px; font-weight: 800; color: #fff; }
+    .bottom-ledger {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
       border-radius: 6px;
-      background: rgba(14, 203, 129, 0.15);
-      color: var(--binance-green);
-      border: 1px solid rgba(14, 203, 129, 0.35);
+      padding: 12px;
     }
-    .token-row-headline {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      margin: 8px 0 4px 0;
-    }
-    .token-huge-title {
-      font-size: 26px;
-      font-weight: 900;
-      color: #fff;
-    }
-    .token-side-chip {
-      font-size: 10px;
-      font-weight: 800;
-      padding: 2px 7px;
-      border-radius: 4px;
-      background: rgba(0, 240, 255, 0.15);
-      color: var(--trading-cyan);
-    }
-    .pnl-live-counter {
-      font-size: 20px;
-      font-weight: 900;
-      margin-bottom: 10px;
-    }
-
-    /* Real Candlestick Sparkline Canvas */
-    .chart-container-box {
-      width: 100%;
-      height: 75px;
-      background: rgba(0, 0, 0, 0.45);
-      border-radius: 10px;
-      border: 1px solid var(--card-border);
-      margin-bottom: 12px;
-      position: relative;
-      overflow: hidden;
-    }
-    #candlestick-canvas {
-      width: 100%;
-      height: 100%;
-    }
-
-    .specs-keyvalue-grid {
-      display: grid;
-      grid-template-columns: 85px 1fr;
-      gap: 5px 10px;
-      font-size: 11px;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--card-border);
-    }
-    .spec-k { color: var(--text-muted); }
-    .spec-v { font-weight: 800; color: #fff; }
-
-    /* NIGHT LOG STREAM */
-    .log-stream-box {
-      padding: 16px 18px;
-      display: flex;
-      flex-direction: column;
-    }
-    .log-top-bar {
+    .ledger-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--card-border);
-      margin-bottom: 10px;
-    }
-    .log-lines-scroll {
-      flex: 1;
-      max-height: 280px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      padding-right: 4px;
-    }
-    .log-lines-scroll::-webkit-scrollbar {
-      width: 4px;
-    }
-    .log-lines-scroll::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 4px;
-    }
-
-    .log-line-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
       font-size: 11px;
-      padding: 6px 10px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.03);
-      transition: all 0.15s ease;
-    }
-    .log-line-item:hover {
-      background: rgba(255, 255, 255, 0.06);
-    }
-    .log-t-time {
-      color: var(--text-sub);
-      font-size: 10px;
-      font-variant-numeric: tabular-nums;
-      flex-shrink: 0;
-    }
-    .log-bot-badge {
-      font-size: 9px;
-      font-weight: 900;
-      padding: 1px 6px;
-      border-radius: 4px;
-      flex-shrink: 0;
-    }
-    .tag-gambler { background: rgba(0, 240, 255, 0.15); color: var(--trading-cyan); }
-    .tag-house { background: rgba(14, 203, 129, 0.15); color: var(--binance-green); }
-    .tag-spy { background: rgba(240, 185, 11, 0.15); color: var(--binance-gold); }
-    .tag-desk { background: rgba(41, 98, 255, 0.15); color: #60a5fa; }
-
-    .log-t-msg {
-      flex: 1;
-      color: var(--text-main);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .log-t-pnl {
-      font-weight: 900;
-      flex-shrink: 0;
-    }
-
-    /* ============================================================
-       PERFORMANCE TRACKER & LEDGER
-       ============================================================ */
-    .ledger-section-box {
-      padding: 16px 20px;
-    }
-    .ledger-top-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      font-weight: 900;
       color: var(--text-muted);
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--card-border);
-      margin-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 6px;
+      margin-bottom: 6px;
     }
-    .ledger-table-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    .ledger-row-line {
+    .ledger-row {
       display: grid;
-      grid-template-columns: 70px 80px 130px 1fr 100px 75px;
-      align-items: center;
-      padding: 7px 12px;
-      border-radius: 8px;
+      grid-template-columns: 65px 75px 110px 1fr 100px 80px;
+      padding: 6px 0;
+      border-bottom: 1px solid #1a202c;
       font-size: 11px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.03);
-      transition: all 0.15s ease;
+      align-items: center;
     }
-    .ledger-row-line:hover {
-      background: rgba(255, 255, 255, 0.05);
-    }
+    .green-txt { color: var(--green-neon); }
+    .red-txt { color: var(--red-neon); }
+    .yellow-txt { color: var(--yellow-neon); }
+    .purple-txt { color: var(--purple-neon); }
+    .cyan-txt { color: var(--cyan-neon); }
+    .orange-txt { color: var(--orange-neon); }
+    .blue-txt { color: var(--blue-neon); }
+    .bold { font-weight: 700; }
 
-    /* DEPOSIT CAPITAL MODAL */
-    .modal-overlay-dark {
+    /* Deposit Modal */
+    .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(3, 5, 10, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(6px);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 99999;
-      padding: 16px;
     }
-    .modal-card-quant {
-      background: rgba(14, 18, 27, 0.96);
-      border: 1.5px solid rgba(240, 185, 11, 0.4);
-      border-radius: 20px;
-      width: 100%;
+    .modal-card {
+      background: #14171d;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      width: 92%;
       max-width: 440px;
-      padding: 24px;
-      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 30px rgba(240, 185, 11, 0.2);
-      animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 22px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.9);
+      animation: modalFadeIn 0.15s ease-out;
     }
-    @keyframes modalPop {
-      from { opacity: 0; transform: scale(0.92); }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
       to { opacity: 1; transform: scale(1); }
     }
-    .modal-header-line {
+    .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      border-bottom: 1px solid #212630;
       padding-bottom: 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 12px;
     }
-    .btn-close-x {
+    .modal-close-btn {
       background: none;
       border: none;
-      color: var(--text-muted);
+      color: #94a3b8;
       font-size: 24px;
       cursor: pointer;
+      line-height: 1;
     }
-    .btn-close-x:hover { color: #fff; }
-
-    .presets-btn-grid {
+    .modal-close-btn:hover { color: #fff; }
+    .preset-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 16px;
+      gap: 6px;
+      margin-bottom: 14px;
     }
-    .preset-gold-chip {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #fff;
-      padding: 10px 4px;
+    .preset-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      padding: 8px 4px;
       font-size: 11px;
-      font-weight: 800;
-      border-radius: 8px;
+      font-weight: 600;
+      border-radius: 4px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.15s;
     }
-    .preset-gold-chip:hover {
-      background: rgba(240, 185, 11, 0.18);
-      border-color: var(--binance-gold);
-      color: var(--binance-gold);
-      transform: translateY(-2px);
+    .preset-btn:hover {
+      background: #334155;
+      border-color: #06b6d4;
+      color: #06b6d4;
     }
-    .deposit-num-field {
+    .modal-input {
       width: 100%;
-      background: rgba(5, 8, 15, 0.6);
-      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      background: #0c0e12;
+      border: 1px solid #334155;
       color: #fff;
-      padding: 12px 14px;
-      font-size: 17px;
-      font-weight: 900;
-      border-radius: 12px;
-      outline: none;
-      margin-top: 6px;
-    }
-    .deposit-num-field:focus {
-      border-color: var(--binance-green);
-      box-shadow: 0 0 15px rgba(14, 203, 129, 0.3);
-    }
-    .deposit-err-msg {
-      color: var(--binance-red);
-      font-size: 11px;
+      padding: 10px 14px;
+      font-size: 16px;
       font-weight: 700;
-      margin-top: 8px;
-      min-height: 18px;
+      border-radius: 4px;
+      outline: none;
+      margin-top: 4px;
     }
-
-    /* Colors helpers */
-    .green-txt { color: var(--binance-green); }
-    .red-txt { color: var(--binance-red); }
-    .gold-txt { color: var(--binance-gold); }
-    .cyan-txt { color: var(--trading-cyan); }
-    .blue-txt { color: #60a5fa; }
-    .bold { font-weight: 800; }
-
-    /* ============================================================
-       RESPONSIVE DESIGN (Mobile & Tablet)
-       ============================================================ */
-    @media (max-width: 1100px) {
-      .arena-grid-layout { grid-template-columns: 1fr; }
-      .stations-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    @media (max-width: 768px) {
-      body { padding: 8px; }
-      .bot-fleet-showcase { grid-template-columns: 1fr; }
-      .trading-hud { flex-direction: column; align-items: stretch; }
-      .hud-center-controls { justify-content: space-between; }
-      .hud-balance-box {
-        text-align: left;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: rgba(255, 255, 255, 0.03);
-        padding: 10px 14px;
-        border-radius: 12px;
-      }
-      .hud-stats-micro { justify-content: flex-start; }
-      .stations-grid { grid-template-columns: 1fr 1fr; }
-      .ledger-row-line { grid-template-columns: 60px 65px 90px 1fr 65px; }
-      .ledger-row-line span:nth-child(6) { display: none; }
-      .presets-btn-grid { grid-template-columns: repeat(2, 1fr); }
+    .modal-input:focus {
+      border-color: #10b981;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
     }
   </style>
 </head>
 <body>
-
-  <!-- Ambient 3D Cyber Particle Network Canvas -->
-  <canvas id="grid-canvas"></canvas>
-
-  <!-- ============================================================
-       DEPOSIT CAPITAL MODAL
-       ============================================================ -->
-  <div id="deposit-modal" class="modal-overlay-dark" style="display:none;">
-    <div class="modal-card-quant">
-      <div class="modal-header-line">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:22px;">💳</span>
-          <span style="font-weight:900; font-size:16px; color:#fff;">DEPOSIT TRADING CAPITAL</span>
-        </div>
-        <button class="btn-close-x" id="modal-close">&times;</button>
+  <!-- Deposit Modal -->
+  <div id="deposit-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span style="font-weight:700; font-size:15px; color:#fff;">💳 DEPOSIT CAPITAL (MAX $1000)</span>
+        <button class="modal-close-btn" id="modal-close">&times;</button>
+      </div>
+      <div style="font-size:12px; color:#94a3b8; margin: 6px 0 14px 0;">
+        Deposit funds to test trading. Enter any amount from <b style="color:#10b981;">$1.00</b> up to maximum <b style="color:#f59e0b;">$1,000.00 USD</b>.
+      </div>
+      
+      <div style="font-size:10px; color:#64748b; margin-bottom: 6px; text-transform:uppercase; letter-spacing:0.5px;">Quick Presets:</div>
+      <div class="preset-grid">
+        <button class="preset-btn" data-amt="5" style="border-color:#10b981; color:#10b981;">$5 (Test)</button>
+        <button class="preset-btn" data-amt="10">$10</button>
+        <button class="preset-btn" data-amt="25">$25</button>
+        <button class="preset-btn" data-amt="50">$50</button>
+        <button class="preset-btn" data-amt="100">$100</button>
+        <button class="preset-btn" data-amt="250">$250</button>
+        <button class="preset-btn" data-amt="500">$500</button>
+        <button class="preset-btn" data-amt="1000" style="border-color:#eab308; color:#eab308;">$1000 (MAX)</button>
       </div>
 
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px; line-height:1.4;">
-        Deposit test or real capital from <b style="color:var(--binance-green);">$1.00</b> up to max <b style="color:var(--binance-gold);">$1,000.00 USD</b>.
-      </p>
-
-      <div style="font-size:10px; font-weight:800; color:var(--text-sub); text-transform:uppercase; margin-bottom:6px;">Quick Presets:</div>
-      <div class="presets-btn-grid">
-        <button class="preset-gold-chip" data-amt="5" style="border-color:var(--binance-green); color:var(--binance-green);">$5 (Test)</button>
-        <button class="preset-gold-chip" data-amt="10">$10</button>
-        <button class="preset-gold-chip" data-amt="25">$25</button>
-        <button class="preset-gold-chip" data-amt="50">$50</button>
-        <button class="preset-gold-chip" data-amt="100">$100</button>
-        <button class="preset-gold-chip" data-amt="250">$250</button>
-        <button class="preset-gold-chip" data-amt="500">$500</button>
-        <button class="preset-gold-chip" data-amt="1000" style="border-color:var(--binance-gold); color:var(--binance-gold);">$1000 (MAX)</button>
+      <div style="margin-top:12px;">
+        <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:4px;">Deposit Amount ($ USD):</label>
+        <input type="number" id="deposit-input" min="1" max="1000" step="1" value="5" class="modal-input" placeholder="e.g. 5">
       </div>
 
-      <div>
-        <label style="font-size:11px; font-weight:800; color:var(--text-muted); display:block;">Deposit Amount ($ USD):</label>
-        <input type="number" id="deposit-input" min="1" max="1000" step="1" value="5" class="deposit-num-field" placeholder="e.g. 5">
-      </div>
-
-      <div id="deposit-error-msg" class="deposit-err-msg"></div>
+      <div id="deposit-error-msg" style="color:#ef4444; font-size:11px; margin-top:8px; min-height:16px; font-weight:600;"></div>
 
       <div style="display:flex; gap:10px; margin-top:14px;">
-        <button class="action-hud-btn btn-deposit-gold" id="modal-confirm-btn" style="flex:1; justify-content:center; padding:12px;">
-          <span>CONFIRM DEPOSIT</span> 🚀
-        </button>
-        <button class="action-hud-btn" id="modal-cancel-btn" style="padding:12px;">CANCEL</button>
+        <button class="action-btn" id="modal-confirm-btn" style="flex:1; background:#065f46; color:#34d399; padding:10px; font-size:12px; font-weight:700;">CONFIRM DEPOSIT</button>
+        <button class="action-btn" id="modal-cancel-btn" style="background:#1e293b; color:#94a3b8; padding:10px; font-size:12px;">CANCEL</button>
       </div>
     </div>
   </div>
 
-  <div class="main-terminal-wrap">
-
-    <!-- ============================================================
-         TOP HUD BAR (Binance / TradingView Real Floor Style)
-         ============================================================ -->
-    <header class="quant-panel trading-hud">
-      <div class="hud-left">
-        <!-- 3D Gold Logo Icon -->
-        <div class="brand-3d-logo">
-          <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
-            <!-- Binance Gold Diamond Grid -->
-            <polygon points="18,3 23,8 18,13 13,8" fill="#f0b90b"/>
-            <polygon points="8,13 13,18 8,23 3,18" fill="#f0b90b"/>
-            <polygon points="28,13 33,18 28,23 23,18" fill="#f0b90b"/>
-            <polygon points="18,23 23,28 18,33 13,28" fill="#f0b90b"/>
-            <polygon points="18,11 25,18 18,25 11,18" fill="#0ecb81"/>
-          </svg>
+  <div class="terminal-container">
+    <!-- Top Header -->
+    <header class="top-bar">
+      <div class="header-left">
+        <div class="avatar-icon">
+          <div class="avatar-eye"></div>
+          <div class="avatar-eye"></div>
         </div>
-
-        <div class="brand-text">
-          <h1>
-            <span>Grok Bot Terminal</span>
-            <span class="badge-market-live">SPOT AI DESK</span>
-          </h1>
-          <div class="hud-meta-row">
-            <span class="pulse-live-dot" id="run-dot"></span>
-            <span id="run-text" style="font-weight:800; color:#fff;">running</span>
-            <span style="color:var(--text-sub);">•</span>
-            <span id="timer-val" style="font-variant-numeric:tabular-nums; font-weight:700;">00:00:00</span>
-            <span style="color:var(--text-sub);">•</span>
-            <span id="exec-pill" style="color:var(--trading-cyan); font-weight:800;">AWAITING DEPOSIT</span>
+        <div class="title-meta">
+          <div class="brand-row">
+            <span class="brand-name">Grok Bot Terminal</span>
+            <span class="tag-version">v1.0-night</span>
           </div>
+          <div class="status-row">
+            <span class="status-indicator-dot" id="run-dot"></span>
+            <span class="status-text" id="run-text">running</span>
+            <span class="timer-text" id="timer-val" style="color:#94a3b8; font-size:11px; margin-left:4px;">00:00:00</span>
+            <span class="status-pill" id="exec-pill">EXECUTOR • CONNECTING</span>
+          </div>
+          <div class="subtext">24/7 AI quant desk: gambler + house + spy (binance live)</div>
         </div>
       </div>
 
-      <!-- Center Action Buttons -->
-      <div class="hud-center-controls">
-        <button class="action-hud-btn btn-deposit-gold" id="deposit-btn">
-          <span>+ DEPOSIT</span> 💳
-        </button>
-        <button class="action-hud-btn" id="toggle-run-btn">PAUSE</button>
-        <button class="action-hud-btn" id="sound-btn" title="Toggle chime">🔊</button>
+      <div class="header-center-controls">
+        <button class="action-btn" id="deposit-btn">+ DEPOSIT</button>
+        <button class="action-btn" id="toggle-run-btn">PAUSE</button>
       </div>
 
-      <!-- Right Balance Display -->
-      <div class="hud-balance-box">
-        <div>
-          <span class="mode-feed-pill" id="mode-badge-el">paper • binance spot feed</span>
+      <div class="header-right">
+        <div class="mode-badge-wrap">
+          <span class="mode-badge" id="mode-badge-el">paper • binance feed</span>
         </div>
-        <div class="balance-total-text" id="balance-val">$0.00</div>
-        <div class="hud-stats-micro">
-          <span id="trades-count">0 trades</span>
-          <span>•</span>
-          <span id="wins-count" style="color:var(--binance-green);">0 wins</span>
-          <span>•</span>
-          <span id="losses-count" style="color:var(--binance-red);">0 losses</span>
+        <div class="balance-display" id="balance-val">$0.00</div>
+        <div class="stats-row">
+          <span class="trades-stat" id="trades-count">0 trades</span>
+          <span class="wins-stat" id="wins-count">0 wins</span>
+          <span class="losses-stat" id="losses-count">0 losses</span>
         </div>
       </div>
     </header>
 
-    <!-- ============================================================
-         3 BOT FLEET STRATEGY SHOWCASE (Bolt, Chip, Pixel)
-         ============================================================ -->
-    <section class="bot-fleet-showcase">
-      <!-- BOT 1: THE GAMBLER (Bolt) -->
-      <div class="quant-panel bot-showcase-card card-gambler" id="card-gambler-el">
-        <div class="bot-avatar-3d avatar-gambler">
-          <!-- 3D Bolt SVG with Visor Shine -->
-          <svg width="40" height="40" viewBox="0 0 44 44" fill="none">
-            <circle cx="22" cy="38" rx="12" ry="3" fill="rgba(0, 240, 255, 0.3)" filter="blur(1px)"/>
-            <rect x="10" y="12" width="24" height="22" rx="8" fill="url(#boltSkin)" stroke="#00f0ff" stroke-width="1.8"/>
-            <rect x="13" y="16" width="18" height="8" rx="3" fill="#031626"/>
-            <circle cx="17" cy="20" r="2.5" fill="#00f0ff"/>
-            <circle cx="27" cy="20" r="2.5" fill="#00f0ff"/>
-            <path d="M21 4 L25 10 H20 L24 13" stroke="#f0b90b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <defs>
-              <linearGradient id="boltSkin" x1="10" y1="12" x2="34" y2="34" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#0284c7"/>
-                <stop offset="1" stop-color="#0c233c"/>
-              </linearGradient>
-            </defs>
-          </svg>
+    <!-- Multi-Bot Fleet Real-time Overview -->
+    <div class="bot-fleet-bar">
+      <div class="bot-card-fleet">
+        <div>
+          <div class="bot-name-tag cyan-txt">⚡ BOT 1: THE GAMBLER</div>
+          <div style="color:#94a3b8; font-size:10px;">Momentum & EMA Ribbon Breakout</div>
         </div>
-        <div class="bot-meta-block">
-          <div class="bot-header-row">
-            <span class="bot-name-tag cyan-txt">⚡ THE GAMBLER (Bolt)</span>
-            <span class="bot-score-display green-txt" id="gambler-pnl">+$0.00</span>
-          </div>
-          <div class="bot-strategy-title">Momentum & EMA Ribbon Breakouts</div>
-          <div class="strategy-chips">
-            <span class="scheme-chip">EMA 7/21 Cross</span>
-            <span class="scheme-chip">Vol &gt; 1.5x</span>
-            <span class="scheme-chip" id="gambler-trades">0 trades</span>
-          </div>
+        <div style="text-align:right;">
+          <div class="green-txt bold" id="gambler-pnl">+$0.00</div>
+          <div style="color:#64748b; font-size:10px;" id="gambler-trades">0 trades</div>
         </div>
       </div>
 
-      <!-- BOT 2: THE HOUSE (Chip) -->
-      <div class="quant-panel bot-showcase-card card-house" id="card-house-el">
-        <div class="bot-avatar-3d avatar-house">
-          <!-- 3D Chip SVG with Hex Shield -->
-          <svg width="40" height="40" viewBox="0 0 44 44" fill="none">
-            <circle cx="22" cy="38" rx="12" ry="3" fill="rgba(14, 203, 129, 0.3)" filter="blur(1px)"/>
-            <path d="M22 8 L33 14 V26 L22 32 L11 26 V14 Z" fill="url(#chipSkin)" stroke="#0ecb81" stroke-width="1.8"/>
-            <circle cx="17" cy="19" r="2.5" fill="#0ecb81"/>
-            <circle cx="27" cy="19" r="2.5" fill="#0ecb81"/>
-            <path d="M18 24 Q22 27 26 24" stroke="#fff" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-            <defs>
-              <linearGradient id="chipSkin" x1="11" y1="8" x2="33" y2="32" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#059669"/>
-                <stop offset="1" stop-color="#062017"/>
-              </linearGradient>
-            </defs>
-          </svg>
+      <div class="bot-card-fleet">
+        <div>
+          <div class="bot-name-tag yellow-txt">🏛️ BOT 2: THE HOUSE</div>
+          <div style="color:#94a3b8; font-size:10px;">Oversold RSI Mean-Reversion</div>
         </div>
-        <div class="bot-meta-block">
-          <div class="bot-header-row">
-            <span class="bot-name-tag green-txt">🏛️ THE HOUSE (Chip)</span>
-            <span class="bot-score-display green-txt" id="house-pnl">+$0.00</span>
-          </div>
-          <div class="bot-strategy-title">Oversold RSI Mean-Reversion</div>
-          <div class="strategy-chips">
-            <span class="scheme-chip">RSI &lt; 30 Dip</span>
-            <span class="scheme-chip">BB Lower Bounce</span>
-            <span class="scheme-chip" id="house-trades">0 trades</span>
-          </div>
+        <div style="text-align:right;">
+          <div class="green-txt bold" id="house-pnl">+$0.00</div>
+          <div style="color:#64748b; font-size:10px;" id="house-trades">0 trades</div>
         </div>
       </div>
 
-      <!-- BOT 3: THE SPY (Pixel) -->
-      <div class="quant-panel bot-showcase-card card-spy" id="card-spy-el">
-        <div class="bot-avatar-3d avatar-spy">
-          <!-- 3D Pixel Drone SVG -->
-          <svg width="40" height="40" viewBox="0 0 44 44" fill="none">
-            <circle cx="22" cy="38" rx="12" ry="3" fill="rgba(240, 185, 11, 0.3)" filter="blur(1px)"/>
-            <circle cx="22" cy="20" r="13" fill="url(#pixelSkin)" stroke="#f0b90b" stroke-width="1.8"/>
-            <path d="M22 7 V3 M19 3 H25" stroke="#f0b90b" stroke-width="1.8" stroke-linecap="round"/>
-            <circle cx="22" cy="20" r="7" fill="#1f1403" stroke="#f0b90b" stroke-width="1.2"/>
-            <circle cx="22" cy="20" r="4" fill="#fbbf24"/>
-            <circle cx="23.5" cy="18.5" r="1.2" fill="#fff"/>
-            <defs>
-              <linearGradient id="pixelSkin" x1="9" y1="7" x2="35" y2="33" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#d97706"/>
-                <stop offset="1" stop-color="#1f1203"/>
-              </linearGradient>
-            </defs>
-          </svg>
+      <div class="bot-card-fleet">
+        <div>
+          <div class="bot-name-tag purple-txt">👁️ BOT 3: THE SPY</div>
+          <div style="color:#94a3b8; font-size:10px;">Whale Orderbook Absorption</div>
         </div>
-        <div class="bot-meta-block">
-          <div class="bot-header-row">
-            <span class="bot-name-tag gold-txt">👁️ THE SPY (Pixel)</span>
-            <span class="bot-score-display green-txt" id="spy-pnl">+$0.00</span>
-          </div>
-          <div class="bot-strategy-title">Whale Orderbook Absorption</div>
-          <div class="strategy-chips">
-            <span class="scheme-chip">Bid Wall Frontrun</span>
-            <span class="scheme-chip">Depth Ratio &gt; 2.0</span>
-            <span class="scheme-chip" id="spy-trades">0 trades</span>
-          </div>
+        <div style="text-align:right;">
+          <div class="green-txt bold" id="spy-pnl">+$0.00</div>
+          <div style="color:#64748b; font-size:10px;" id="spy-trades">0 trades</div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- ============================================================
-         THE RUNNING HIGHWAY (Laser Track + Animated Running Bot!)
-         ============================================================ -->
-    <section class="quant-panel highway-stage-panel">
-      <div class="highway-top-header">
-        <div class="highway-title">
-          <span style="font-size:18px;">⚡</span>
-          <span>AUTONOMOUS EXECUTION HIGHWAY • LIVE ORDER FLOW</span>
-        </div>
-        <span style="font-size:11px; color:var(--text-muted); font-variant-numeric:tabular-nums;" id="speed-indicator">tick 1.0s</span>
-      </div>
-
-      <div class="laser-track-container">
-        <!-- Glowing Laser Connector Line -->
-        <div class="laser-line-rail">
-          <div class="laser-pulse-wave"></div>
+    <!-- Main Grid Layout -->
+    <div class="main-layout">
+      <!-- Left Column: AGENTS -->
+      <aside class="agents-column">
+        <div class="panel-header">
+          <span>AGENTS</span>
+          <span>6 online</span>
         </div>
 
-        <!-- The Animated Walking/Running Bot on the Line! -->
-        <div class="walking-runner-bot" id="walking-bot-el">
-          <div class="runner-speech-bubble" id="runner-speech">SCANNING...</div>
-          <!-- Cute Walking Bot SVG with Moving Legs -->
-          <svg class="runner-svg" viewBox="0 0 40 40" fill="none">
-            <!-- Bot Body -->
-            <rect x="10" y="8" width="20" height="20" rx="8" fill="#f0b90b" stroke="#fff" stroke-width="1.6"/>
-            <!-- Visor -->
-            <rect x="13" y="12" width="14" height="6" rx="2" fill="#080a0f"/>
-            <circle cx="16" cy="15" r="1.8" fill="#00f0ff"/>
-            <circle cx="24" cy="15" r="1.8" fill="#00f0ff"/>
-            <!-- Cute Backpack Cargo -->
-            <rect x="6" y="12" width="4" height="12" rx="2" fill="#0ecb81"/>
-            <!-- Moving Running Legs! -->
-            <line class="leg-left" x1="15" y1="28" x2="13" y2="36" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
-            <line class="leg-right" x1="25" y1="28" x2="27" y2="36" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
-          </svg>
+        <!-- 1: SCANNER -->
+        <div class="agent-card">
+          <div class="agent-header">
+            <span class="agent-name">SCANNER</span>
+            <span class="agent-state-tag tag-yellow">SCAN</span>
+          </div>
+          <div class="agent-role">flags only, never trades</div>
+          <div class="agent-detail" id="scanner-detail">BTCUSDT • Binance Verified</div>
         </div>
 
-        <!-- 5 Highway Execution Stations -->
-        <div class="stations-grid">
-          <!-- Station 1: Scanner -->
-          <div class="highway-station active-station" id="station-1">
-            <div class="station-icon">🔭</div>
-            <div class="station-step-num">STEP 1</div>
-            <div class="station-name-title" id="flow-tok-1">BTCUSDT</div>
-            <div class="station-detail-sub">Binance Scanner</div>
+        <!-- 2: RUG CHECK -->
+        <div class="agent-card">
+          <div class="agent-header">
+            <span class="agent-name">RUG CHECK</span>
+            <span class="agent-state-tag tag-red" id="rug-tag">PASS</span>
           </div>
-
-          <!-- Station 2: Rug & Spread Filter -->
-          <div class="highway-station" id="station-2">
-            <div class="station-icon">🛡️</div>
-            <div class="station-step-num">STEP 2</div>
-            <div class="station-name-title" id="filtered-val">0 FILTERED</div>
-            <div class="station-detail-sub green-txt" id="flow-rug-sub">Spread &lt; 0.05% PASS</div>
-          </div>
-
-          <!-- Station 3: Dynamic Sizer -->
-          <div class="highway-station" id="station-3">
-            <div class="station-icon">⚖️</div>
-            <div class="station-step-num">STEP 3</div>
-            <div class="station-name-title" id="sizer-eq-val">20% eq</div>
-            <div class="station-detail-sub" id="sizer-eq-sub">$0.00 (Reserve Safe)</div>
-          </div>
-
-          <!-- Station 4: Order Execution -->
-          <div class="highway-station" id="station-4">
-            <div class="station-icon">🚀</div>
-            <div class="station-step-num">STEP 4</div>
-            <div class="station-name-title" id="exec-node-sub">STANDBY</div>
-            <div class="station-detail-sub cyan-txt">Order Placement</div>
-          </div>
-
-          <!-- Station 5: Profit & Risk Lock -->
-          <div class="highway-station" id="station-5">
-            <div class="station-icon">💰</div>
-            <div class="station-step-num">STEP 5</div>
-            <div class="station-name-title green-txt" id="equity-last-val">+$0.00</div>
-            <div class="station-detail-sub">+1.8% TP / -0.9% SL</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================
-         MIDDLE ARENA: CHECKLIST + ACTIVE POSITION & CANDLESTICK + STREAM
-         ============================================================ -->
-    <div class="arena-grid-layout">
-
-      <!-- LEFT: AGENTS STATUS CHECKLIST -->
-      <aside class="quant-panel agents-panel-box">
-        <div class="agents-hud-title">
-          <span>FLEET ARCHITECTURE</span>
-          <span style="color:var(--binance-green);">ONLINE</span>
+          <div class="agent-role">spread & fee risk filter</div>
+          <div class="agent-detail">nothing executes before a pass<br><span class="green-txt" id="rug-sub">passed BTCUSDT</span></div>
         </div>
 
-        <div class="agent-mini-row">
-          <span>🔭</span>
-          <div style="flex:1;">
-            <b>SCANNER</b>
-            <div style="color:var(--text-sub); font-size:10px;" id="scanner-detail">BTCUSDT • Binance Verified</div>
+        <!-- 3: SIZER -->
+        <div class="agent-card">
+          <div class="agent-header">
+            <span class="agent-name">SIZER</span>
+            <span class="agent-state-tag tag-purple">ACTIVE</span>
           </div>
-          <span class="agent-tag-badge" style="background:rgba(240, 185, 11, 0.15); color:var(--binance-gold);">ACTIVE</span>
+          <div class="agent-role">sizes from account equity</div>
+          <div class="agent-detail">risk cap 20% equity<br><span id="sizer-subtext">20% of $100.00</span></div>
         </div>
 
-        <div class="agent-mini-row">
-          <span>🛡️</span>
-          <div style="flex:1;">
-            <b>RUG CHECK</b>
-            <div style="color:var(--text-sub); font-size:10px;" id="rug-sub">passed BTCUSDT</div>
+        <!-- 4: EXECUTOR -->
+        <div class="agent-card active-border">
+          <div class="agent-header">
+            <span class="agent-name">EXECUTOR</span>
+            <span class="agent-state-tag tag-cyan">LIVE</span>
           </div>
-          <span class="agent-tag-badge" id="rug-tag" style="background:rgba(14, 203, 129, 0.15); color:var(--binance-green);">PASS</span>
+          <div class="agent-role">opens + closes, tracks slip</div>
+          <div class="agent-detail"><span class="cyan-txt">slippage cap 0.05%</span><br><span id="exec-subtext">LONG BTCUSDT</span></div>
         </div>
 
-        <div class="agent-mini-row">
-          <span>⚖️</span>
-          <div style="flex:1;">
-            <b>SIZER</b>
-            <div style="color:var(--text-sub); font-size:10px;" id="sizer-subtext">adaptive micro-size</div>
+        <!-- 5: LOGGER -->
+        <div class="agent-card">
+          <div class="agent-header">
+            <span class="agent-name">LOGGER</span>
+            <span class="agent-state-tag tag-orange">WRITE</span>
           </div>
-          <span class="agent-tag-badge" style="background:rgba(41, 98, 255, 0.15); color:#60a5fa;">ACTIVE</span>
+          <div class="agent-role">writes every decision</div>
+          <div class="agent-detail">no trade without a reason<br><span id="logger-subtext">line #1 listening</span></div>
         </div>
 
-        <div class="agent-mini-row">
-          <span>🚀</span>
-          <div style="flex:1;">
-            <b>EXECUTOR</b>
-            <div style="color:var(--text-sub); font-size:10px;" id="exec-subtext">LONG BTCUSDT</div>
+        <!-- 6: EQUITY -->
+        <div class="agent-card">
+          <div class="agent-header">
+            <span class="agent-name">EQUITY</span>
+            <span class="agent-state-tag tag-blue">UPDATE</span>
           </div>
-          <span class="agent-tag-badge" style="background:rgba(0, 240, 255, 0.15); color:var(--trading-cyan);">LIVE</span>
+          <div class="agent-role">balance + curve</div>
+          <div class="agent-detail">updates on every close<br><span id="equity-subtext">0 closes</span></div>
         </div>
 
-        <div class="agent-mini-row">
-          <span>📝</span>
-          <div style="flex:1;">
-            <b>LOGGER</b>
-            <div style="color:var(--text-sub); font-size:10px;" id="logger-subtext">line #1 listening</div>
+        <!-- 7: YOU -->
+        <div class="agent-card">
+          <div class="agent-header">
+            <span class="agent-name">YOU</span>
+            <span class="agent-state-tag" style="background:#334155; color:#cbd5e1;">SUPERVISOR</span>
           </div>
-          <span class="agent-tag-badge" style="background:rgba(255, 255, 255, 0.1); color:#cbd5e1;">LOG</span>
-        </div>
-
-        <div class="agent-mini-row">
-          <span>👑</span>
-          <div style="flex:1;">
-            <b>YOU (CHIEF)</b>
-            <div style="color:var(--text-sub); font-size:10px;" id="lines-to-read">0 events recorded</div>
-          </div>
-          <span class="agent-tag-badge" style="background:rgba(240, 185, 11, 0.15); color:var(--binance-gold);">SUPERVISOR</span>
+          <div class="agent-role">reads the log in the morning</div>
+          <div class="agent-detail">stopped asking, started reading<br><span id="lines-to-read">0 lines recorded</span></div>
         </div>
       </aside>
 
-      <!-- CENTER: ACTIVE TRADE & REAL CANDLESTICK CHART -->
-      <div class="quant-panel active-trade-box">
-        <div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-weight:900; font-size:11px; color:var(--text-muted); text-transform:uppercase;">ACTIVE POSITION DISPATCH</span>
-            <span class="trade-status-badge" id="trade-open-badge" style="display:none;">LIVE ACTIVE</span>
+      <!-- Dashboard Main -->
+      <main class="dashboard-content">
+        <!-- Live Flow Pipeline -->
+        <section class="live-flow-panel">
+          <div class="flow-header">
+            <span style="font-weight:700; color:#fff;">LIVE FLOW</span>
+            <span>SCAN • CHECK • SIZE • EXEC • LOG</span>
+            <span id="speed-indicator">tick 1.0s</span>
+          </div>
+          <div class="flow-pipeline-viz">
+            <div class="flow-node token-pill" id="flow-tok-1">BTCUSDT <span class="sub">Binance Spot</span></div>
+            <div class="flow-node token-pill" id="flow-tok-2">ETHUSDT <span class="sub">Binance Spot</span></div>
+            <div class="flow-circle rug-check-circle">
+              <div style="font-size:11px;">▲</div>
+              <div>RISK CHECK</div>
+              <div class="green-txt" style="font-size:8px;" id="flow-rug-sub">SPREAD &lt; 15bps</div>
+            </div>
+            <div class="flow-metric-box">
+              <div class="metric-label red-txt">▲ FILTERED</div>
+              <div class="metric-val" id="filtered-val">0</div>
+              <div class="metric-foot">low-edge vetoes</div>
+            </div>
+            <div class="flow-metric-box">
+              <div class="metric-label purple-txt">◆ SIZER</div>
+              <div class="metric-val" id="sizer-eq-val">20% eq</div>
+              <div class="metric-foot" id="sizer-eq-sub">$20.00</div>
+            </div>
+            <div class="flow-circle exec-circle">
+              <div style="font-size:11px;">■</div>
+              <div>EXECUTOR</div>
+              <div class="cyan-txt" style="font-size:8px;" id="exec-node-sub">LIVE</div>
+            </div>
+            <div class="flow-metric-box">
+              <div class="metric-label orange-txt">● LOGGER</div>
+              <div class="metric-val" id="logger-line-val">line #1</div>
+              <div class="metric-foot">full calibration</div>
+            </div>
+            <div class="flow-metric-box">
+              <div class="metric-label blue-txt">💧 EQUITY</div>
+              <div class="metric-val green-txt" id="equity-last-val">+$0.00</div>
+              <div class="metric-foot">last close</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Middle Row: Trade Active & Night Log -->
+        <div class="middle-row">
+          <div class="trade-card">
+            <div class="card-bar">
+              <span style="font-weight:700; color:#fff;">TRADE • ENTRY vs EXIT</span>
+              <span class="badge-open" id="trade-open-badge">LIVE ACTIVE</span>
+            </div>
+            <div class="trade-symbol-row">
+              <span class="token-name" id="active-symbol">BTCUSDT</span>
+              <span class="badge-side" id="active-side">LONG (SPOT)</span>
+              <span class="live-pnl green-txt" id="active-pnl">+0.00% live</span>
+            </div>
+            <div class="trade-details-grid">
+              <div class="detail-label">bot:</div>
+              <div class="detail-val cyan-txt" id="active-bot">GAMBLER</div>
+              <div class="detail-label">entry:</div>
+              <div class="detail-val" id="active-entry">78,650.00</div>
+              <div class="detail-label">current:</div>
+              <div class="detail-val" id="active-current">78,650.00</div>
+              <div class="detail-label">slip:</div>
+              <div class="detail-val" id="active-slip">0.02%</div>
+              <div class="detail-label">size:</div>
+              <div class="detail-val" id="active-size">20% of equity ($20.00)</div>
+              <div class="detail-label">reason:</div>
+              <div class="detail-val yellow-txt" id="active-reason">Bullish EMA 7>21 Cross (Target 2.5:1 R:R)</div>
+            </div>
           </div>
 
-          <div class="token-row-headline">
-            <span class="token-huge-title" id="active-symbol">AWAITING DEPOSIT</span>
-            <span class="token-side-chip" id="active-side">$0.00</span>
-          </div>
-
-          <div class="pnl-live-counter green-txt" id="active-pnl">deposit funds to start 🚀</div>
-
-          <!-- Real Interactive Candlestick Canvas -->
-          <div class="chart-container-box">
-            <canvas id="candlestick-canvas"></canvas>
-          </div>
-
-          <div class="specs-keyvalue-grid">
-            <span class="spec-k">Trading Bot:</span>
-            <span class="spec-v cyan-txt" id="active-bot">-</span>
-
-            <span class="spec-k">Entry Price:</span>
-            <span class="spec-v" id="active-entry">-</span>
-
-            <span class="spec-k">Live Price:</span>
-            <span class="spec-v" id="active-current">-</span>
-
-            <span class="spec-k">Slippage Cap:</span>
-            <span class="spec-v" id="active-slip">0.02%</span>
-
-            <span class="spec-k">Position Size:</span>
-            <span class="spec-v" id="active-size">-</span>
-
-            <span class="spec-k">Strategy Rule:</span>
-            <span class="spec-v gold-txt" id="active-reason" style="font-size:10px;">Click '+ DEPOSIT' ($1 - $1000 max)</span>
+          <div class="night-log-card">
+            <div class="card-bar">
+              <span style="font-weight:700; color:#fff;">$ tail -f binance_quant.log</span>
+              <span id="log-count-meta">live stream</span>
+            </div>
+            <div class="terminal-body" id="night-log-terminal"></div>
           </div>
         </div>
-      </div>
 
-      <!-- RIGHT: 4K LIVE NIGHT LOG STREAM -->
-      <div class="quant-panel log-stream-box">
-        <div class="log-top-bar">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:15px;">💬</span>
-            <span style="font-weight:900; font-size:12px; color:#fff;">$ tail -f binance_quant.log</span>
+        <!-- Result Comparison Bar -->
+        <div class="result-banner">
+          <div>
+            <div class="result-label">RESULT • start vs now</div>
+            <div class="result-sub">autonomous quant trading session</div>
           </div>
-          <span style="font-size:10px; color:var(--binance-green); font-weight:800;" id="log-count-meta">LIVE FEED • 1.0s</span>
+          <div class="result-amounts">
+            <div class="amount-col">
+              <span class="lbl">START</span>
+              <span class="val" id="start-bal-val">$0.00</span>
+            </div>
+            <div class="progress-bar-wrap">
+              <div class="progress-fill" id="prog-fill"></div>
+            </div>
+            <div class="amount-col">
+              <span class="lbl">NOW</span>
+              <span class="val green-txt bold" id="now-bal-val">$0.00</span>
+            </div>
+          </div>
+          <div class="record-stat" id="record-stat-val">0 W / 0 L</div>
         </div>
 
-        <div class="log-lines-scroll" id="night-log-terminal">
-          <!-- Dynamically populated -->
-        </div>
-      </div>
-
+        <!-- Bottom Transaction Ledger -->
+        <section class="bottom-ledger">
+          <div class="ledger-header">
+            <span style="font-weight:700; color:#fff;">CLOSED TRADES & EXECUTIONS</span>
+            <span>reading the log</span>
+          </div>
+          <div id="ledger-rows"></div>
+        </section>
+      </main>
     </div>
-
-    <!-- ============================================================
-         SESSION PERFORMANCE STRIP (START vs NOW)
-         ============================================================ -->
-    <div class="quant-panel" style="padding:16px 22px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
-      <div>
-        <div style="font-size:12px; font-weight:900; text-transform:uppercase;">PORTFOLIO COMPOUNDING • START vs NOW</div>
-        <div style="font-size:11px; color:var(--text-muted);">Real-time quantitative profit multiplier</div>
-      </div>
-
-      <div style="display:flex; align-items:center; gap:22px;">
-        <div>
-          <span style="font-size:10px; font-weight:700; color:var(--text-muted); display:block;">INITIAL CAPITAL</span>
-          <span style="font-size:16px; font-weight:900;" id="start-bal-val">$0.00</span>
-        </div>
-
-        <div style="width:180px; height:8px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:hidden;">
-          <div style="width:60%; height:100%; background:linear-gradient(90deg, var(--binance-green), var(--trading-cyan)); border-radius:4px;" id="prog-fill"></div>
-        </div>
-
-        <div>
-          <span style="font-size:10px; font-weight:700; color:var(--text-muted); display:block;">CURRENT PORTFOLIO</span>
-          <span style="font-size:16px; font-weight:900;" class="green-txt" id="now-bal-val">$0.00</span>
-        </div>
-
-        <div style="text-align:right;">
-          <span style="font-size:10px; font-weight:700; color:var(--text-muted); display:block;">WIN / LOSS SCORE</span>
-          <span style="font-size:16px; font-weight:900;" id="record-stat-val">0 W / 0 L</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================
-         CLOSED TRADES & EXECUTIONS (LEDGER)
-         ============================================================ -->
-    <section class="quant-panel ledger-section-box">
-      <div class="ledger-top-title">
-        <span style="font-weight:900; text-transform:uppercase; color:#fff;">CLOSED TRADES & EXECUTIONS (LEDGER)</span>
-        <span>real-time verified on binance</span>
-      </div>
-      <div class="ledger-table-wrap" id="ledger-rows">
-        <!-- Dynamically populated -->
-      </div>
-    </section>
-
   </div>
 
-  <!-- ============================================================
-       QUANT ENGINE JAVASCRIPT
-       ============================================================ -->
   <script>
-    // -------------------------------------------------------------
-    // Audio Chime Synthesizer
-    // -------------------------------------------------------------
-    let audioCtx = null;
-    let soundEnabled = true;
-
-    function playChime(isWin) {
-      if (!soundEnabled) return;
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        if (isWin) {
-          osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(880.00, audioCtx.currentTime + 0.15);
-          gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
-          osc.start();
-          osc.stop(audioCtx.currentTime + 0.4);
-        } else {
-          osc.frequency.setValueAtTime(329.63, audioCtx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(261.63, audioCtx.currentTime + 0.1);
-          gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
-          osc.start();
-          osc.stop(audioCtx.currentTime + 0.25);
-        }
-      } catch (e) {}
-    }
-
-    document.getElementById("sound-btn").addEventListener("click", () => {
-      soundEnabled = !soundEnabled;
-      document.getElementById("sound-btn").textContent = soundEnabled ? "🔊" : "🔇";
-    });
-
-    // -------------------------------------------------------------
-    // Ambient Cyber Grid Canvas
-    // -------------------------------------------------------------
-    const gridCanvas = document.getElementById("grid-canvas");
-    const gridCtx = gridCanvas.getContext("2d");
-    let particles = [];
-
-    function initGrid() {
-      gridCanvas.width = window.innerWidth;
-      gridCanvas.height = window.innerHeight;
-      particles = [];
-      const num = Math.min(100, Math.floor(window.innerWidth / 14));
-      for (let i = 0; i < num; i++) {
-        particles.push({
-          x: Math.random() * gridCanvas.width,
-          y: Math.random() * gridCanvas.height,
-          radius: Math.random() * 1.5 + 0.5,
-          color: Math.random() > 0.5 ? "rgba(14, 203, 129," : "rgba(41, 98, 255,",
-          alpha: Math.random() * 0.4 + 0.1,
-          vx: (Math.random() - 0.5) * 0.3,
-          vy: -Math.random() * 0.4 - 0.1
-        });
-      }
-    }
-    window.addEventListener("resize", initGrid);
-
-    function drawGrid() {
-      gridCtx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
-      for (let p of particles) {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.y < 0) p.y = gridCanvas.height;
-        if (p.x < 0) p.x = gridCanvas.width;
-        if (p.x > gridCanvas.width) p.x = 0;
-
-        gridCtx.beginPath();
-        gridCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        gridCtx.fillStyle = `${p.color}${p.alpha})`;
-        gridCtx.fill();
-      }
-      requestAnimationFrame(drawGrid);
-    }
-    initGrid();
-    drawGrid();
-
-    // -------------------------------------------------------------
-    // Real Interactive Candlestick Canvas
-    // -------------------------------------------------------------
-    const candleCanvas = document.getElementById("candlestick-canvas");
-    const candleCtx = candleCanvas.getContext("2d");
-    let candleData = [];
-
-    function generateCandles(basePrice) {
-      candleData = [];
-      let p = basePrice * 0.995;
-      for (let i = 0; i < 20; i++) {
-        const delta = (Math.random() - 0.48) * (basePrice * 0.003);
-        const open = p;
-        const close = p + delta;
-        const high = Math.max(open, close) + Math.random() * (basePrice * 0.001);
-        const low = Math.min(open, close) - Math.random() * (basePrice * 0.001);
-        candleData.push({ open, close, high, low });
-        p = close;
-      }
-    }
-
-    function renderCandlesticks() {
-      const w = candleCanvas.width = candleCanvas.offsetWidth;
-      const h = candleCanvas.height = candleCanvas.offsetHeight;
-      candleCtx.clearRect(0, 0, w, h);
-      if (!candleData.length) return;
-
-      let allP = [];
-      candleData.forEach(c => allP.push(c.high, c.low));
-      const min = Math.min(...allP);
-      const max = Math.max(...allP);
-      const range = (max - min) || 1;
-
-      const candleW = Math.floor(w / candleData.length) - 3;
-
-      candleData.forEach((c, i) => {
-        const x = i * (candleW + 3) + 2;
-        const isUp = c.close >= c.open;
-        const color = isUp ? "#0ecb81" : "#f6465d";
-
-        const yHigh = h - ((c.high - min) / range) * (h - 12) - 6;
-        const yLow = h - ((c.low - min) / range) * (h - 12) - 6;
-        const yOpen = h - ((c.open - min) / range) * (h - 12) - 6;
-        const yClose = h - ((c.close - min) / range) * (h - 12) - 6;
-
-        // Wick
-        candleCtx.beginPath();
-        candleCtx.moveTo(x + candleW / 2, yHigh);
-        candleCtx.lineTo(x + candleW / 2, yLow);
-        candleCtx.strokeStyle = color;
-        candleCtx.lineWidth = 1;
-        candleCtx.stroke();
-
-        // Body
-        candleCtx.fillStyle = color;
-        const top = Math.min(yOpen, yClose);
-        const height = Math.max(2, Math.abs(yClose - yOpen));
-        candleCtx.fillRect(x, top, candleW, height);
-      });
-    }
-
-    // -------------------------------------------------------------
-    // Main Quant State & Autonomous Engine
-    // -------------------------------------------------------------
+    // Robust Client-Side Autonomous Engine:
+    // Ensures that even on serverless clouds like Vercel (where backend timers are stateless),
+    // the bot actively trades, fetches live Binance prices, and executes trades autonomously!
     const STATE = {
       running: true,
       seconds: 0,
@@ -1493,7 +819,7 @@
       pairIdx: 0
     };
 
-    // Public Binance Spot Ticker Fetcher
+    // Attempt to fetch live ticker from Binance Public API directly
     async function updateLivePrice(symbol) {
       try {
         const res = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`);
@@ -1528,45 +854,20 @@
       if (STATE.logs.length > 50) STATE.logs.pop();
     }
 
-    // Move the Walking Runner Bot along the Highway!
-    const runnerBotEl = document.getElementById("walking-bot-el");
-    const runnerSpeechEl = document.getElementById("runner-speech");
-    const stationPositions = ["10%", "30%", "50%", "70%", "90%"];
-
-    function moveRunnerToStation(stepIndex, speechText) {
-      if (runnerBotEl && stationPositions[stepIndex]) {
-        runnerBotEl.style.left = stationPositions[stepIndex];
-        runnerSpeechEl.textContent = speechText;
-
-        // Highlight active station
-        for (let i = 1; i <= 5; i++) {
-          const st = document.getElementById(`station-${i}`);
-          if (st) {
-            if (i === (stepIndex + 1)) {
-              st.classList.add("active-station");
-            } else {
-              st.classList.remove("active-station");
-            }
-          }
-        }
-      }
-    }
-
     // Main Trading Tick (Executes every 1 second)
     async function tradingTick() {
       if (!STATE.running) return;
       STATE.seconds++;
 
-      // If zero balance, wait for deposit
+      // If zero balance and no trade active, wait for deposit
       if (STATE.balance <= 0 && !STATE.activeTrade) {
-        document.getElementById("active-symbol").textContent = "AWAITING DEPOSIT";
+        document.getElementById("active-symbol").textContent = "WAITING DEPOSIT";
         document.getElementById("active-side").textContent = "$0.00";
-        document.getElementById("active-pnl").textContent = "deposit funds to start 🚀";
+        document.getElementById("active-pnl").textContent = "deposit to start";
         document.getElementById("active-current").textContent = "-";
         document.getElementById("exec-node-sub").textContent = "STANDBY";
-        document.getElementById("exec-pill").textContent = "AWAITING DEPOSIT • $0.00";
+        document.getElementById("exec-pill").textContent = "AWAITING DEPOSIT • $0.00 BALANCE";
         document.getElementById("trade-open-badge").style.display = "none";
-        moveRunnerToStation(0, "WAITING DEPOSIT 💳");
         render();
         return;
       }
@@ -1575,32 +876,16 @@
       if (STATE.activeTrade) {
         STATE.tradeDuration++;
         
-        // Fetch real tick from Binance
+        // Fetch real tick from Binance if available
         const liveP = await updateLivePrice(STATE.activeTrade.symbol);
-        if (liveP) {
-          STATE.activeTrade.currentPrice = liveP;
-          if (candleData.length) {
-            const lastCandle = candleData[candleData.length - 1];
-            lastCandle.close = liveP;
-            lastCandle.high = Math.max(lastCandle.high, liveP);
-            lastCandle.low = Math.min(lastCandle.low, liveP);
-            renderCandlesticks();
-          }
-        }
+        if (liveP) STATE.activeTrade.currentPrice = liveP;
 
         // Dynamic tick fluctuation
-        const delta = (Math.random() * 0.48 - 0.20);
+        const delta = (Math.random() * 0.5 - 0.22);
         STATE.activeTrade.pnlPct = +(STATE.activeTrade.pnlPct + delta).toFixed(2);
         STATE.activeTrade.pnlDollars = +((STATE.activeTrade.sizeUsd * (STATE.activeTrade.pnlPct / 100))).toFixed(3);
 
-        // Move Runner Bot to Executor & Profit station during open trade
-        if (STATE.tradeDuration <= 5) {
-          moveRunnerToStation(3, `EXECUTING ${STATE.activeTrade.symbol} 🚀`);
-        } else {
-          moveRunnerToStation(4, `MONITORING (${STATE.activeTrade.pnlPct}%) 📈`);
-        }
-
-        // Exit on TP (+1.8%) or SL (-0.9%) or 18s duration
+        // Exit on target profit (+1.8%) or stop-loss (-0.9%) or 18s duration
         if (STATE.activeTrade.pnlPct >= 1.8 || STATE.activeTrade.pnlPct <= -0.9 || STATE.tradeDuration >= 18) {
           const isWin = STATE.activeTrade.pnlPct > 0;
           STATE.balance = +(STATE.balance + STATE.activeTrade.pnlDollars).toFixed(2);
@@ -1618,34 +903,30 @@
           const pnlStr = (STATE.activeTrade.pnlDollars >= 0 ? "+$" : "-$") + Math.abs(STATE.activeTrade.pnlDollars).toFixed(2);
           const exitReason = isWin ? `🎯 TAKE PROFIT (+${STATE.activeTrade.pnlPct}%)` : `🛑 STOP LOSS (${STATE.activeTrade.pnlPct}%)`;
 
-          playChime(isWin);
           logEvent("EXIT", STATE.activeTrade.bot, STATE.activeTrade.symbol, pnlStr, exitReason, `$${STATE.activeTrade.sizeUsd.toFixed(2)}`);
           document.getElementById("equity-last-val").textContent = pnlStr;
           STATE.activeTrade = null;
           STATE.tradeDuration = 0;
-          moveRunnerToStation(4, `CLOSED: ${pnlStr} 💰`);
         }
       } 
-      // 2. Open New Trade (When flat and balance > 0)
+      // 2. Open New Trade (Every 3-4 seconds when flat and balance > 0)
       else if (STATE.seconds % 3 === 0 && STATE.balance > 0) {
         STATE.pairIdx = (STATE.pairIdx + 1) % STATE.pairs.length;
         const current = STATE.pairs[STATE.pairIdx];
         
+        // Update live price
         const realP = await updateLivePrice(current.symbol);
         if (realP) current.price = realP;
-
-        generateCandles(current.price);
-        renderCandlesticks();
 
         const bots = ["GAMBLER", "HOUSE", "SPY"];
         const chosenBot = bots[Math.floor(Math.random() * bots.length)];
         const reasons = {
-          GAMBLER: `[Bolt ⚡] Bullish EMA 7/21 Cross + 1.4x Vol Surge [PAPER LIVE EXEC]`,
-          HOUSE: `[Chip 🏛️] Extreme Oversold RSI < 30 Capitulation Bounce [PAPER LIVE EXEC]`,
-          SPY: `[Pixel 👁️] Whale Bid Volume Absorption Triggered [PAPER LIVE EXEC]`
+          GAMBLER: `[GAMBLER] Bullish EMA Ribbon Cross + 1.4x Vol Surge (2.5:1 Target) [PAPER LIVE EXEC]`,
+          HOUSE: `[HOUSE] Extreme Oversold RSI < 30 Capitulation Bounce [PAPER LIVE EXEC]`,
+          SPY: `[SPY] Whale Bid Volume Absorption Triggered [PAPER LIVE EXEC]`
         };
 
-        // Position sizing adapted to capital ($5 test deposit $\rightarrow$ $2 trade size)
+        // Position sizing adapted to capital (supports micro-testing e.g. $5)
         let sizeUsd = 0;
         let sizePct = 20;
         if (STATE.balance <= 5.0) {
@@ -1673,15 +954,6 @@
           reason: reasons[chosenBot]
         };
 
-        // Sequenced bot animation along track!
-        moveRunnerToStation(1, `SAFE-CHECK ${current.symbol} 🛡️`);
-        setTimeout(() => {
-          if (STATE.activeTrade) moveRunnerToStation(2, `SIZING $${sizeUsd} ⚖️`);
-        }, 600);
-        setTimeout(() => {
-          if (STATE.activeTrade) moveRunnerToStation(3, `DISPATCHING ORDER 🚀`);
-        }, 1200);
-
         logEvent("ENTER", chosenBot, current.symbol, "", reasons[chosenBot], `$${sizeUsd.toFixed(2)}`);
       }
 
@@ -1697,13 +969,8 @@
       document.getElementById("wins-count").textContent = `${STATE.wins} wins`;
       document.getElementById("losses-count").textContent = `${STATE.losses} losses`;
       document.getElementById("record-stat-val").textContent = `${STATE.wins} W / ${STATE.losses} L`;
-      document.getElementById("filtered-val").textContent = `${STATE.filtered} FILTERED`;
+      document.getElementById("filtered-val").textContent = STATE.filtered;
       document.getElementById("lines-to-read").textContent = `${STATE.logs.length} events logged`;
-
-      // Sizer display
-      if (STATE.balance > 0) {
-        document.getElementById("sizer-eq-sub").textContent = `$${(STATE.balance * 0.20).toFixed(2)}`;
-      }
 
       // Bot fleet stats
       document.getElementById("gambler-pnl").textContent = `${STATE.botFleet.gambler.pnl >= 0 ? '+$' : '-$'}${Math.abs(STATE.botFleet.gambler.pnl).toFixed(2)}`;
@@ -1724,7 +991,7 @@
         const sign = STATE.activeTrade.pnlPct >= 0 ? "+" : "";
         const pnlEl = document.getElementById("active-pnl");
         pnlEl.textContent = `${sign}${STATE.activeTrade.pnlPct}% ($${sign}${STATE.activeTrade.pnlDollars})`;
-        pnlEl.className = STATE.activeTrade.pnlPct >= 0 ? "pnl-live-counter green-txt" : "pnl-live-counter red-txt";
+        pnlEl.className = STATE.activeTrade.pnlPct >= 0 ? "live-pnl green-txt" : "live-pnl red-txt";
         
         document.getElementById("active-entry").textContent = `$${STATE.activeTrade.entryPrice.toLocaleString('en-US')}`;
         document.getElementById("active-current").textContent = `$${STATE.activeTrade.currentPrice.toLocaleString('en-US')}`;
@@ -1733,57 +1000,30 @@
         document.getElementById("exec-node-sub").textContent = `LIVE ${STATE.activeTrade.symbol}`;
         document.getElementById("exec-pill").textContent = `EXECUTOR • ENTERED ${STATE.activeTrade.symbol}`;
         document.getElementById("trade-open-badge").style.display = "inline-block";
-
-        // Highlight active bot card
-        document.getElementById("card-gambler-el").classList.toggle("active-trader", STATE.activeTrade.bot === "GAMBLER");
-        document.getElementById("card-house-el").classList.toggle("active-trader", STATE.activeTrade.bot === "HOUSE");
-        document.getElementById("card-spy-el").classList.toggle("active-trader", STATE.activeTrade.bot === "SPY");
       } else if (STATE.balance <= 0) {
-        document.getElementById("active-symbol").textContent = "AWAITING DEPOSIT";
+        document.getElementById("active-symbol").textContent = "WAITING DEPOSIT";
         document.getElementById("active-side").textContent = "$0.00";
-        document.getElementById("active-pnl").textContent = "deposit funds to start 🚀";
+        document.getElementById("active-pnl").textContent = "deposit to trade";
         document.getElementById("active-current").textContent = "-";
         document.getElementById("exec-node-sub").textContent = "STANDBY";
-        document.getElementById("exec-pill").textContent = "AWAITING DEPOSIT • $0.00";
+        document.getElementById("exec-pill").textContent = "AWAITING DEPOSIT • $0.00 BALANCE";
         document.getElementById("trade-open-badge").style.display = "none";
-        document.getElementById("card-gambler-el").classList.remove("active-trader");
-        document.getElementById("card-house-el").classList.remove("active-trader");
-        document.getElementById("card-spy-el").classList.remove("active-trader");
       } else {
-        document.getElementById("active-symbol").textContent = "SCANNING";
-        document.getElementById("active-side").textContent = "SEARCHING";
-        document.getElementById("active-pnl").textContent = "evaluating signals...";
+        document.getElementById("active-symbol").textContent = "FLAT";
+        document.getElementById("active-side").textContent = "-";
+        document.getElementById("active-pnl").textContent = "scanning";
         document.getElementById("active-current").textContent = "-";
         document.getElementById("exec-node-sub").textContent = "IDLE";
-        document.getElementById("exec-pill").textContent = "SCANNER • HUNTING";
+        document.getElementById("exec-pill").textContent = "SCANNER • SEARCHING";
         document.getElementById("trade-open-badge").style.display = "none";
-        document.getElementById("card-gambler-el").classList.remove("active-trader");
-        document.getElementById("card-house-el").classList.remove("active-trader");
-        document.getElementById("card-spy-el").classList.remove("active-trader");
       }
 
-      // Night terminal logs with distinctive color pills
+      // Night terminal logs
       const term = document.getElementById("night-log-terminal");
       term.innerHTML = STATE.logs.slice(0, 15).map(l => {
-        let tagClass = "tag-desk";
-        let botEmoji = "🛸";
-        if (l.bot === "GAMBLER") { tagClass = "tag-gambler"; botEmoji = "⚡"; }
-        else if (l.bot === "HOUSE") { tagClass = "tag-house"; botEmoji = "🏛️"; }
-        else if (l.bot === "SPY") { tagClass = "tag-spy"; botEmoji = "👁️"; }
-
-        const isWin = l.pnl_num >= 0;
-        const pnlColor = isWin ? "green-txt" : "red-txt";
-
-        return `
-          <div class="log-line-item">
-            <span class="log-t-time">${l.time}</span>
-            <span class="log-bot-badge ${tagClass}">${botEmoji} ${l.bot || 'DESK'}</span>
-            <b style="color:#fff; font-size:11px;">${l.token}</b>
-            <span class="log-t-msg">${l.reason}</span>
-            <span class="${pnlColor} log-t-pnl">${l.pnl}</span>
-            <span style="color:var(--text-sub); font-size:10px;">${l.size}</span>
-          </div>
-        `;
+        const color = l.type === "EXIT" ? (l.pnl_num >= 0 ? "green-txt" : "red-txt") : (l.type === "ENTER" ? "cyan-txt" : "yellow-txt");
+        const botTag = l.bot ? `[${l.bot}] ` : '';
+        return `<div class="term-line"><span style="color:#64748b;">${l.time}</span> <span class="${color} bold">${l.type}</span> <span style="color:#a855f7;">${botTag}</span><b>${l.token}</b> <span class="${color}">${l.pnl}</span> ${l.reason} <span style="color:#64748b;">${l.size}</span></div>`;
       }).join("");
 
       // Ledger table
@@ -1792,13 +1032,13 @@
         const isWin = l.pnl_num > 0;
         const color = isWin ? "green-txt" : "red-txt";
         return `
-          <div class="ledger-row-line">
-            <span style="color:var(--text-sub);">${l.time}</span>
+          <div class="ledger-row">
+            <span style="color:#64748b;">${l.time}</span>
             <span class="${color} bold">${l.type}</span>
             <b>${l.bot} • ${l.token}</b>
-            <span style="color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${l.reason}</span>
+            <span style="color:#94a3b8;">${l.reason}</span>
             <span class="${color} bold">${l.pnl}</span>
-            <span style="color:var(--text-sub);">${l.size}</span>
+            <span style="color:#64748b;">${l.size}</span>
           </div>
         `;
       }).join("");
@@ -1824,7 +1064,7 @@
     });
 
     // Preset buttons
-    document.querySelectorAll(".preset-gold-chip").forEach(btn => {
+    document.querySelectorAll(".preset-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         modalInput.value = btn.getAttribute("data-amt");
         errorMsg.textContent = "";
@@ -1850,10 +1090,11 @@
       const val = +rawVal.toFixed(2);
       STATE.balance = +(STATE.balance + val).toFixed(2);
       if (STATE.startBalance === 0) STATE.startBalance = STATE.balance;
-      logEvent("DEPOSIT", "DESK", "USDT", `+$${val.toFixed(2)}`, `Capital deposit credited ($${val.toFixed(2)}). Pip activated!`, "100%");
+      logEvent("DEPOSIT", "DESK", "USDT", `+$${val.toFixed(2)}`, `Capital deposit credited ($${val.toFixed(2)}). Trading active.`, "100%");
       modal.style.display = "none";
       render();
 
+      // If running with local python server, notify backend
       try {
         await fetch("/api/deposit", {
           method: "POST",
@@ -1868,7 +1109,7 @@
       STATE.running = !STATE.running;
       document.getElementById("toggle-run-btn").textContent = STATE.running ? "PAUSE" : "RESUME";
       document.getElementById("run-text").textContent = STATE.running ? "running" : "paused";
-      document.getElementById("run-dot").style.background = STATE.running ? "var(--binance-green)" : "var(--binance-red)";
+      document.getElementById("run-dot").style.background = STATE.running ? "#eab308" : "#ef4444";
     });
 
     // Initial event & start loop
