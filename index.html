@@ -12,11 +12,12 @@
       --border-color: #1a2336;
       --border-blue: rgba(59, 130, 246, 0.35);
       --border-red: rgba(239, 68, 68, 0.35);
+      --border-green: rgba(16, 185, 129, 0.35);
       --text-main: #f1f5f9;
       --text-muted: #8292ab;
       --text-sub: #4b586e;
 
-      /* Red & Blue Clean Quant Theme */
+      /* Red, Blue, Green Institutional Palette */
       --neon-blue: #3b82f6;
       --neon-blue-bright: #60a5fa;
       --neon-blue-glow: rgba(59, 130, 246, 0.3);
@@ -27,9 +28,13 @@
       --neon-red-glow: rgba(239, 68, 68, 0.3);
       --neon-red-bg: rgba(239, 68, 68, 0.14);
 
+      --neon-green: #10b981;
+      --neon-green-bright: #34d399;
+      --neon-green-glow: rgba(16, 185, 129, 0.3);
+      --neon-green-bg: rgba(16, 185, 129, 0.14);
+
       --cyan-neon: #38bdf8;
-      --cyan-glow: rgba(56, 189, 248, 0.25);
-      --green-neon: #38bdf8; /* Clean electric cyan-blue for positive PnL */
+      --green-neon: #10b981;
       --yellow-neon: #60a5fa;
       --purple-neon: #818cf8;
       --orange-neon: #f87171;
@@ -46,7 +51,7 @@
       background-image: 
         radial-gradient(circle at 10% 12%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
         radial-gradient(circle at 90% 12%, rgba(239, 68, 68, 0.11) 0%, transparent 40%),
-        radial-gradient(circle at 50% 90%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+        radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.07) 0%, transparent 50%);
       background-attachment: fixed;
       color: var(--text-main);
       font-size: 13px;
@@ -377,6 +382,23 @@
     .metric-label { font-size: 10px; font-weight: 700; }
     .metric-val { font-size: 13px; font-weight: 800; margin: 2px 0; }
     .metric-foot { font-size: 9px; color: var(--text-muted); }
+    
+    /* Spot Candlestick Chart (Red, Blue, Green) */
+    .chart-container-box {
+      width: 100%;
+      height: 70px;
+      background: rgba(7, 9, 14, 0.7);
+      border: 1px solid rgba(59, 130, 246, 0.22);
+      border-radius: 6px;
+      margin: 8px 0 10px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    #candlestick-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
     .middle-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -982,6 +1004,75 @@
       if (STATE.logs.length > 50) STATE.logs.pop();
     }
 
+    
+    // Spot Candlestick Chart Engine (Red & Green Candles with Blue Grid)
+    const candleCanvas = document.getElementById("candlestick-canvas");
+    const candleCtx = candleCanvas ? candleCanvas.getContext("2d") : null;
+    let candleData = [];
+
+    function generateCandles(basePrice) {
+      candleData = [];
+      let p = basePrice * 0.995;
+      for (let i = 0; i < 22; i++) {
+        const delta = (Math.random() - 0.48) * (basePrice * 0.003);
+        const open = p;
+        const close = p + delta;
+        const high = Math.max(open, close) + Math.random() * (basePrice * 0.001);
+        const low = Math.min(open, close) - Math.random() * (basePrice * 0.001);
+        candleData.push({ open, close, high, low });
+        p = close;
+      }
+    }
+
+    function renderCandlesticks() {
+      if (!candleCanvas || !candleCtx || !candleData.length) return;
+      const w = candleCanvas.width = candleCanvas.offsetWidth;
+      const h = candleCanvas.height = candleCanvas.offsetHeight;
+      if (w <= 0 || h <= 0) return;
+      candleCtx.clearRect(0, 0, w, h);
+
+      // Subtle Blue baseline
+      candleCtx.strokeStyle = "rgba(59, 130, 246, 0.15)";
+      candleCtx.lineWidth = 1;
+      candleCtx.beginPath();
+      candleCtx.moveTo(0, h / 2);
+      candleCtx.lineTo(w, h / 2);
+      candleCtx.stroke();
+
+      let allP = [];
+      candleData.forEach(c => allP.push(c.high, c.low));
+      const min = Math.min(...allP);
+      const max = Math.max(...allP);
+      const range = (max - min) || 1;
+
+      const candleW = Math.max(3, Math.floor(w / candleData.length) - 3);
+
+      candleData.forEach((c, i) => {
+        const x = i * (candleW + 3) + 3;
+        const isUp = c.close >= c.open;
+        const color = isUp ? "#10b981" : "#ef4444"; // Green for bullish, Red for bearish
+
+        const yHigh = h - ((c.high - min) / range) * (h - 10) - 5;
+        const yLow = h - ((c.low - min) / range) * (h - 10) - 5;
+        const yOpen = h - ((c.open - min) / range) * (h - 10) - 5;
+        const yClose = h - ((c.close - min) / range) * (h - 10) - 5;
+
+        // Wick
+        candleCtx.beginPath();
+        candleCtx.moveTo(x + candleW / 2, yHigh);
+        candleCtx.lineTo(x + candleW / 2, yLow);
+        candleCtx.strokeStyle = color;
+        candleCtx.lineWidth = 1;
+        candleCtx.stroke();
+
+        // Body
+        candleCtx.fillStyle = color;
+        const top = Math.min(yOpen, yClose);
+        const height = Math.max(2, Math.abs(yClose - yOpen));
+        candleCtx.fillRect(x, top, candleW, height);
+      });
+    }
+
     // Main Trading Tick (Executes every 1 second)
     async function tradingTick() {
       if (!STATE.running) return;
@@ -1006,7 +1097,16 @@
         
         // Fetch real tick from Binance if available
         const liveP = await updateLivePrice(STATE.activeTrade.symbol);
-        if (liveP) STATE.activeTrade.currentPrice = liveP;
+        if (liveP) {
+          STATE.activeTrade.currentPrice = liveP;
+          if (candleData.length) {
+            const lastCandle = candleData[candleData.length - 1];
+            lastCandle.close = liveP;
+            lastCandle.high = Math.max(lastCandle.high, liveP);
+            lastCandle.low = Math.min(lastCandle.low, liveP);
+            renderCandlesticks();
+          }
+        }
 
         // Dynamic tick fluctuation
         const delta = (Math.random() * 0.5 - 0.22);
@@ -1045,6 +1145,9 @@
         // Update live price
         const realP = await updateLivePrice(current.symbol);
         if (realP) current.price = realP;
+
+        generateCandles(current.price);
+        renderCandlesticks();
 
         const bots = ["GAMBLER", "HOUSE", "SPY"];
         const chosenBot = bots[Math.floor(Math.random() * bots.length)];
