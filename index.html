@@ -1788,6 +1788,25 @@
                 type: "MARKET",
                 quoteOrderQty: STATE.activeTrade.sizeUsd
               })
+            }).then(() => {
+              // Re-sync balance from Binance
+              setTimeout(() => {
+                fetch("/api/order", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    action: "test_connection",
+                    apiKey: userApiKey,
+                    apiSecret: userApiSecret
+                  })
+                }).then(r => r.json()).then(d => {
+                  if (d.success && d.usdtBalance !== undefined) {
+                    STATE.balance = parseFloat(d.usdtBalance);
+                    saveUserState();
+                    render();
+                  }
+                }).catch(() => {});
+              }, 1500);
             }).catch(() => {});
           }
 
@@ -1928,7 +1947,7 @@
       const modeBadge = document.getElementById("mode-badge-el");
       if (modeBadge) {
         if (currentTradingMode === "LIVE") {
-          modeBadge.textContent = "LIVE • BINANCE API CONNECTED";
+          modeBadge.textContent = `🔴 LIVE • BINANCE SPOT ($${STATE.balance.toFixed(2)} USDT)`;
           modeBadge.style.color = "#f87171";
           modeBadge.style.borderColor = "rgba(239, 68, 68, 0.4)";
           modeBadge.style.background = "rgba(239, 68, 68, 0.15)";
@@ -2075,7 +2094,7 @@
       updateModalModeDisplay();
     });
 
-    document.getElementById("save-api-btn").addEventListener("click", () => {
+    document.getElementById("save-api-btn").addEventListener("click", async () => {
       if (currentTradingMode === "LIVE") {
         const k = apiKeyInput.value.trim();
         const s = apiSecretInput.value.trim();
@@ -2084,52 +2103,10 @@
           apiStatus.style.color = "#ef4444";
           return;
         }
-        userApiKey = k;
-        userApiSecret = s;
-        localStorage.setItem("grok_user_api_key", k);
-        localStorage.setItem("grok_user_api_secret", s);
-        apiStatus.textContent = "✅ Live API credentials saved in your private browser storage.";
-        apiStatus.style.color = "#34d399";
-      } else {
-        apiStatus.textContent = "✅ Practice Mode active (Zero financial risk).";
-        apiStatus.style.color = "#34d399";
-      }
-      saveUserState();
-      setTimeout(() => {
-        apiModal.style.display = "none";
-        render();
-      }, 700);
-    });
-
-    document.getElementById("clear-keys-btn").addEventListener("click", () => {
-      localStorage.removeItem("grok_user_api_key");
-      localStorage.removeItem("grok_user_api_secret");
-      userApiKey = "";
-      userApiSecret = "";
-      apiKeyInput.value = "";
-      apiSecretInput.value = "";
-      currentTradingMode = "PAPER";
-      updateModalModeDisplay();
-      apiStatus.textContent = "🗑️ Keys removed. Switched to Practice Mode.";
-      apiStatus.style.color = "#38bdf8";
-      saveUserState();
-      render();
-    });
-
-    // Test Binance Connection & Permissions via Serverless Proxy
-    const testApiBtn = document.getElementById("test-api-btn");
-    if (testApiBtn) {
-      testApiBtn.addEventListener("click", async () => {
-        const k = apiKeyInput.value.trim();
-        const s = apiSecretInput.value.trim();
-        if (!k || !s) {
-          apiStatus.textContent = "⚠️ Please paste both Binance API Key & Secret Key first.";
-          apiStatus.style.color = "#ef4444";
-          return;
-        }
-        testApiBtn.disabled = true;
-        testApiBtn.textContent = "⏳ Testing Connection with Binance...";
-        apiStatus.textContent = "Verifying HMAC signature with Binance Spot API...";
+        
+        const saveBtn = document.getElementById("save-api-btn");
+        saveBtn.disabled = true;
+        apiStatus.textContent = "⏳ Authenticating with Binance & detecting live wallet balance...";
         apiStatus.style.color = "#60a5fa";
 
         try {
@@ -2144,13 +2121,110 @@
           });
           const data = await res.json();
           if (data.success) {
-            let msg = `✅ Authenticated! Type: ${data.accountType || 'SPOT'} • Spot Trading: ${data.canTrade ? 'Active' : 'Disabled'}`;
-            if (data.usdtBalance !== undefined && data.usdtBalance > 0) {
-              msg += ` • Wallet Balance: $${data.usdtBalance.toFixed(2)} USDT`;
-              // Automatically sync user's real Binance balance!
-              STATE.balance = data.usdtBalance;
-              STATE.startBalance = data.usdtBalance;
-              saveUserState();
+            userApiKey = k;
+            userApiSecret = s;
+            localStorage.setItem("grok_user_api_key", k);
+            localStorage.setItem("grok_user_api_secret", s);
+
+            const detectedBalance = data.usdtBalance !== undefined ? parseFloat(data.usdtBalance) : 0.0;
+            STATE.balance = detectedBalance;
+            STATE.startBalance = detectedBalance;
+            currentTradingMode = "LIVE";
+            saveUserState();
+            render();
+
+            logEvent("CONNECTED", "DESK", "BINANCE_SPOT", `$${detectedBalance.toFixed(2)}`, `Real Binance Account connected! Balance detected: $${detectedBalance.toFixed(2)} USDT. Auto-trading activated.`, "LIVE");
+
+            apiStatus.textContent = `✅ Live Account Activated! Real Balance: $${detectedBalance.toFixed(2)} USDT. Bot is now actively trading this account!`;
+            apiStatus.style.color = "#34d399";
+
+            setTimeout(() => {
+              apiModal.style.display = "none";
+              render();
+            }, 1000);
+          } else {
+            apiStatus.textContent = `❌ ${data.error || 'Authentication failed'}`;
+            apiStatus.style.color = "#ef4444";
+          }
+        } catch (err) {
+          apiStatus.textContent = "❌ Connection failed: " + err.message;
+          apiStatus.style.color = "#ef4444";
+        } finally {
+          saveBtn.disabled = false;
+        }
+      } else {
+        currentTradingMode = "PAPER";
+        apiStatus.textContent = "✅ Practice Mode active ($100 Demo Funds, Zero Risk).";
+        apiStatus.style.color = "#34d399";
+        saveUserState();
+        setTimeout(() => {
+          apiModal.style.display = "none";
+          render();
+        }, 700);
+      }
+    });
+
+    document.getElementById("clear-keys-btn").addEventListener("click", () => {
+      localStorage.removeItem("grok_user_api_key");
+      localStorage.removeItem("grok_user_api_secret");
+      userApiKey = "";
+      userApiSecret = "";
+      apiKeyInput.value = "";
+      apiSecretInput.value = "";
+      currentTradingMode = "PAPER";
+      STATE.balance = 100.0;
+      STATE.startBalance = 100.0;
+      updateModalModeDisplay();
+      apiStatus.textContent = "🗑️ Keys removed. Switched back to Practice Mode ($100 Demo).";
+      apiStatus.style.color = "#38bdf8";
+      saveUserState();
+      render();
+    });
+
+    // Test Binance Connection & Detect Balance
+    const testApiBtn = document.getElementById("test-api-btn");
+    if (testApiBtn) {
+      testApiBtn.addEventListener("click", async () => {
+        const k = apiKeyInput.value.trim();
+        const s = apiSecretInput.value.trim();
+        if (!k || !s) {
+          apiStatus.textContent = "⚠️ Please paste both Binance API Key & Secret Key first.";
+          apiStatus.style.color = "#ef4444";
+          return;
+        }
+        testApiBtn.disabled = true;
+        testApiBtn.textContent = "⏳ Testing Connection & Detecting Balance...";
+        apiStatus.textContent = "Connecting to Binance Spot API & fetching wallet balances...";
+        apiStatus.style.color = "#60a5fa";
+
+        try {
+          const res = await fetch("/api/order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "test_connection",
+              apiKey: k,
+              apiSecret: s
+            })
+          });
+          const data = await res.json();
+          if (data.success) {
+            const detectedBal = data.usdtBalance !== undefined ? parseFloat(data.usdtBalance) : 0.0;
+            STATE.balance = detectedBal;
+            STATE.startBalance = detectedBal;
+            userApiKey = k;
+            userApiSecret = s;
+            localStorage.setItem("grok_user_api_key", k);
+            localStorage.setItem("grok_user_api_secret", s);
+            currentTradingMode = "LIVE";
+            saveUserState();
+            render();
+
+            let msg = `✅ Authenticated! Real USDT Balance: $${detectedBal.toFixed(2)} USDT • Spot Trading: ${data.canTrade ? 'Active' : 'Disabled'}`;
+            if (detectedBal >= 10.0) {
+              msg += ` • Ready for live auto-trading!`;
+            } else {
+              msg += ` • (Note: Binance requires min $10 USDT to execute spot orders)`;
             }
             apiStatus.textContent = msg;
             apiStatus.style.color = "#34d399";
