@@ -645,6 +645,9 @@
         <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:4px; padding:8px 10px; font-size:10px; color:#fca5a5; margin-bottom:10px; line-height:1.4;">
           ⚠️ <b>Security Rule:</b> Binance API Management mein sirf <b>"Enable Reading"</b> aur <b>"Enable Spot & Margin Trading"</b> check karein. <b>"Enable Withdrawals" ko hamesha UNCHECKED rakhein!</b>
         </div>
+        <button type="button" id="test-api-btn" style="width:100%; margin-bottom:10px; background:rgba(59,130,246,0.18); border:1px solid #3b82f6; color:#93c5fd; padding:9px 12px; border-radius:4px; font-weight:700; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+          🔍 TEST CONNECTION & SPOT PERMISSIONS
+        </button>
       </div>
 
       <!-- Session Info -->
@@ -694,6 +697,11 @@
       </div>
 
       <div id="deposit-error-msg" style="color:#ef4444; font-size:11px; margin-top:8px; min-height:16px; font-weight:600;"></div>
+
+      <div style="margin-top:10px; padding:8px 10px; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.25); border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:11px; color:#93c5fd;">⚡ Sandbox Testing Funds:</span>
+        <button type="button" id="quick-reset-demo-btn" style="background:#1d4ed8; color:#fff; border:1px solid #3b82f6; padding:4px 10px; border-radius:3px; font-size:11px; font-weight:700; cursor:pointer;">Reset to $100 Demo</button>
+      </div>
 
       <div style="display:flex; gap:10px; margin-top:14px;">
         <button class="action-btn" id="modal-confirm-btn" style="flex:1; background:#1d4ed8; color:#ffffff; padding:10px; font-size:12px; font-weight:700; border:1px solid #3b82f6;">CONFIRM DEPOSIT</button>
@@ -1025,7 +1033,22 @@
     let userApiSecret = localStorage.getItem("grok_user_api_secret") || "";
 
     const savedBal = localStorage.getItem("grok_user_balance");
-    const initialBal = savedBal !== null ? Math.max(0, parseFloat(savedBal)) : 0.0;
+    // Frictionless onboarding: Default $100.00 Paper Balance so bots start trading immediately!
+    const initialBal = savedBal !== null ? Math.max(0, parseFloat(savedBal)) : 100.0;
+    if (savedBal === null) {
+      localStorage.setItem("grok_user_balance", "100.00");
+    }
+
+    // Restore active trade if page was refreshed during an open position
+    let savedTrade = null;
+    let savedDuration = 0;
+    try {
+      const rawTrade = localStorage.getItem("grok_active_trade");
+      if (rawTrade) {
+        savedTrade = JSON.parse(rawTrade);
+        savedDuration = savedTrade.tradeDuration || 0;
+      }
+    } catch (e) {}
 
     const STATE = {
       running: true,
@@ -1041,8 +1064,8 @@
         house:   { trades: 0, wins: 0, pnl: 0 },
         spy:     { trades: 0, wins: 0, pnl: 0 }
       },
-      activeTrade: null,
-      tradeDuration: 0,
+      activeTrade: savedTrade,
+      tradeDuration: savedDuration,
       logs: [],
       pairs: [
         { symbol: "BTCUSDT", price: 77000.0 },
@@ -1067,7 +1090,24 @@
     function saveUserState() {
       localStorage.setItem("grok_user_balance", STATE.balance.toFixed(2));
       localStorage.setItem("grok_trading_mode", currentTradingMode);
+      if (STATE.activeTrade) {
+        localStorage.setItem("grok_active_trade", JSON.stringify({
+          ...STATE.activeTrade,
+          tradeDuration: STATE.tradeDuration
+        }));
+      } else {
+        localStorage.removeItem("grok_active_trade");
+      }
     }
+
+    // Tab close warning during active trade
+    window.addEventListener("beforeunload", (e) => {
+      if (STATE.activeTrade) {
+        e.preventDefault();
+        e.returnValue = "Active trade in progress! Tab close will pause client monitoring.";
+        return e.returnValue;
+      }
+    });
 
     function formatTime(s) {
       const h = String(Math.floor(s / 3600)).padStart(2, '0');
@@ -1310,8 +1350,27 @@
 
           logEvent("EXIT", STATE.activeTrade.bot, STATE.activeTrade.symbol, pnlStr, exitReason, `$${STATE.activeTrade.sizeUsd.toFixed(2)}`);
           document.getElementById("equity-last-val").textContent = pnlStr;
+
+          // If LIVE mode, dispatch SELL order to Binance via serverless proxy
+          if (currentTradingMode === "LIVE" && userApiKey && userApiSecret) {
+            fetch("/api/order", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                action: "create_order",
+                apiKey: userApiKey,
+                apiSecret: userApiSecret,
+                symbol: STATE.activeTrade.symbol,
+                side: "SELL",
+                type: "MARKET",
+                quoteOrderQty: STATE.activeTrade.sizeUsd
+              })
+            }).catch(() => {});
+          }
+
           STATE.activeTrade = null;
           STATE.tradeDuration = 0;
+          saveUserState();
         }
       } 
       // 2. Open New Trade (When flat and balance >= $10 Binance MIN_NOTIONAL)
@@ -1334,13 +1393,11 @@
 
         // Binance MIN_NOTIONAL Rule: Minimum trade size is $10.00 USD
         let sizeUsd = 10.0;
-        if (STATE.balance > 50.0) {
+        if (STATE.balance >= 50.0) {
           sizeUsd = +(STATE.balance * 0.20).toFixed(2);
+        } else if (STATE.balance >= 10.0) {
+          sizeUsd = 10.0; // Enforce $10 Binance MIN_NOTIONAL on smaller accounts ($10 - $50)
         } else {
-          sizeUsd = +(Math.min(STATE.balance, 10.0)).toFixed(2);
-        }
-
-        if (sizeUsd < 10.0) {
           // Balance is less than Binance minimum trade size
           return;
         }
@@ -1361,8 +1418,34 @@
           sizePct: sizePct,
           reason: reason
         };
+        saveUserState();
 
         logEvent("ENTER", chosenBot, currentPair.symbol, "FEE: $0.02", reason, `$${sizeUsd.toFixed(2)}`);
+
+        // If LIVE mode, dispatch order to Binance via serverless proxy
+        if (currentTradingMode === "LIVE" && userApiKey && userApiSecret) {
+          fetch("/api/order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "create_order",
+              apiKey: userApiKey,
+              apiSecret: userApiSecret,
+              symbol: currentPair.symbol,
+              side: "BUY",
+              type: "MARKET",
+              quoteOrderQty: sizeUsd
+            })
+          }).then(r => r.json()).then(res => {
+            if (res.success && res.order) {
+              logEvent("BINANCE_LIVE", chosenBot, currentPair.symbol, "ORDER_FILLED", `Binance Spot Order #${res.order.orderId}`, `$${sizeUsd.toFixed(2)}`);
+            } else {
+              logEvent("API_ERROR", chosenBot, currentPair.symbol, "REJECTED", res.error || "Order rejected by Binance", `$${sizeUsd.toFixed(2)}`);
+            }
+          }).catch(err => {
+            logEvent("NET_ERR", chosenBot, currentPair.symbol, "FAIL", "Proxy error: " + err.message, `$${sizeUsd.toFixed(2)}`);
+          });
+        }
       } else if (STATE.balance > 0 && STATE.balance < 10.0 && !STATE.activeTrade) {
         document.getElementById("active-symbol").textContent = "BALANCE < $10";
         document.getElementById("active-side").textContent = "MIN NOTIONAL";
@@ -1428,6 +1511,10 @@
         document.getElementById("active-current").textContent = `$${STATE.activeTrade.currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         document.getElementById("active-size").textContent = `$${STATE.activeTrade.sizeUsd.toFixed(2)} (${STATE.activeTrade.sizePct}% eq)`;
         document.getElementById("active-reason").textContent = STATE.activeTrade.reason;
+        const slipEl = document.getElementById("active-slip");
+        if (slipEl) {
+          slipEl.textContent = `-$${(STATE.activeTrade.fees || 0.02).toFixed(2)} (0.1% Buy + 0.1% Sell)`;
+        }
         document.getElementById("exec-node-sub").textContent = `LIVE ${STATE.activeTrade.symbol}`;
         document.getElementById("exec-pill").textContent = `EXECUTOR • ENTERED ${STATE.activeTrade.symbol} ($${STATE.activeTrade.sizeUsd.toFixed(2)})`;
         document.getElementById("trade-open-badge").style.display = "inline-block";
@@ -1572,6 +1659,54 @@
       render();
     });
 
+    // Test Binance Connection & Permissions via Serverless Proxy
+    const testApiBtn = document.getElementById("test-api-btn");
+    if (testApiBtn) {
+      testApiBtn.addEventListener("click", async () => {
+        const k = apiKeyInput.value.trim();
+        const s = apiSecretInput.value.trim();
+        if (!k || !s) {
+          apiStatus.textContent = "⚠️ Please paste both Binance API Key & Secret Key first.";
+          apiStatus.style.color = "#ef4444";
+          return;
+        }
+        testApiBtn.disabled = true;
+        testApiBtn.textContent = "⏳ Testing Connection with Binance...";
+        apiStatus.textContent = "Verifying HMAC signature with Binance Spot API...";
+        apiStatus.style.color = "#60a5fa";
+
+        try {
+          const res = await fetch("/api/order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "test_connection",
+              apiKey: k,
+              apiSecret: s
+            })
+          });
+          const data = await res.json();
+          if (data.success) {
+            let msg = `✅ Authenticated! Type: ${data.accountType || 'SPOT'} • canTrade: ${data.canTrade}`;
+            if (data.balances && data.balances.length) {
+              msg += ` • Assets: ${data.balances.map(b => b.free + ' ' + b.asset).join(', ')}`;
+            }
+            apiStatus.textContent = msg;
+            apiStatus.style.color = "#34d399";
+          } else {
+            apiStatus.textContent = `❌ ${data.error || 'Authentication failed'}`;
+            apiStatus.style.color = "#ef4444";
+          }
+        } catch (err) {
+          apiStatus.textContent = "❌ Connection failed: " + err.message;
+          apiStatus.style.color = "#ef4444";
+        } finally {
+          testApiBtn.disabled = false;
+          testApiBtn.textContent = "🔍 TEST CONNECTION & SPOT PERMISSIONS";
+        }
+      });
+    }
+
     // -------------------------------------------------------------
     // Deposit Modal Controller (Min $10, Max $1000)
     // -------------------------------------------------------------
@@ -1620,6 +1755,19 @@
       modal.style.display = "none";
       render();
     });
+
+    // Quick Reset to $100 Demo Funds
+    const resetDemoBtn = document.getElementById("quick-reset-demo-btn");
+    if (resetDemoBtn) {
+      resetDemoBtn.addEventListener("click", () => {
+        STATE.balance = 100.0;
+        STATE.startBalance = 100.0;
+        saveUserState();
+        logEvent("DEPOSIT", "DESK", "USDT", "+$100.00", "Sandbox testing balance reset to $100.00.", "100%");
+        modal.style.display = "none";
+        render();
+      });
+    }
 
     // Toggle Pause/Resume Button
     document.getElementById("toggle-run-btn").addEventListener("click", () => {

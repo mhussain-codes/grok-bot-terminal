@@ -3,20 +3,27 @@ Server for Grok Bot Terminal - Powered by Binance Quant Engine.
 Zero hardcoded keys: reads exclusively from environment variables or .env.local.
 """
 import os
+import sys
 import json
 import time
 import threading
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import urllib.parse
 from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
 from binance_engine import BinanceTradingEngine
+from api.order import handler as OrderHandler
 
 # Read keys strictly from Environment Variables (Zero Secrets in code)
 api_key = os.getenv("BINANCE_API_KEY", "")
 secret_key = os.getenv("BINANCE_SECRET_KEY", "")
 
 # Load from local .env if present locally
-env_file = Path(__file__).resolve().parent / ".env"
+env_file = BASE_DIR / ".env"
 if env_file.exists():
     with open(env_file, "r") as f:
         for line in f:
@@ -41,9 +48,18 @@ def background_trading_loop():
 sim_thread = threading.Thread(target=background_trading_loop, daemon=True)
 sim_thread.start()
 
-BASE_DIR = Path(__file__).resolve().parent
+class DeskHandler(OrderHandler, SimpleHTTPRequestHandler):
+    def do_OPTIONS(self):
+        parsed = urllib.parse.urlparse(self.path)
+        if parsed.path.startswith("/api/order"):
+            super().do_OPTIONS()
+        else:
+            self.send_response(200)
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+            self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-MBX-APIKEY")
+            self.end_headers()
 
-class DeskHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
         if parsed.path == "/api/state":
@@ -58,6 +74,8 @@ class DeskHandler(SimpleHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps({"running": engine.running}).encode("utf-8"))
+        elif parsed.path == "/api/order":
+            super().do_GET()
         else:
             html_file = BASE_DIR / "index.html"
             if html_file.exists():
@@ -83,6 +101,11 @@ class DeskHandler(SimpleHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps({"status": "ok", "balance": engine.current_equity}).encode("utf-8"))
+        elif parsed.path == "/api/order":
+            super().do_POST()
+        else:
+            self.send_response(404)
+            self.end_headers()
 
 def start(port=8888):
     server = HTTPServer(("", port), DeskHandler)

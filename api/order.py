@@ -1,0 +1,185 @@
+from http.server import BaseHTTPRequestHandler
+import json
+import urllib.request
+import urllib.parse
+import urllib.error
+import time
+import hmac
+import hashlib
+
+BINANCE_BASE_URL = "https://api.binance.com"
+
+class handler(BaseHTTPRequestHandler):
+    def _send_cors_headers(self):
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-MBX-APIKEY')
+
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self._send_cors_headers()
+        self.end_headers()
+
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json')
+        self._send_cors_headers()
+        self.end_headers()
+        self.wfile.write(json.dumps({
+            "status": "online",
+            "service": "Grok Bot Binance Proxy Serverless API",
+            "timestamp": int(time.time() * 1000)
+        }).encode('utf-8'))
+
+    def do_POST(self):
+        content_length = int(self.headers.get('Content-Length', 0))
+        body = self.rfile.read(content_length).decode('utf-8') if content_length > 0 else "{}"
+        
+        try:
+            data = json.loads(body)
+        except Exception as e:
+            self._respond_json(400, {"success": False, "error": "Invalid JSON: " + str(e)})
+            return
+
+        action = data.get("action", "test_connection")
+        api_key = data.get("apiKey", "").strip()
+        api_secret = data.get("apiSecret", "").strip()
+
+        if not api_key or not api_secret:
+            self._respond_json(400, {
+                "success": False,
+                "error": "Missing Binance API Key or Secret Key"
+            })
+            return
+
+        if action == "test_connection":
+            self.handle_test_connection(api_key, api_secret)
+        elif action == "create_order":
+            self.handle_create_order(api_key, api_secret, data)
+        else:
+            self._respond_json(400, {"success": False, "error": f"Unknown action: {action}"})
+
+    def handle_test_connection(self, api_key, api_secret):
+        timestamp = int(time.time() * 1000)
+        query_string = f"timestamp={timestamp}&recvWindow=5000"
+        signature = hmac.new(api_secret.encode('utf-8'), query_string.encode('utf-8'), hashlib.sha256).hexdigest()
+        full_url = f"{BINANCE_BASE_URL}/api/v3/account?{query_string}&signature={signature}"
+
+        req = urllib.request.Request(full_url, headers={
+            'X-MBX-APIKEY': api_key,
+            'User-Agent': 'GrokBotTerminal/2.0'
+        })
+
+        try:
+            with urllib.request.urlopen(req, timeout=6) as response:
+                res_data = json.loads(response.read().decode('utf-8'))
+                can_trade = res_data.get("canTrade", False)
+                account_type = res_data.get("accountType", "SPOT")
+                permissions = res_data.get("permissions", [])
+                
+                # Filter positive balances
+                balances = []
+                for b in res_data.get("balances", []):
+                    free = float(b.get("free", 0))
+                    locked = float(b.get("locked", 0))
+                    if free > 0 or locked > 0:
+                        balances.append({
+                            "asset": b.get("asset"),
+                            "free": round(free, 6),
+                            "locked": round(locked, 6)
+                        })
+
+                self._respond_json(200, {
+                    "success": True,
+                    "canTrade": can_trade,
+                    "accountType": account_type,
+                    "permissions": permissions,
+                    "balances": balances[:10],
+                    "message": "Binance API Key successfully authenticated."
+                })
+        except urllib.error.HTTPError as e:
+            try:
+                err_data = json.loads(e.read().decode('utf-8'))
+                err_msg = err_data.get("msg", str(e))
+                err_code = err_data.get("code", e.code)
+            except Exception:
+                err_msg = str(e)
+                err_code = e.code
+
+            self._respond_json(200, {
+                "success": False,
+                "code": err_code,
+                "error": f"Binance rejected: {err_msg}"
+            })
+        except Exception as e:
+            self._respond_json(200, {
+                "success": False,
+                "error": f"Connection error: {str(e)}"
+            })
+
+    def handle_create_order(self, api_key, api_secret, data):
+        symbol = data.get("symbol", "BTCUSDT").upper()
+        side = data.get("side", "BUY").upper()
+        order_type = data.get("type", "MARKET").upper()
+        quote_order_qty = data.get("quoteOrderQty")
+        quantity = data.get("quantity")
+
+        params = {
+            "symbol": symbol,
+            "side": side,
+            "type": order_type,
+            "timestamp": int(time.time() * 1000),
+            "recvWindow": 5000
+        }
+
+        if quote_order_qty:
+            params["quoteOrderQty"] = f"{float(quote_order_qty):.2f}"
+        elif quantity:
+            params["quantity"] = f"{float(quantity):.6f}"
+        else:
+            self._respond_json(400, {"success": False, "error": "Must specify quoteOrderQty or quantity"})
+            return
+
+        query_string = urllib.parse.urlencode(params)
+        signature = hmac.new(api_secret.encode('utf-8'), query_string.encode('utf-8'), hashlib.sha256).hexdigest()
+        full_url = f"{BINANCE_BASE_URL}/api/v3/order?{query_string}&signature={signature}"
+
+        req = urllib.request.Request(full_url, data=b"", headers={
+            'X-MBX-APIKEY': api_key,
+            'User-Agent': 'GrokBotTerminal/2.0'
+        }, method="POST")
+
+        try:
+            with urllib.request.urlopen(req, timeout=6) as response:
+                res_data = json.loads(response.read().decode('utf-8'))
+                self._respond_json(200, {
+                    "success": True,
+                    "order": res_data,
+                    "message": f"Order executed: {side} {symbol}"
+                })
+        except urllib.error.HTTPError as e:
+            try:
+                err_data = json.loads(e.read().decode('utf-8'))
+                err_msg = err_data.get("msg", str(e))
+                err_code = err_data.get("code", e.code)
+            except Exception:
+                err_msg = str(e)
+                err_code = e.code
+
+            self._respond_json(200, {
+                "success": False,
+                "code": err_code,
+                "error": f"Binance order error: {err_msg}"
+            })
+        except Exception as e:
+            self._respond_json(200, {
+                "success": False,
+                "error": f"Order dispatch error: {str(e)}"
+            })
+
+    def _respond_json(self, status_code, data):
+        self.send_response(status_code)
+        self.send_header('Content-Type', 'application/json')
+        self._send_cors_headers()
+        self.end_headers()
+        self.wfile.write(json.dumps(data).encode('utf-8'))

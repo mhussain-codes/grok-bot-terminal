@@ -6,6 +6,10 @@
       "destination": "/api/state.py"
     },
     {
+      "source": "/api/order",
+      "destination": "/api/order.py"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
