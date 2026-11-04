@@ -17,6 +17,7 @@ if str(BASE_DIR) not in sys.path:
 
 from binance_engine import BinanceTradingEngine
 from api.order import handler as OrderHandler
+from api.auth import handler as AuthHandler
 
 # Read keys strictly from Environment Variables (Zero Secrets in code)
 api_key = os.getenv("BINANCE_API_KEY", "")
@@ -48,11 +49,13 @@ def background_trading_loop():
 sim_thread = threading.Thread(target=background_trading_loop, daemon=True)
 sim_thread.start()
 
-class DeskHandler(OrderHandler, SimpleHTTPRequestHandler):
+class DeskHandler(OrderHandler, AuthHandler, SimpleHTTPRequestHandler):
     def do_OPTIONS(self):
         parsed = urllib.parse.urlparse(self.path)
         if parsed.path.startswith("/api/order"):
             super().do_OPTIONS()
+        elif parsed.path.startswith("/api/auth"):
+            AuthHandler.do_OPTIONS(self)
         else:
             self.send_response(200)
             self.send_header("Access-Control-Allow-Origin", "*")
@@ -76,6 +79,8 @@ class DeskHandler(OrderHandler, SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps({"running": engine.running}).encode("utf-8"))
         elif parsed.path == "/api/order":
             super().do_GET()
+        elif parsed.path.startswith("/api/auth"):
+            AuthHandler.do_GET(self)
         else:
             html_file = BASE_DIR / "index.html"
             if html_file.exists():
@@ -103,6 +108,8 @@ class DeskHandler(OrderHandler, SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps({"status": "ok", "balance": engine.current_equity}).encode("utf-8"))
         elif parsed.path == "/api/order":
             super().do_POST()
+        elif parsed.path.startswith("/api/auth"):
+            AuthHandler.do_POST(self)
         else:
             self.send_response(404)
             self.end_headers()

@@ -739,6 +739,75 @@
 </head>
 <body>
 
+  <!-- User Account & Database Modal (Sign Up / Login) -->
+  <div id="auth-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-card" style="max-width:440px;">
+      <div class="modal-header">
+        <span style="font-weight:800; font-size:15px; color:#fff;">👤 USER ACCOUNT & SESSION DATABASE</span>
+        <button class="modal-close-btn" id="auth-modal-close">&times;</button>
+      </div>
+
+      <div style="font-size:12px; color:#94a3b8; margin: 4px 0 12px 0; line-height:1.4;">
+        Har user ka apna alag session aur database record hota hai. Aapki API key aur trades doosro se 100% alag rahengi.
+      </div>
+
+      <!-- State 1: When user is NOT logged in -->
+      <div id="auth-logged-out-view">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
+          <button type="button" id="tab-login-btn" style="padding:9px; border-radius:5px; font-weight:800; font-size:12px; cursor:pointer; background:#1d4ed8; color:#fff; border:1px solid #3b82f6;">
+            🔑 LOG IN
+          </button>
+          <button type="button" id="tab-signup-btn" style="padding:9px; border-radius:5px; font-weight:800; font-size:12px; cursor:pointer; background:#1e293b; color:#94a3b8; border:1px solid #334155;">
+            ✨ SIGN UP (NEW)
+          </button>
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:4px; font-weight:600;">Username (Unique ID):</label>
+          <input type="text" id="auth-username" class="modal-input" placeholder="e.g. ahmad, trader1" autocomplete="username">
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:4px; font-weight:600;">Password:</label>
+          <input type="password" id="auth-password" class="modal-input" placeholder="Enter your password" autocomplete="current-password">
+        </div>
+
+        <div id="auth-modal-msg" style="font-size:11.5px; margin-bottom:12px; min-height:18px; font-weight:600;"></div>
+
+        <div style="display:flex; gap:10px;">
+          <button class="action-btn" id="auth-submit-btn" style="flex:1; background:#1d4ed8; color:#ffffff; padding:10px; font-size:12px; font-weight:700; border:1px solid #3b82f6;">
+            LOG IN TO MY SESSION
+          </button>
+          <button class="action-btn" id="auth-cancel-btn" style="background:#1e293b; color:#94a3b8; padding:10px; font-size:12px;">CLOSE</button>
+        </div>
+      </div>
+
+      <!-- State 2: When user IS logged in -->
+      <div id="auth-logged-in-view" style="display:none;">
+        <div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); border-radius:6px; padding:12px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:11px; color:#94a3b8; text-transform:uppercase;">Active Account:</span>
+            <span style="font-size:10px; background:#059669; color:#fff; padding:2px 8px; border-radius:10px; font-weight:700;">🟢 LOGGED IN</span>
+          </div>
+          <div style="font-size:16px; font-weight:800; color:#34d399;" id="auth-profile-name">ahmad</div>
+          <div style="font-size:11px; color:#94a3b8; margin-top:6px;" id="auth-profile-key-status">🔑 Binance API Key: Saved & Safe in Database</div>
+          <div style="font-size:11px; color:#94a3b8; margin-top:2px;" id="auth-profile-bal-status">💰 Account Balance: $5.00 USDT</div>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-bottom:10px;">
+          <button type="button" id="auth-open-keys-btn" class="action-btn" style="flex:1; background:#1d4ed8; color:#fff; border:1px solid #3b82f6; padding:9px; font-size:11px; font-weight:700;">
+            🔑 MANAGE BINANCE KEYS
+          </button>
+          <button type="button" id="auth-logout-btn" class="action-btn" style="background:#dc2626; color:#fff; border:1px solid #ef4444; padding:9px 16px; font-size:11px; font-weight:700;">
+            🚪 LOG OUT
+          </button>
+        </div>
+        <button class="action-btn" id="auth-logged-close-btn" style="width:100%; background:#1e293b; color:#94a3b8; padding:8px; font-size:11px;">CLOSE</button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Connect Binance Modal -->
   <div id="api-modal" class="modal-overlay" style="display:none;">
     <div class="modal-card">
@@ -893,6 +962,7 @@
       </div>
 
       <div class="header-center-controls">
+        <button class="action-btn" id="auth-modal-btn" style="background:rgba(16,185,129,0.18); border:1px solid #10b981; color:#34d399; font-weight:700;" title="User Login or Sign Up"><span id="auth-btn-icon">👤</span> <span id="auth-btn-label">SIGN IN / UP</span></button>
         <button class="action-btn" id="api-modal-btn" style="background:rgba(59,130,246,0.18); border:1px solid #3b82f6; color:#93c5fd;" title="Setup your own Binance API keys or toggle Practice mode">🔑 CONNECT BINANCE</button>
         <button class="action-btn" id="deposit-btn">💳 CAPITAL / WALLET</button>
         <button class="action-btn" id="toggle-run-btn">⏸️ PAUSE BOT</button>
@@ -1224,10 +1294,18 @@
     const sessionDetailEl = document.getElementById("lines-to-read");
     if (sessionDetailEl) sessionDetailEl.textContent = `Session: ${userSessionId} (Private)`;
 
-    // User settings stored strictly in their own browser
-    let currentTradingMode = localStorage.getItem("grok_trading_mode") || "PAPER";
-    let userApiKey = localStorage.getItem("grok_user_api_key") || "";
-    let userApiSecret = localStorage.getItem("grok_user_api_secret") || "";
+    // Active User Object (Persistent Database session)
+    let activeUser = null;
+    try {
+      const stored = localStorage.getItem("grok_active_user");
+      if (stored) {
+        activeUser = JSON.parse(stored);
+      }
+    } catch(e) {}
+
+    let currentTradingMode = (activeUser && activeUser.tradingMode) ? activeUser.tradingMode : (localStorage.getItem("grok_trading_mode") || "PAPER");
+    let userApiKey = (activeUser && activeUser.apiKey) ? activeUser.apiKey : (localStorage.getItem("grok_user_api_key") || "");
+    let userApiSecret = (activeUser && activeUser.apiSecret) ? activeUser.apiSecret : (localStorage.getItem("grok_user_api_secret") || "");
 
     const savedBal = localStorage.getItem("grok_user_balance");
     // Frictionless onboarding: Default $100.00 Paper Balance so bots start trading immediately!
@@ -2126,6 +2204,19 @@
           apiStatus.style.color = "#ef4444";
           return;
         }
+
+        // Check if user is logged into their private account
+        if (!activeUser || !activeUser.username) {
+          apiStatus.textContent = "⚠️ Pehle 'SIGN IN / UP' karein taaki aapki API keys aapke database account mein safe rahen!";
+          apiStatus.style.color = "#fef08a";
+          setTimeout(() => {
+            apiModal.style.display = "none";
+            authModal.style.display = "flex";
+            authModalMsg.textContent = "ℹ️ Apne private username se Sign In ya Sign Up karein taaki keys hamesha safe rahein.";
+            authModalMsg.style.color = "#60a5fa";
+          }, 1100);
+          return;
+        }
         
         const saveBtn = document.getElementById("save-api-btn");
         saveBtn.disabled = true;
@@ -2153,12 +2244,35 @@
             STATE.balance = detectedBalance;
             STATE.startBalance = detectedBalance;
             currentTradingMode = "LIVE";
+
+            // Save directly into the user account database!
+            try {
+              await fetch("/api/auth", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  action: "save_keys",
+                  username: activeUser.username,
+                  apiKey: k,
+                  apiSecret: s,
+                  balance: detectedBalance,
+                  tradingMode: "LIVE"
+                })
+              });
+              activeUser.apiKey = k;
+              activeUser.apiSecret = s;
+              activeUser.balance = detectedBalance;
+              activeUser.tradingMode = "LIVE";
+              localStorage.setItem("grok_active_user", JSON.stringify(activeUser));
+            } catch (err) {}
+
             saveUserState();
+            renderAuthUI();
             render();
 
-            logEvent("CONNECTED", "DESK", "BINANCE_SPOT", `$${detectedBalance.toFixed(2)}`, `Real Binance Account connected! Balance detected: $${detectedBalance.toFixed(2)} USDT. Auto-trading activated.`, "LIVE");
+            logEvent("CONNECTED", "DESK", "BINANCE_SPOT", `$${detectedBalance.toFixed(2)}`, `Real Binance Account connected! Balance: $${detectedBalance.toFixed(2)} USDT. Saved to database.`, "LIVE");
 
-            apiStatus.textContent = `✅ Live Account Activated! Real Balance: $${detectedBalance.toFixed(2)} USDT. Bot is now actively trading this account!`;
+            apiStatus.textContent = `✅ Live Account Activated! Real Balance: $${detectedBalance.toFixed(2)} USDT. Safe in database!`;
             apiStatus.style.color = "#34d399";
 
             setTimeout(() => {
@@ -2177,7 +2291,11 @@
         }
       } else {
         currentTradingMode = "PAPER";
-        apiStatus.textContent = "✅ Practice Mode active ($100 Demo Funds, Zero Risk).";
+        if (activeUser) {
+          activeUser.tradingMode = "PAPER";
+          localStorage.setItem("grok_active_user", JSON.stringify(activeUser));
+        }
+        apiStatus.textContent = "✅ Practice Mode active (Demo Funds, Zero Risk).";
         apiStatus.style.color = "#34d399";
         saveUserState();
         setTimeout(() => {
@@ -2187,7 +2305,8 @@
       }
     });
 
-    document.getElementById("clear-keys-btn").addEventListener("click", () => {
+    // Clear Keys ONLY manually upon user click
+    document.getElementById("clear-keys-btn").addEventListener("click", async () => {
       localStorage.removeItem("grok_user_api_key");
       localStorage.removeItem("grok_user_api_secret");
       userApiKey = "";
@@ -2195,14 +2314,253 @@
       apiKeyInput.value = "";
       apiSecretInput.value = "";
       currentTradingMode = "PAPER";
-      STATE.balance = 100.0;
-      STATE.startBalance = 100.0;
+      STATE.balance = 5.0;
+      STATE.startBalance = 5.0;
+
+      if (activeUser && activeUser.username) {
+        try {
+          await fetch("/api/auth", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "clear_keys", username: activeUser.username })
+          });
+          activeUser.apiKey = "";
+          activeUser.apiSecret = "";
+          activeUser.tradingMode = "PAPER";
+          localStorage.setItem("grok_active_user", JSON.stringify(activeUser));
+        } catch (e) {}
+      }
+
       updateModalModeDisplay();
-      apiStatus.textContent = "🗑️ Keys removed. Switched back to Practice Mode ($100 Demo).";
-      apiStatus.style.color = "#38bdf8";
+      renderAuthUI();
       saveUserState();
       render();
+      apiStatus.textContent = "🗑️ API Keys cleared manually from your database account.";
+      apiStatus.style.color = "#94a3b8";
     });
+
+    // -------------------------------------------------------------
+    // USER AUTHENTICATION & DATABASE CONTROLLER
+    // -------------------------------------------------------------
+    const authModal = document.getElementById("auth-modal");
+    const authModalBtn = document.getElementById("auth-modal-btn");
+    const authModalClose = document.getElementById("auth-modal-close");
+    const authCancelBtn = document.getElementById("auth-cancel-btn");
+    const authSubmitBtn = document.getElementById("auth-submit-btn");
+    const tabLoginBtn = document.getElementById("tab-login-btn");
+    const tabSignupBtn = document.getElementById("tab-signup-btn");
+    const authUsernameInput = document.getElementById("auth-username");
+    const authPasswordInput = document.getElementById("auth-password");
+    const authModalMsg = document.getElementById("auth-modal-msg");
+    const loggedOutView = document.getElementById("auth-logged-out-view");
+    const loggedInView = document.getElementById("auth-logged-in-view");
+    const profileNameEl = document.getElementById("auth-profile-name");
+    const profileKeyStatus = document.getElementById("auth-profile-key-status");
+    const profileBalStatus = document.getElementById("auth-profile-bal-status");
+    const authLogoutBtn = document.getElementById("auth-logout-btn");
+    const authOpenKeysBtn = document.getElementById("auth-open-keys-btn");
+    const authLoggedCloseBtn = document.getElementById("auth-logged-close-btn");
+    const authBtnLabel = document.getElementById("auth-btn-label");
+
+    let authMode = "LOGIN"; // "LOGIN" or "SIGNUP"
+
+    function updateAuthTabs() {
+      if (authMode === "LOGIN") {
+        tabLoginBtn.style.background = "#1d4ed8";
+        tabLoginBtn.style.color = "#fff";
+        tabLoginBtn.style.borderColor = "#3b82f6";
+        tabSignupBtn.style.background = "#1e293b";
+        tabSignupBtn.style.color = "#94a3b8";
+        tabSignupBtn.style.borderColor = "#334155";
+        authSubmitBtn.textContent = "LOG IN TO MY SESSION";
+        authSubmitBtn.style.background = "#1d4ed8";
+      } else {
+        tabSignupBtn.style.background = "#059669";
+        tabSignupBtn.style.color = "#fff";
+        tabSignupBtn.style.borderColor = "#10b981";
+        tabLoginBtn.style.background = "#1e293b";
+        tabLoginBtn.style.color = "#94a3b8";
+        tabLoginBtn.style.borderColor = "#334155";
+        authSubmitBtn.textContent = "CREATE UNIQUE ACCOUNT";
+        authSubmitBtn.style.background = "#059669";
+      }
+      authModalMsg.textContent = "";
+    }
+
+    if (tabLoginBtn && tabSignupBtn) {
+      tabLoginBtn.addEventListener("click", () => {
+        authMode = "LOGIN";
+        updateAuthTabs();
+      });
+
+      tabSignupBtn.addEventListener("click", () => {
+        authMode = "SIGNUP";
+        updateAuthTabs();
+      });
+    }
+
+    function renderAuthUI() {
+      if (activeUser && activeUser.username) {
+        if (authBtnLabel) authBtnLabel.textContent = activeUser.username;
+        if (authModalBtn) {
+          authModalBtn.style.borderColor = "#10b981";
+          authModalBtn.style.background = "rgba(16,185,129,0.22)";
+          authModalBtn.style.color = "#34d399";
+        }
+        
+        if (loggedOutView) loggedOutView.style.display = "none";
+        if (loggedInView) loggedInView.style.display = "block";
+        if (profileNameEl) profileNameEl.textContent = activeUser.username;
+        if (profileKeyStatus) profileKeyStatus.textContent = activeUser.apiKey ? "🔑 Binance API Key: Saved & Safe in Database" : "⚠️ Binance API Key: Not Connected";
+        if (profileBalStatus) profileBalStatus.textContent = `💰 Account Balance: $${STATE.balance.toFixed(2)} USDT`;
+        
+        userSessionId = `USER-${activeUser.username.toUpperCase()}`;
+        const sIdEl = document.getElementById("client-session-id");
+        if (sIdEl) sIdEl.textContent = activeUser.username;
+        const sDetail = document.getElementById("lines-to-read");
+        if (sDetail) sDetail.textContent = `User: ${activeUser.username} (Saved in Database)`;
+      } else {
+        if (authBtnLabel) authBtnLabel.textContent = "SIGN IN / UP";
+        if (authModalBtn) {
+          authModalBtn.style.borderColor = "#3b82f6";
+          authModalBtn.style.background = "rgba(59,130,246,0.18)";
+          authModalBtn.style.color = "#93c5fd";
+        }
+        
+        if (loggedOutView) loggedOutView.style.display = "block";
+        if (loggedInView) loggedInView.style.display = "none";
+        const sIdEl = document.getElementById("client-session-id");
+        if (sIdEl) sIdEl.textContent = "GUEST";
+      }
+    }
+
+    if (authModalBtn) {
+      authModalBtn.addEventListener("click", () => {
+        authModal.style.display = "flex";
+        authModalMsg.textContent = "";
+        renderAuthUI();
+        if (!activeUser && authUsernameInput) {
+          authUsernameInput.focus();
+        }
+      });
+    }
+
+    if (authModalClose) authModalClose.addEventListener("click", () => { authModal.style.display = "none"; });
+    if (authCancelBtn) authCancelBtn.addEventListener("click", () => { authModal.style.display = "none"; });
+    if (authLoggedCloseBtn) authLoggedCloseBtn.addEventListener("click", () => { authModal.style.display = "none"; });
+
+    if (authOpenKeysBtn) {
+      authOpenKeysBtn.addEventListener("click", () => {
+        authModal.style.display = "none";
+        apiModal.style.display = "flex";
+        updateModalModeDisplay();
+      });
+    }
+
+    // Form Submit (Sign Up or Log In)
+    if (authSubmitBtn) {
+      authSubmitBtn.addEventListener("click", async () => {
+        const u = authUsernameInput.value.trim();
+        const p = authPasswordInput.value.trim();
+        if (!u || !p) {
+          authModalMsg.textContent = "⚠️ Please enter both Username and Password!";
+          authModalMsg.style.color = "#ef4444";
+          return;
+        }
+
+        authSubmitBtn.disabled = true;
+        authModalMsg.textContent = "⏳ Contacting database...";
+        authModalMsg.style.color = "#60a5fa";
+
+        try {
+          const res = await fetch("/api/auth", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: authMode === "SIGNUP" ? "signup" : "login",
+              username: u,
+              password: p
+            })
+          });
+          const data = await res.json();
+
+          if (data.success && data.user) {
+            activeUser = data.user;
+            localStorage.setItem("grok_active_user", JSON.stringify(activeUser));
+            
+            // Restore user's saved keys and settings
+            userApiKey = activeUser.apiKey || "";
+            userApiSecret = activeUser.apiSecret || "";
+            apiKeyInput.value = userApiKey;
+            apiSecretInput.value = userApiSecret;
+            if (activeUser.tradingMode) currentTradingMode = activeUser.tradingMode;
+            if (activeUser.balance !== undefined && parseFloat(activeUser.balance) > 0) {
+              STATE.balance = parseFloat(activeUser.balance);
+              STATE.startBalance = parseFloat(activeUser.balance);
+            }
+
+            authModalMsg.textContent = `✅ ${data.message || 'Success!'}`;
+            authModalMsg.style.color = "#34d399";
+            renderAuthUI();
+            render();
+
+            setTimeout(() => {
+              authModal.style.display = "none";
+            }, 800);
+          } else {
+            authModalMsg.textContent = `❌ ${data.error || 'Authentication failed'}`;
+            authModalMsg.style.color = "#ef4444";
+          }
+        } catch (err) {
+          authModalMsg.textContent = "❌ Network error: " + err.message;
+          authModalMsg.style.color = "#ef4444";
+        } finally {
+          authSubmitBtn.disabled = false;
+        }
+      });
+    }
+
+    // Log Out Handler
+    if (authLogoutBtn) {
+      authLogoutBtn.addEventListener("click", () => {
+        activeUser = null;
+        localStorage.removeItem("grok_active_user");
+        userApiKey = "";
+        userApiSecret = "";
+        apiKeyInput.value = "";
+        apiSecretInput.value = "";
+        currentTradingMode = "PAPER";
+        STATE.balance = 5.0;
+        STATE.startBalance = 5.0;
+        renderAuthUI();
+        render();
+        authModal.style.display = "none";
+        logEvent("AUTH", "SYSTEM", "USER", "$0.00", "Logged out. Switched to public guest session.", "DEMO");
+      });
+    }
+
+    // On startup: re-sync active user from server database if present
+    if (activeUser && activeUser.username) {
+      fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "get_user", username: activeUser.username })
+      }).then(r => r.json()).then(d => {
+        if (d.success && d.user) {
+          activeUser = d.user;
+          userApiKey = activeUser.apiKey || userApiKey;
+          userApiSecret = activeUser.apiSecret || userApiSecret;
+          apiKeyInput.value = userApiKey;
+          apiSecretInput.value = userApiSecret;
+          if (activeUser.tradingMode) currentTradingMode = activeUser.tradingMode;
+          if (activeUser.balance !== undefined) STATE.balance = parseFloat(activeUser.balance);
+          localStorage.setItem("grok_active_user", JSON.stringify(activeUser));
+          renderAuthUI();
+          render();
+        }
+      }).catch(() => {});
+    }
+    renderAuthUI();
 
     // Test Binance Connection & Detect Balance
     const testApiBtn = document.getElementById("test-api-btn");
