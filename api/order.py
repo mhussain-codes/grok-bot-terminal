@@ -9,6 +9,14 @@ import hashlib
 
 BINANCE_BASE_URL = "https://api.binance.com"
 
+# Precision map for Binance Spot base assets
+SYMBOL_PRECISION = {
+    "BTCUSDT": 5,
+    "ETHUSDT": 4,
+    "SOLUSDT": 2,
+    "BNBUSDT": 3
+}
+
 class handler(BaseHTTPRequestHandler):
     def _send_cors_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -77,11 +85,14 @@ class handler(BaseHTTPRequestHandler):
                 account_type = res_data.get("accountType", "SPOT")
                 permissions = res_data.get("permissions", [])
                 
-                # Filter positive balances
+                # Filter positive balances & extract USDT
+                usdt_free = 0.0
                 balances = []
                 for b in res_data.get("balances", []):
                     free = float(b.get("free", 0))
                     locked = float(b.get("locked", 0))
+                    if b.get("asset") == "USDT":
+                        usdt_free = round(free, 2)
                     if free > 0 or locked > 0:
                         balances.append({
                             "asset": b.get("asset"),
@@ -89,11 +100,15 @@ class handler(BaseHTTPRequestHandler):
                             "locked": round(locked, 6)
                         })
 
+                # Sort so USDT is first
+                balances.sort(key=lambda x: 0 if x["asset"] == "USDT" else 1)
+
                 self._respond_json(200, {
                     "success": True,
                     "canTrade": can_trade,
                     "accountType": account_type,
                     "permissions": permissions,
+                    "usdtBalance": usdt_free,
                     "balances": balances[:10],
                     "message": "Binance API Key successfully authenticated."
                 })
@@ -132,13 +147,23 @@ class handler(BaseHTTPRequestHandler):
             "recvWindow": 5000
         }
 
-        if quote_order_qty:
-            params["quoteOrderQty"] = f"{float(quote_order_qty):.2f}"
-        elif quantity:
-            params["quantity"] = f"{float(quantity):.6f}"
-        else:
-            self._respond_json(400, {"success": False, "error": "Must specify quoteOrderQty or quantity"})
-            return
+        decimals = SYMBOL_PRECISION.get(symbol, 4)
+
+        if side == "BUY":
+            if quote_order_qty:
+                params["quoteOrderQty"] = f"{float(quote_order_qty):.2f}"
+            elif quantity:
+                params["quantity"] = f"{float(quantity):.{decimals}f}"
+            else:
+                params["quoteOrderQty"] = "10.00"
+        else: # SELL
+            if quantity:
+                params["quantity"] = f"{float(quantity):.{decimals}f}"
+            elif quote_order_qty:
+                params["quoteOrderQty"] = f"{float(quote_order_qty):.2f}"
+            else:
+                self._respond_json(400, {"success": False, "error": "Must specify quantity or quoteOrderQty for SELL"})
+                return
 
         query_string = urllib.parse.urlencode(params)
         signature = hmac.new(api_secret.encode('utf-8'), query_string.encode('utf-8'), hashlib.sha256).hexdigest()
@@ -155,7 +180,7 @@ class handler(BaseHTTPRequestHandler):
                 self._respond_json(200, {
                     "success": True,
                     "order": res_data,
-                    "message": f"Order executed: {side} {symbol}"
+                    "message": f"Binance Spot order executed: {side} {symbol}"
                 })
         except urllib.error.HTTPError as e:
             try:
