@@ -2,1640 +2,1642 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Grok Bot Terminal - Multi-Bot 24/7 Desk</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Grok Terminal Pro - Institutional Quant & Spot Execution</title>
   <style>
     :root {
-      --bg-black: #07090e;
-      --card-bg: #0d121d;
-      --card-hover: #121826;
-      --border-color: #1a2336;
-      --border-blue: rgba(59, 130, 246, 0.35);
-      --border-red: rgba(239, 68, 68, 0.35);
-      --border-green: rgba(16, 185, 129, 0.35);
-      --text-main: #f1f5f9;
-      --text-muted: #8292ab;
-      --text-sub: #4b586e;
+      --bg-base: #0b0e14;
+      --bg-surface: #121620;
+      --bg-surface-elevated: #181e2b;
+      --border-subtle: #1e2638;
+      --border-focus: #2962ff;
 
-      /* Red, Blue, Green Institutional Palette */
-      --neon-blue: #3b82f6;
-      --neon-blue-bright: #60a5fa;
-      --neon-blue-glow: rgba(59, 130, 246, 0.3);
-      --neon-blue-bg: rgba(59, 130, 246, 0.14);
+      --text-primary: #eaecef;
+      --text-secondary: #848e9c;
+      --text-disabled: #474f5d;
 
-      --neon-red: #ef4444;
-      --neon-red-bright: #f87171;
-      --neon-red-glow: rgba(239, 68, 68, 0.3);
-      --neon-red-bg: rgba(239, 68, 68, 0.14);
-
-      --neon-green: #10b981;
-      --neon-green-bright: #34d399;
-      --neon-green-glow: rgba(16, 185, 129, 0.3);
-      --neon-green-bg: rgba(16, 185, 129, 0.14);
-
-      --cyan-neon: #38bdf8;
-      --green-neon: #10b981;
-      --yellow-neon: #60a5fa;
-      --purple-neon: #818cf8;
-      --orange-neon: #f87171;
-      --blue-neon: #3b82f6;
+      --buy-green: #0ecb81;
+      --buy-green-bg: rgba(14, 203, 129, 0.12);
+      --sell-red: #f6465d;
+      --sell-red-bg: rgba(246, 70, 93, 0.12);
+      --binance-gold: #f0b90b;
+      --binance-gold-bg: rgba(240, 185, 11, 0.12);
+      --brand-blue: #2962ff;
+      --brand-blue-bg: rgba(41, 98, 255, 0.12);
     }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Courier New", monospace;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, monospace;
+      -webkit-font-smoothing: antialiased;
     }
+
     body {
-      background-color: var(--bg-black);
-      background-image: 
-        radial-gradient(circle at 10% 12%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 90% 12%, rgba(239, 68, 68, 0.11) 0%, transparent 40%),
-        radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.07) 0%, transparent 50%);
-      background-attachment: fixed;
-      color: var(--text-main);
-      font-size: 13px;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-size: 12px;
+      line-height: 1.4;
       overflow-x: hidden;
-      padding: 12px;
+      min-height: 100vh;
     }
-    .terminal-container {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-    .top-bar {
+
+    /* Top Navigation Header */
+    .terminal-nav {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 8px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 12px;
-      margin-bottom: 14px;
-    }
-    .header-left {
-      display: flex;
-      align-items: center;
+      flex-wrap: wrap;
       gap: 12px;
     }
-    .avatar-icon {
-      width: 44px;
-      height: 44px;
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+
+    .brand-logo-icon {
+      width: 28px;
+      height: 28px;
       background: #f1f5f9;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 7px;
-      box-shadow: -2px 0 10px rgba(239, 68, 68, 0.35), 2px 0 10px rgba(59, 130, 246, 0.45);
+      gap: 4px;
+      flex-shrink: 0;
     }
 
-    /* Cute Mini Bot Mascot (Pure SVG, 0% CPU Load) */
-    .cute-mascot-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: rgba(13, 18, 29, 0.9);
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      padding: 3px 10px 3px 6px;
-      border-radius: 20px;
-      margin-left: 8px;
-      vertical-align: middle;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    }
-    .cute-bot-svg {
-      animation: botHover 3s ease-in-out infinite;
-      transform-origin: center;
-    }
-    @keyframes botHover {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-2px); }
-    }
-    .antenna-beacon {
-      animation: beaconPulse 1.8s ease-in-out infinite;
-    }
-    @keyframes beaconPulse {
-      0%, 100% { opacity: 0.7; filter: drop-shadow(0 0 1px #ef4444); }
-      50% { opacity: 1; filter: drop-shadow(0 0 5px #ef4444); }
-    }
-    .bot-eye-blink {
-      animation: eyeBlink 3.8s infinite;
-      transform-origin: center;
-    }
-    @keyframes eyeBlink {
-      0%, 93%, 100% { transform: scaleY(1); }
-      96% { transform: scaleY(0.12); }
-    }
-    .mascot-label {
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      color: #f1f5f9;
-    }
-    .mascot-sub {
-      font-size: 8px;
-      background: var(--neon-blue-bg);
-      color: var(--neon-blue-bright);
-      padding: 1px 5px;
-      border-radius: 3px;
-      font-weight: 700;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-    }
-    .avatar-eye {
-      width: 4px;
-      height: 16px;
+    .brand-logo-eye {
+      width: 3px;
+      height: 11px;
       background: #0f172a;
-      border-radius: 2px;
+      border-radius: 1px;
     }
-    .brand-name {
-      font-size: 18px;
-      font-weight: 700;
-      color: #fff;
-    }
-    .tag-version {
-      background: #242933;
-      color: #a3e635;
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      margin-left: 6px;
-    }
-    .status-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 3px;
-    }
-    .status-indicator-dot {
-      width: 7px;
-      height: 7px;
-      background: var(--yellow-neon);
-      border-radius: 50%;
-      display: inline-block;
-      animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-      0% { opacity: 0.4; }
-      50% { opacity: 1.0; }
-      100% { opacity: 0.4; }
-    }
-    .status-pill {
-      background: #1e293b;
-      color: var(--cyan-neon);
-      padding: 1px 8px;
-      border-radius: 3px;
-      font-size: 11px;
-    }
-    .subtext {
-      color: var(--text-muted);
-      font-size: 11px;
-      margin-top: 2px;
-    }
-    .header-center-controls {
-      display: flex;
-      gap: 8px;
-    }
-    .action-btn {
-      padding: 6px 14px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 11px;
-      transition: all 0.2s;
-    }
-    #deposit-btn {
-      background: var(--neon-blue-bg);
-      color: var(--neon-blue-bright);
-      border: 1px solid var(--neon-blue);
-    }
-    #deposit-btn:hover {
-      background: rgba(59, 130, 246, 0.28);
-      box-shadow: 0 0 10px var(--neon-blue-glow);
-    }
-    #toggle-run-btn {
-      background: var(--neon-red-bg);
-      color: var(--neon-red-bright);
-      border: 1px solid var(--neon-red);
-    }
-    #toggle-run-btn:hover {
-      background: rgba(239, 68, 68, 0.28);
-      box-shadow: 0 0 10px var(--neon-red-glow);
-    }
-    .header-right { text-align: right; }
-    .mode-badge {
-      background: var(--neon-blue-bg);
-      color: var(--neon-blue-bright);
-      border: 1px solid rgba(59, 130, 246, 0.35);
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 10px;
-      display: inline-block;
-      margin-bottom: 4px;
-    }
-    .balance-display {
-      font-size: 26px;
-      font-weight: 800;
-      color: #ffffff;
-    }
-    .stats-row {
-      display: flex;
-      gap: 10px;
-      font-size: 12px;
-      justify-content: flex-end;
-    }
-    .wins-stat { color: var(--green-neon); font-weight: 600; }
-    .losses-stat { color: var(--red-neon); font-weight: 600; }
 
-    /* Multi-bot fleet banner */
-    .bot-fleet-bar {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .bot-card-fleet {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 8px 12px;
+    .pair-tabs {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .bot-card-fleet.bot-blue-card {
-      border: 1px solid var(--border-blue);
-    }
-    .bot-card-fleet.bot-blue-card:hover {
-      box-shadow: 0 0 12px var(--neon-blue-glow);
-    }
-    .bot-card-fleet.bot-red-card {
-      border: 1px solid var(--border-red);
-    }
-    .bot-card-fleet.bot-red-card:hover {
-      box-shadow: 0 0 12px var(--neon-red-glow);
-    }
-    .bot-card-fleet.bot-hybrid-card {
-      border: 1px solid rgba(129, 140, 248, 0.35);
-    }
-    .bot-card-fleet.bot-hybrid-card:hover {
-      box-shadow: 0 0 12px rgba(129, 140, 248, 0.3);
-    }
-    .bot-name-tag { font-weight: 800; font-size: 12px; display: flex; align-items: center; gap: 6px; }
-
-    .main-layout {
-      display: grid;
-      grid-template-columns: 240px 1fr;
-      gap: 14px;
-    }
-    .agents-column {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      color: var(--text-muted);
-      padding: 0 4px;
-    }
-    .agent-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 8px 10px;
-    }
-    .agent-card.active-border {
-      border: 1px solid var(--cyan-neon);
-      box-shadow: 0 0 8px var(--cyan-glow);
-    }
-    .agent-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-    .agent-name { font-weight: 700; font-size: 12px; color: #fff; }
-    .agent-role { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
-    .agent-detail { font-size: 11px; color: #cbd5e1; line-height: 1.3; }
-    .agent-state-tag { font-size: 9px; padding: 1px 5px; border-radius: 3px; font-weight: 600; }
-    .tag-yellow { background: #854d0e; color: #fef08a; }
-    .tag-red { background: #7f1d1d; color: #fca5a5; }
-    .tag-purple { background: #581c87; color: #e9d5ff; }
-    .tag-cyan { background: #164e63; color: #a5f3fc; }
-    .tag-orange { background: #7c2d12; color: #fed7aa; }
-    .tag-blue { background: #1e3a8a; color: #bfdbfe; }
-    .live-flow-panel {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 10px 14px;
-      margin-bottom: 12px;
-    }
-    .flow-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
-    .flow-pipeline-viz {
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      gap: 8px;
-    }
-    .flow-node.token-pill {
-      background: #1e293b;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      border: 1px solid #334155;
-    }
-    .flow-node.token-pill .sub {
-      display: block;
-      font-size: 10px;
-      font-weight: normal;
-      color: var(--text-muted);
-    }
-    .flow-circle {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      font-size: 9px;
-      font-weight: 700;
-    }
-    .rug-check-circle { background: #2a1215; border: 2px solid var(--red-neon); box-shadow: 0 0 10px var(--red-glow); }
-    .exec-circle { background: #0c2730; border: 2px solid var(--cyan-neon); box-shadow: 0 0 10px var(--cyan-glow); }
-    .flow-metric-box {
-      background: #0d1117;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 6px 12px;
-      min-width: 90px;
-      text-align: center;
-    }
-    .metric-label { font-size: 10px; font-weight: 700; }
-    .metric-val { font-size: 13px; font-weight: 800; margin: 2px 0; }
-    .metric-foot { font-size: 9px; color: var(--text-muted); }
-    
-    /* Spot Candlestick Chart (Red, Blue, Green) */
-    .chart-container-box {
-      width: 100%;
-      height: 56px;
-      background: rgba(7, 9, 14, 0.75);
-      border: 1px solid rgba(59, 130, 246, 0.25);
-      border-radius: 6px;
-      margin: 8px 0 10px 0;
-      position: relative;
-      overflow: hidden;
-    }
-    #candlestick-canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-    .middle-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-    .trade-card, .night-log-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 12px;
-    }
-    .card-bar {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 6px;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-    .badge-open {
-      color: var(--green-neon);
-      border: 1px solid var(--green-neon);
-      padding: 1px 6px;
-      border-radius: 3px;
-      font-size: 9px;
-      font-weight: 700;
-    }
-    .trade-symbol-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .token-name { font-size: 16px; font-weight: 800; color: #fff; }
-    .badge-side {
-      background: #064e3b;
-      color: var(--green-neon);
-      padding: 1px 6px;
-      border-radius: 3px;
-      font-size: 10px;
-      font-weight: 700;
-    }
-    .live-pnl { font-size: 13px; font-weight: 700; }
-    .trade-details-grid {
-      display: grid;
-      grid-template-columns: 75px 1fr;
-      gap: 5px;
-      font-size: 11px;
-    }
-    .detail-label { color: var(--text-muted); }
-    .detail-val { color: #f1f5f9; font-weight: 600; }
-    .terminal-body {
-      background: #080a0e;
+      gap: 4px;
+      background: var(--bg-base);
+      padding: 3px;
       border-radius: 4px;
-      padding: 8px;
-      height: 145px;
-      overflow-y: auto;
-      font-family: monospace;
-      font-size: 11px;
+      border: 1px solid var(--border-subtle);
     }
-    .term-line { margin-bottom: 4px; white-space: nowrap; }
-    .result-banner {
-      background: #11141a;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px;
-      margin-bottom: 12px;
-    }
-    .result-label { font-size: 11px; font-weight: 700; color: #fff; }
-    .result-sub { font-size: 10px; color: var(--text-muted); }
-    .result-amounts {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .amount-col .lbl { font-size: 9px; color: var(--text-muted); display: block; }
-    .amount-col .val { font-size: 14px; font-weight: 700; color: #fff; }
-    .progress-bar-wrap {
-      width: 200px;
-      height: 6px;
-      background: #1e293b;
-      border-radius: 3px;
-      overflow: hidden;
-    }
-    .progress-fill { width: 85%; height: 100%; background: linear-gradient(90deg, #3b82f6, #ef4444); border-radius: 3px; }
-    .record-stat { font-size: 13px; font-weight: 800; color: #fff; }
-    .bottom-ledger {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 12px;
-    }
-    .ledger-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      color: var(--text-muted);
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 6px;
-      margin-bottom: 6px;
-    }
-    .ledger-row {
-      display: grid;
-      grid-template-columns: 65px 75px 110px 1fr 100px 80px;
-      padding: 6px 0;
-      border-bottom: 1px solid #1a202c;
-      font-size: 11px;
-      align-items: center;
-    }
-    .green-txt { color: var(--green-neon); }
-    .red-txt { color: var(--red-neon); }
-    .yellow-txt { color: var(--yellow-neon); }
-    .purple-txt { color: var(--purple-neon); }
-    .cyan-txt { color: var(--cyan-neon); }
-    .orange-txt { color: var(--orange-neon); }
-    .blue-txt { color: var(--blue-neon); }
-    .bold { font-weight: 700; }
 
-    /* Deposit Modal */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.82);
-      backdrop-filter: blur(6px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 99999;
-    }
-    .modal-card {
-      background: #14171d;
-      border: 1px solid #2d3748;
-      border-radius: 8px;
-      width: 92%;
-      max-width: 440px;
-      padding: 22px;
-      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.9);
-      animation: modalFadeIn 0.15s ease-out;
-    }
-    @keyframes modalFadeIn {
-      from { opacity: 0; transform: scale(0.96); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #212630;
-      padding-bottom: 12px;
-      margin-bottom: 12px;
-    }
-    .modal-close-btn {
+    .pair-tab-btn {
       background: none;
       border: none;
-      color: #94a3b8;
-      font-size: 24px;
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 3px;
       cursor: pointer;
-      line-height: 1;
+      transition: all 0.15s;
     }
-    .modal-close-btn:hover { color: #fff; }
-    .preset-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      margin-bottom: 14px;
+
+    .pair-tab-btn:hover {
+      color: #fff;
     }
-    .preset-btn {
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #e2e8f0;
-      padding: 8px 4px;
+
+    .pair-tab-btn.active {
+      background: var(--bg-surface-elevated);
+      color: #fff;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mode-pill {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      background: var(--buy-green-bg);
+      color: var(--buy-green);
+      border: 1px solid rgba(14, 203, 129, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .mode-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--buy-green);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    .nav-action-btn {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      padding: 5px 12px;
       font-size: 11px;
       font-weight: 600;
       border-radius: 4px;
       cursor: pointer;
       transition: all 0.15s;
     }
-    .preset-btn:hover {
-      background: #334155;
-      border-color: #06b6d4;
-      color: #06b6d4;
-    }
-    .modal-input {
-      width: 100%;
-      background: #0c0e12;
-      border: 1px solid #334155;
+
+    .nav-action-btn:hover {
+      border-color: var(--brand-blue);
       color: #fff;
-      padding: 10px 14px;
-      font-size: 16px;
+    }
+
+    .btn-deposit {
+      background: var(--buy-green-bg);
+      color: var(--buy-green);
+      border-color: rgba(14, 203, 129, 0.35);
+    }
+
+    .btn-deposit:hover {
+      background: var(--buy-green);
+      color: #000;
+    }
+
+    /* 24h Ticker & Market Statistics Bar */
+    .market-stats-bar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .stat-val {
+      font-size: 12px;
       font-weight: 700;
+    }
+
+    .stat-price-main {
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    /* Main Trading Grid Layout (3 Columns) */
+    .trading-grid {
+      display: grid;
+      grid-template-columns: 1fr 310px 340px;
+      gap: 6px;
+      padding: 6px;
+      min-height: calc(100vh - 170px);
+    }
+
+    @media (max-width: 1200px) {
+      .trading-grid {
+        grid-template-columns: 1fr 320px;
+      }
+      .col-orderbook {
+        grid-column: span 2;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .trading-grid {
+        grid-template-columns: 1fr;
+      }
+      .col-orderbook, .col-ticket {
+        grid-column: span 1;
+      }
+    }
+
+    .panel-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
       border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 8px 12px;
+      background: var(--bg-surface-elevated);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* Chart Panel */
+    .chart-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tf-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+
+    .tf-btn.active {
+      background: var(--brand-blue-bg);
+      color: var(--brand-blue);
+    }
+
+    .chart-canvas-wrap {
+      flex: 1;
+      min-height: 380px;
+      position: relative;
+      background: #080a0f;
+    }
+
+    #candlestick-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Order Book Panel */
+    .orderbook-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+
+    .orderbook-table th {
+      padding: 6px 10px;
+      text-align: right;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .orderbook-table th:first-child { text-align: left; }
+
+    .ob-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      padding: 3px 10px;
+      position: relative;
+      font-family: monospace;
+      font-size: 11px;
+    }
+
+    .ob-row .depth-bar {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
+    .ob-row.bid .depth-bar { background: var(--buy-green); }
+    .ob-row.ask .depth-bar { background: var(--sell-red); }
+
+    .ob-spread-bar {
+      padding: 6px 10px;
+      background: var(--bg-surface-elevated);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* Order Entry Ticket */
+    .order-ticket-wrap {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .ticket-type-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      background: var(--bg-base);
+      padding: 2px;
+      border-radius: 4px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .ticket-tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px;
+      border-radius: 3px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .ticket-tab-btn.active {
+      background: var(--bg-surface-elevated);
+      color: #fff;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-label {
+      font-size: 10px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .form-input-wrap {
+      display: flex;
+      align-items: center;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 6px 10px;
+    }
+
+    .form-input-wrap:focus-within {
+      border-color: var(--border-focus);
+    }
+
+    .form-input {
+      background: none;
+      border: none;
       outline: none;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      width: 100%;
+      font-family: monospace;
+    }
+
+    .form-suffix {
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+
+    .pct-chips {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+    }
+
+    .chip-btn {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 4px 0;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 3px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .chip-btn:hover {
+      color: #fff;
+      border-color: var(--border-focus);
+    }
+
+    .min-notional-alert {
+      background: rgba(240, 185, 11, 0.08);
+      border: 1px solid rgba(240, 185, 11, 0.25);
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-size: 10px;
+      color: var(--binance-gold);
+      line-height: 1.3;
+    }
+
+    .fee-audit-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-secondary);
+      border-top: 1px dashed var(--border-subtle);
+      padding-top: 6px;
+    }
+
+    .btn-exec-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
       margin-top: 4px;
     }
-    .modal-input:focus {
-      border-color: #10b981;
-      box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+
+    .btn-trade-action {
+      border: none;
+      border-radius: 4px;
+      padding: 10px 0;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.5px;
     }
+
+    .btn-buy {
+      background: var(--buy-green);
+      color: #000;
+    }
+    .btn-buy:hover { filter: brightness(1.1); }
+
+    .btn-sell {
+      background: var(--sell-red);
+      color: #fff;
+    }
+    .btn-sell:hover { filter: brightness(1.1); }
+
+    /* Strategy Engine Toggle Card */
+    .quant-strategy-box {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .strat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 32px;
+      height: 18px;
+    }
+
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      transition: .2s;
+      border-radius: 18px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 12px;
+      width: 12px;
+      left: 2px;
+      bottom: 2px;
+      background-color: var(--text-secondary);
+      transition: .2s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--buy-green-bg);
+      border-color: var(--buy-green);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(14px);
+      background-color: var(--buy-green);
+    }
+
+    /* Bottom Section: Positions & History */
+    .bottom-positions-wrap {
+      margin: 0 6px 10px 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .pos-tabs-header {
+      display: flex;
+      gap: 2px;
+      background: var(--bg-surface-elevated);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0 8px;
+    }
+
+    .pos-tab {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 10px 14px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+
+    .pos-tab.active {
+      color: #fff;
+      border-bottom-color: var(--brand-blue);
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+      min-height: 120px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .data-table th {
+      padding: 8px 12px;
+      text-align: left;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-base);
+    }
+
+    .data-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-family: monospace;
+    }
+
+    .empty-state {
+      padding: 30px;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
+    /* Utilities */
+    .green-txt { color: var(--buy-green); }
+    .red-txt { color: var(--sell-red); }
+    .gold-txt { color: var(--binance-gold); }
+    .blue-txt { color: var(--brand-blue); }
+    .bold { font-weight: 700; }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+    }
+
+    .modal-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      width: 92%;
+      max-width: 480px;
+      padding: 20px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .modal-close:hover { color: #fff; }
   </style>
 </head>
 <body>
-  <!-- API Settings & User Account Isolation Modal -->
-  <div id="api-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-card" style="max-width:520px;">
-      <div class="modal-header">
-        <span style="font-weight:700; font-size:15px; color:#fff;">🔑 CONNECT BINANCE / ACCOUNT ISOLATION</span>
-        <button class="modal-close-btn" id="api-modal-close">&times;</button>
-      </div>
 
-      <div style="background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3); border-radius:6px; padding:10px 12px; margin-bottom:12px; font-size:11px; line-height:1.4; color:#bfdbfe;">
-        <b>🔒 100% Client-Side Privacy:</b> Har user ka system <b>100% separate aur isolated</b> hai. Aapki API key sirf aapke apne browser ke local storage mein rehti hai. Kisi aur user ke sath aapki keys ya trades overlap nahi hoti.
-      </div>
-
-      <!-- Trading Mode Selector -->
-      <div style="margin-bottom:12px;">
-        <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:6px; font-weight:700;">CHOOSE TRADING MODE:</label>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-          <button type="button" class="preset-btn" id="mode-paper-btn" style="padding:10px; text-align:left; border-color:#10b981; background:rgba(16,185,129,0.12);">
-            <div style="font-weight:700; color:#34d399;">🟢 Paper Trading (Sandbox)</div>
-            <div style="font-size:10px; color:#94a3b8;">Virtual Funds • Zero Risk • Real Binance Feed</div>
-          </button>
-          <button type="button" class="preset-btn" id="mode-live-btn" style="padding:10px; text-align:left; border-color:#334155;">
-            <div style="font-weight:700; color:#f87171;">🔴 Live Binance API</div>
-            <div style="font-size:10px; color:#94a3b8;">Real Execution • User's Own Keys</div>
-          </button>
+  <!-- ============================================================
+       TOP HEADER & ACCOUNT NAVIGATION
+       ============================================================ -->
+  <header class="terminal-nav">
+    <div class="nav-left">
+      <div class="brand-mark">
+        <div class="brand-logo-icon">
+          <div class="brand-logo-eye"></div>
+          <div class="brand-logo-eye"></div>
         </div>
+        <span>GROK TERMINAL <span style="color:var(--brand-blue); font-size:11px;">PRO</span></span>
       </div>
 
-      <!-- Live API Key Inputs -->
-      <div id="live-api-fields" style="display:none; margin-top:8px; border-top:1px solid #1e293b; padding-top:10px;">
-        <div style="margin-bottom:10px;">
-          <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:4px;">Binance API Key:</label>
-          <input type="password" id="user-api-key" class="modal-input" placeholder="Paste your Binance API Key" style="font-size:12px; font-family:monospace;">
-        </div>
-        <div style="margin-bottom:10px;">
-          <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:4px;">Binance Secret Key:</label>
-          <input type="password" id="user-api-secret" class="modal-input" placeholder="Paste your Binance Secret Key" style="font-size:12px; font-family:monospace;">
-        </div>
-        <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:4px; padding:8px 10px; font-size:10px; color:#fca5a5; margin-bottom:10px; line-height:1.4;">
-          ⚠️ <b>Security Rule:</b> Binance API Management mein sirf <b>"Enable Reading"</b> aur <b>"Enable Spot & Margin Trading"</b> check karein. <b>"Enable Withdrawals" ko hamesha UNCHECKED rakhein!</b>
-        </div>
-      </div>
-
-      <!-- Session Info -->
-      <div style="display:flex; justify-content:space-between; align-items:center; font-size:10px; color:#64748b; margin-top:10px;">
-        <span>Client Session ID: <code id="client-session-id" style="color:#60a5fa; font-weight:700;">USER-ISOLATED</code></span>
-        <button type="button" id="clear-keys-btn" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:10px; text-decoration:underline;">Reset / Clear Keys</button>
-      </div>
-
-      <div id="api-modal-status" style="font-size:11px; margin-top:8px; min-height:16px; font-weight:600;"></div>
-
-      <div style="display:flex; gap:10px; margin-top:14px;">
-        <button class="action-btn" id="save-api-btn" style="flex:1; background:#1d4ed8; color:#ffffff; padding:10px; font-size:12px; font-weight:700; border:1px solid #3b82f6;">SAVE & APPLY SETTINGS</button>
-        <button class="action-btn" id="api-modal-cancel" style="background:#1e293b; color:#94a3b8; padding:10px; font-size:12px;">CLOSE</button>
+      <div class="pair-tabs">
+        <button class="pair-tab-btn active" data-pair="BTCUSDT">BTC/USDT</button>
+        <button class="pair-tab-btn" data-pair="ETHUSDT">ETH/USDT</button>
+        <button class="pair-tab-btn" data-pair="SOLUSDT">SOL/USDT</button>
+        <button class="pair-tab-btn" data-pair="BNBUSDT">BNB/USDT</button>
       </div>
     </div>
-  </div>
 
-  <!-- Deposit Modal -->
+    <div class="nav-right">
+      <div class="mode-pill" id="mode-pill-el">
+        <span class="mode-dot"></span>
+        <span id="mode-label-txt">PAPER SANDBOX</span>
+      </div>
+
+      <div style="text-align:right;">
+        <div style="font-size:9px; color:var(--text-secondary);">WALLET BALANCE</div>
+        <div style="font-size:14px; font-weight:800; color:#fff;" id="wallet-balance-val">$100.00 USDT</div>
+      </div>
+
+      <button class="nav-action-btn btn-deposit" id="btn-deposit-open">+ DEPOSIT</button>
+      <button class="nav-action-btn" id="btn-api-open">🔑 API & SECURITY</button>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       MARKET 24H STATISTICS BAR
+       ============================================================ -->
+  <section class="market-stats-bar">
+    <div class="stat-item">
+      <div class="stat-price-main">
+        <span id="ticker-price-val">--</span>
+        <span style="font-size:12px; font-weight:700;" id="ticker-change-val" class="green-txt">+0.00%</span>
+      </div>
+      <div class="stat-label">Binance Spot Index</div>
+    </div>
+
+    <div class="stat-item">
+      <span class="stat-val" id="ticker-high-val">--</span>
+      <span class="stat-label">24h High</span>
+    </div>
+
+    <div class="stat-item">
+      <span class="stat-val" id="ticker-low-val">--</span>
+      <span class="stat-label">24h Low</span>
+    </div>
+
+    <div class="stat-item">
+      <span class="stat-val" id="ticker-vol-val">--</span>
+      <span class="stat-label">24h Volume (USDT)</span>
+    </div>
+
+    <div class="stat-item">
+      <span class="stat-val green-txt" id="ticker-spread-val">$0.01 (0.01 bps)</span>
+      <span class="stat-label">Orderbook Spread</span>
+    </div>
+
+    <div class="stat-item">
+      <span class="stat-val" id="ticker-rsi-val">50.0 (Neutral)</span>
+      <span class="stat-label">RSI (14)</span>
+    </div>
+
+    <div class="stat-item">
+      <span class="stat-val blue-txt" id="feed-ping-val">12ms (Direct)</span>
+      <span class="stat-label">API Latency</span>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TRADING FLOOR (3 COLUMNS: CHART, ORDER BOOK, EXECUTION TICKET)
+       ============================================================ -->
+  <main class="trading-grid">
+    <!-- COLUMN 1: CHART WINDOW -->
+    <div class="panel-box">
+      <div class="panel-header">
+        <span id="chart-title">BTCUSDT • Spot Candlesticks</span>
+        <div class="chart-controls">
+          <button class="tf-btn active" data-tf="1m">1m</button>
+          <button class="tf-btn" data-tf="5m">5m</button>
+          <button class="tf-btn" data-tf="15m">15m</button>
+          <span style="color:var(--text-secondary); margin-left:8px;">EMA(9,21)</span>
+        </div>
+      </div>
+      <div class="chart-canvas-wrap">
+        <canvas id="candlestick-canvas"></canvas>
+      </div>
+    </div>
+
+    <!-- COLUMN 2: REAL ORDER BOOK LADDER -->
+    <div class="panel-box col-orderbook">
+      <div class="panel-header">
+        <span>Order Book (Depth 5)</span>
+        <span style="font-size:10px; color:var(--text-secondary);">Real-Time Bids & Asks</span>
+      </div>
+
+      <table class="orderbook-table">
+        <thead>
+          <tr>
+            <th>Price (USDT)</th>
+            <th>Size (BTC)</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+      </table>
+
+      <!-- Asks (Red / Sell Depth) -->
+      <div id="ob-asks-container" style="display:flex; flex-direction:column-reverse;"></div>
+
+      <!-- Spread Indicator -->
+      <div class="ob-spread-bar">
+        <span style="color:var(--text-secondary);">Spread:</span>
+        <span class="blue-txt" id="ob-spread-mid">$0.01</span>
+      </div>
+
+      <!-- Bids (Green / Buy Depth) -->
+      <div id="ob-bids-container"></div>
+    </div>
+
+    <!-- COLUMN 3: ORDER TICKET & QUANT STRATEGY -->
+    <div class="panel-box col-ticket">
+      <div class="panel-header">
+        <span>Order Execution</span>
+        <span style="font-size:10px; color:var(--text-secondary);" id="ticket-mode-tag">Spot Market</span>
+      </div>
+
+      <div class="order-ticket-wrap">
+        <div class="ticket-type-tabs">
+          <button class="ticket-tab-btn active" id="tab-market">MARKET</button>
+          <button class="ticket-tab-btn" id="tab-limit">LIMIT</button>
+          <button class="ticket-tab-btn" id="tab-algo">ALGO AUTO</button>
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">
+            <span>Order Sizing</span>
+            <span>Min: $10.00 USDT</span>
+          </div>
+          <div class="form-input-wrap">
+            <input type="number" id="order-size-usd" class="form-input" value="10.00" min="10" step="5">
+            <span class="form-suffix">USDT</span>
+          </div>
+        </div>
+
+        <div class="pct-chips">
+          <button class="chip-btn" data-pct="25">25%</button>
+          <button class="chip-btn" data-pct="50">50%</button>
+          <button class="chip-btn" data-pct="75">75%</button>
+          <button class="chip-btn" data-pct="100">MAX</button>
+        </div>
+
+        <div class="min-notional-alert">
+          ⚖️ <b>Binance Rule (MIN_NOTIONAL):</b> Minimum order size is <b>$10.00 USDT</b>. Smaller orders are rejected by the exchange.
+        </div>
+
+        <div class="fee-audit-row">
+          <span>Binance Spot Fee:</span>
+          <span style="color:#fff;">0.10% Taker / 0.10% Maker</span>
+        </div>
+
+        <div class="btn-exec-group">
+          <button class="btn-trade-action btn-buy" id="btn-manual-buy">BUY / LONG</button>
+          <button class="btn-trade-action btn-sell" id="btn-manual-sell">SELL / SHORT</button>
+        </div>
+
+        <!-- Strategy Engine -->
+        <div class="quant-strategy-box">
+          <div class="strat-header">
+            <span>Automated Strategy Engine</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="algo-toggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div style="font-size:10px; color:var(--text-secondary); line-height:1.4;">
+            Executes disciplined spot trades based on <b>EMA 9/21 cross</b> and <b>RSI(14) oversold (<35) dips</b>. Enforces <b>+1.5% Take Profit</b>, <b>-1.0% Stop Loss</b>, and full fee accounting.
+          </div>
+          <div style="font-size:10px; color:var(--brand-blue); font-weight:700;" id="algo-status-line">
+            ● Status: ACTIVE • Scanning real 1m candles
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============================================================
+       BOTTOM ROW: POSITIONS, OPEN ORDERS & EXECUTION AUDIT
+       ============================================================ -->
+  <section class="bottom-positions-wrap">
+    <div class="pos-tabs-header">
+      <button class="pos-tab active" data-tab="pos">Open Positions (<span id="pos-count">0</span>)</button>
+      <button class="pos-tab" data-tab="ledger">Trade History & Fee Audit (<span id="history-count">0</span>)</button>
+      <button class="pos-tab" data-tab="security">User Isolation & Security Status</button>
+    </div>
+
+    <!-- Tab 1: Positions -->
+    <div id="tab-content-pos" class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Side</th>
+            <th>Size (USDT)</th>
+            <th>Entry Price</th>
+            <th>Mark Price</th>
+            <th>Est. Fees (0.2%)</th>
+            <th>Unrealized PnL (Net)</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="positions-tbody">
+          <tr>
+            <td colspan="8" class="empty-state">No open positions. Use the order ticket above or enable Algo Auto.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tab 2: History & Fee Audit -->
+    <div id="tab-content-ledger" class="table-responsive" style="display:none;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Symbol</th>
+            <th>Side</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Fees (0.2%)</th>
+            <th>Net Realized PnL</th>
+            <th>Exit Reason</th>
+          </tr>
+        </thead>
+        <tbody id="history-tbody">
+          <tr>
+            <td colspan="8" class="empty-state">No executed trades yet in this session.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tab 3: Security & Isolation Status -->
+    <div id="tab-content-security" style="padding:16px; display:none; line-height:1.6; font-size:11px;">
+      <div style="background:var(--bg-base); border:1px solid var(--border-subtle); border-radius:4px; padding:12px; margin-bottom:10px;">
+        <h4 style="color:#fff; margin-bottom:6px;">🔒 Client-Side Isolation Guarantee</h4>
+        <p style="color:var(--text-secondary);">
+          Your trading session is <b>strictly isolated</b> inside your browser's private storage. 
+          Session ID: <code style="color:var(--brand-blue);" id="security-session-id">USER-ISOLATED</code>.
+          No other visitor to this URL can view your trades, balance, or API keys.
+        </p>
+      </div>
+
+      <div style="background:var(--bg-base); border:1px solid var(--border-subtle); border-radius:4px; padding:12px;">
+        <h4 style="color:#fff; margin-bottom:6px;">🛡️ Binance API Security Rules</h4>
+        <p style="color:var(--text-secondary);">
+          1. <b>Never enable "Withdrawals"</b> on Binance API Management.<br>
+          2. We strongly recommend testing first with <b>Paper Trading Mode</b> (Zero financial risk).<br>
+          3. Sizing is governed by the official Binance <b>MIN_NOTIONAL ($10.00 USDT)</b> rule.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       DEPOSIT CAPITAL MODAL
+       ============================================================ -->
   <div id="deposit-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-card">
-      <div class="modal-header">
-        <span style="font-weight:700; font-size:15px; color:#fff;">💳 DEPOSIT CAPITAL (MAX $1000)</span>
-        <button class="modal-close-btn" id="modal-close">&times;</button>
+    <div class="modal-box">
+      <div class="modal-head">
+        <span>Deposit Wallet Capital</span>
+        <button class="modal-close" id="deposit-close">&times;</button>
       </div>
-      <div style="font-size:12px; color:#94a3b8; margin: 6px 0 12px 0; line-height:1.4;">
-        Deposit funds for automated quantitative execution.
-        <div style="background:rgba(234,179,8,0.1); border:1px solid rgba(234,179,8,0.3); border-radius:4px; padding:6px 10px; margin-top:6px; font-size:10px; color:#fef08a;">
-          ⚖️ <b>Binance Spot Rule:</b> Minimum order size is <b>$10.00 USDT</b> (<code>MIN_NOTIONAL</code>). Har real trade kam az kam $10 ki hoti hai.
+
+      <div style="font-size:11px; color:var(--text-secondary); margin-bottom:12px; line-height:1.4;">
+        Add virtual testing funds to your isolated private wallet session. Minimum deposit is <b>$10.00 USDT</b> to satisfy Binance's minimum trade notional requirement.
+      </div>
+
+      <div class="pct-chips" style="margin-bottom:12px;">
+        <button class="chip-btn" data-dep="10">$10</button>
+        <button class="chip-btn" data-dep="25">$25</button>
+        <button class="chip-btn" data-dep="50">$50</button>
+        <button class="chip-btn" data-dep="100">$100</button>
+        <button class="chip-btn" data-dep="250">$250</button>
+        <button class="chip-btn" data-dep="500">$500</button>
+        <button class="chip-btn" data-dep="1000">$1,000</button>
+        <button class="chip-btn" data-dep="5000">$5,000</button>
+      </div>
+
+      <div class="form-group" style="margin-bottom:12px;">
+        <div class="form-label">
+          <span>Deposit Amount</span>
+          <span>Max: $10,000.00</span>
+        </div>
+        <div class="form-input-wrap">
+          <input type="number" id="deposit-input-val" class="form-input" value="100" min="10" max="10000" step="10">
+          <span class="form-suffix">USDT</span>
         </div>
       </div>
-      
-      <div style="font-size:10px; color:#64748b; margin-bottom: 6px; text-transform:uppercase; letter-spacing:0.5px;">Quick Presets:</div>
-      <div class="preset-grid">
-        <button class="preset-btn" data-amt="10" style="border-color:#3b82f6; color:#60a5fa; font-weight:700;">$10 (Min)</button>
-        <button class="preset-btn" data-amt="25">$25</button>
-        <button class="preset-btn" data-amt="50">$50</button>
-        <button class="preset-btn" data-amt="100">$100</button>
-        <button class="preset-btn" data-amt="250">$250</button>
-        <button class="preset-btn" data-amt="500">$500</button>
-        <button class="preset-btn" data-amt="750">$750</button>
-        <button class="preset-btn" data-amt="1000" style="border-color:#ef4444; color:#f87171; font-weight:700;">$1000 (MAX)</button>
-      </div>
 
-      <div style="margin-top:12px;">
-        <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:4px;">Deposit Capital ($ USD, Min $10, Max $1000):</label>
-        <input type="number" id="deposit-input" min="10" max="1000" step="5" value="10" class="modal-input" placeholder="e.g. 10">
-      </div>
+      <div id="deposit-err-msg" style="color:var(--sell-red); font-size:11px; margin-bottom:10px; min-height:16px;"></div>
 
-      <div id="deposit-error-msg" style="color:#ef4444; font-size:11px; margin-top:8px; min-height:16px; font-weight:600;"></div>
-
-      <div style="display:flex; gap:10px; margin-top:14px;">
-        <button class="action-btn" id="modal-confirm-btn" style="flex:1; background:#1d4ed8; color:#ffffff; padding:10px; font-size:12px; font-weight:700; border:1px solid #3b82f6;">CONFIRM DEPOSIT</button>
-        <button class="action-btn" id="modal-cancel-btn" style="background:#1e293b; color:#94a3b8; padding:10px; font-size:12px;">CANCEL</button>
+      <div style="display:flex; gap:10px;">
+        <button class="btn-trade-action btn-buy" id="btn-deposit-confirm" style="flex:1;">CONFIRM DEPOSIT</button>
+        <button class="nav-action-btn" id="btn-deposit-cancel" style="padding:10px 16px;">CANCEL</button>
       </div>
     </div>
   </div>
 
-  <div class="terminal-container">
-    <!-- Top Header -->
-    <header class="top-bar">
-      <div class="header-left">
-        <div class="avatar-icon">
-          <div class="avatar-eye"></div>
-          <div class="avatar-eye"></div>
-        </div>
-        <div class="title-meta">
-          <div class="brand-row" style="display:flex; align-items:center; flex-wrap:wrap; gap:6px;">
-            <span class="brand-name">Grok Bot Terminal</span>
-            <span class="tag-version">v1.0-night</span>
-            <div class="cute-mascot-chip" title="Active Quant Desk AI Companion">
-              <svg class="cute-bot-svg" width="24" height="24" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Antenna with glowing red beacon -->
-                <path d="M21 11V4" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round"/>
-                <circle cx="21" cy="4" r="3" fill="#ef4444" class="antenna-beacon"/>
-                <!-- Cute Robot Head -->
-                <rect x="7" y="11" width="28" height="23" rx="8" fill="#0c1220" stroke="#3b82f6" stroke-width="2"/>
-                <!-- Screen visor -->
-                <rect x="11" y="15" width="20" height="11" rx="4" fill="#050811"/>
-                <!-- Left Eye: Electric Blue -->
-                <circle cx="16" cy="20.5" r="2.8" fill="#38bdf8" class="bot-eye-blink"/>
-                <!-- Right Eye: Neon Red -->
-                <circle cx="26" cy="20.5" r="2.8" fill="#f87171" class="bot-eye-blink"/>
-                <!-- Cute smile -->
-                <path d="M17 29C19 31 23 31 25 29" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round"/>
-                <!-- Left Ear: Neon Red -->
-                <rect x="4" y="18" width="3" height="9" rx="1.5" fill="#ef4444"/>
-                <!-- Right Ear: Electric Blue -->
-                <rect x="35" y="18" width="3" height="9" rx="1.5" fill="#3b82f6"/>
-              </svg>
-              <span class="mascot-label">CYBER BOT</span>
-              <span class="mascot-sub">ONLINE</span>
-            </div>
-          </div>
-          <div class="status-row">
-            <span class="status-indicator-dot" id="run-dot"></span>
-            <span class="status-text" id="run-text">running</span>
-            <span class="timer-text" id="timer-val" style="color:#94a3b8; font-size:11px; margin-left:4px;">00:00:00</span>
-            <span class="status-pill" id="exec-pill">EXECUTOR • CONNECTING</span>
-          </div>
-          <div class="subtext">24/7 AI quant desk: gambler + house + spy (binance live)</div>
+  <!-- ============================================================
+       API SETTINGS & USER ISOLATION MODAL
+       ============================================================ -->
+  <div id="api-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-head">
+        <span>Binance API & Account Mode</span>
+        <button class="modal-close" id="api-close">&times;</button>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label style="font-size:11px; color:var(--text-secondary); display:block; margin-bottom:6px; font-weight:700;">CHOOSE TRADING ENVIRONMENT:</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <button type="button" class="nav-action-btn" id="btn-select-paper" style="padding:10px; text-align:left; border-color:var(--buy-green); background:var(--buy-green-bg);">
+            <div style="font-weight:700; color:var(--buy-green);">🟢 Paper Trading</div>
+            <div style="font-size:10px; color:var(--text-secondary);">Real Binance Feed • Zero Risk</div>
+          </button>
+          <button type="button" class="nav-action-btn" id="btn-select-live" style="padding:10px; text-align:left;">
+            <div style="font-weight:700; color:var(--sell-red);">🔴 Live Binance API</div>
+            <div style="font-size:10px; color:var(--text-secondary);">Your Private API Key</div>
+          </button>
         </div>
       </div>
 
-      <div class="header-center-controls">
-        <button class="action-btn" id="api-modal-btn" style="background:rgba(59,130,246,0.18); border:1px solid #3b82f6; color:#93c5fd;" title="Setup your own Binance API keys or toggle Paper mode">🔑 CONNECT BINANCE</button>
-        <button class="action-btn" id="deposit-btn">+ DEPOSIT</button>
-        <button class="action-btn" id="toggle-run-btn">PAUSE</button>
-      </div>
+      <div id="live-api-block" style="display:none; border-top:1px solid var(--border-subtle); padding-top:10px; margin-bottom:12px;">
+        <div class="form-group" style="margin-bottom:10px;">
+          <label class="form-label"><span>Binance API Key:</span></label>
+          <div class="form-input-wrap">
+            <input type="password" id="input-api-key" class="form-input" placeholder="Paste your API key">
+          </div>
+        </div>
 
-      <div class="header-right">
-        <div class="mode-badge-wrap">
-          <span class="mode-badge" id="mode-badge-el">paper • binance feed</span>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label class="form-label"><span>Binance Secret Key:</span></label>
+          <div class="form-input-wrap">
+            <input type="password" id="input-api-secret" class="form-input" placeholder="Paste your Secret key">
+          </div>
         </div>
-        <div class="balance-display" id="balance-val">$0.00</div>
-        <div class="stats-row">
-          <span class="trades-stat" id="trades-count">0 trades</span>
-          <span class="wins-stat" id="wins-count">0 wins</span>
-          <span class="losses-stat" id="losses-count">0 losses</span>
-        </div>
-      </div>
-    </header>
 
-    <!-- Multi-Bot Fleet Real-time Overview (Red & Blue Theme) -->
-    <div class="bot-fleet-bar">
-      <div class="bot-card-fleet bot-blue-card">
-        <div>
-          <div class="bot-name-tag cyan-txt">⚡ BOT 1: THE GAMBLER</div>
-          <div style="color:#8292ab; font-size:10px;">Momentum & EMA Ribbon Breakout</div>
-        </div>
-        <div style="text-align:right;">
-          <div class="green-txt bold" id="gambler-pnl">+$0.00</div>
-          <div style="color:#64748b; font-size:10px;" id="gambler-trades">0 trades</div>
+        <div style="font-size:10px; color:var(--sell-red); background:var(--sell-red-bg); padding:6px 10px; border-radius:4px; line-height:1.4;">
+          ⚠️ <b>Security Alert:</b> Never enable "Withdrawals" on Binance. Keys are stored only in your private browser memory.
         </div>
       </div>
 
-      <div class="bot-card-fleet bot-red-card">
-        <div>
-          <div class="bot-name-tag red-txt">🏛️ BOT 2: THE HOUSE</div>
-          <div style="color:#8292ab; font-size:10px;">Oversold RSI Mean-Reversion</div>
-        </div>
-        <div style="text-align:right;">
-          <div class="green-txt bold" id="house-pnl">+$0.00</div>
-          <div style="color:#64748b; font-size:10px;" id="house-trades">0 trades</div>
-        </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; font-size:10px; color:var(--text-secondary); margin-bottom:12px;">
+        <span>Session: <code id="modal-session-id" style="color:var(--brand-blue);">USER-ISOLATED</code></span>
+        <button id="btn-clear-keys" style="background:none; border:none; color:var(--sell-red); cursor:pointer; text-decoration:underline;">Reset / Clear Keys</button>
       </div>
 
-      <div class="bot-card-fleet bot-hybrid-card">
-        <div>
-          <div class="bot-name-tag purple-txt">👁️ BOT 3: THE SPY</div>
-          <div style="color:#8292ab; font-size:10px;">Whale Orderbook Absorption</div>
-        </div>
-        <div style="text-align:right;">
-          <div class="green-txt bold" id="spy-pnl">+$0.00</div>
-          <div style="color:#64748b; font-size:10px;" id="spy-trades">0 trades</div>
-        </div>
+      <div id="api-status-msg" style="font-size:11px; min-height:16px; margin-bottom:10px; font-weight:700;"></div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="btn-trade-action btn-buy" id="btn-api-save" style="flex:1;">SAVE SETTINGS</button>
+        <button class="nav-action-btn" id="btn-api-cancel" style="padding:10px 16px;">CLOSE</button>
       </div>
-    </div>
-
-    <!-- Main Grid Layout -->
-    <div class="main-layout">
-      <!-- Left Column: AGENTS -->
-      <aside class="agents-column">
-        <div class="panel-header">
-          <span>AGENTS</span>
-          <span>6 online</span>
-        </div>
-
-        <!-- 1: SCANNER -->
-        <div class="agent-card">
-          <div class="agent-header">
-            <span class="agent-name">SCANNER</span>
-            <span class="agent-state-tag tag-blue">SCAN</span>
-          </div>
-          <div class="agent-role">live spot ticker & 24h vol</div>
-          <div class="agent-detail" id="scanner-detail">BTCUSDT • Vol: $1.2B (Live)</div>
-        </div>
-
-        <!-- 2: RUG CHECK -->
-        <div class="agent-card">
-          <div class="agent-header">
-            <span class="agent-name">RUG CHECK</span>
-            <span class="agent-state-tag tag-red" id="rug-tag">PASS</span>
-          </div>
-          <div class="agent-role">spread (<10bps) & 0.1% fee filter</div>
-          <div class="agent-detail">orderbook check: <span class="green-txt" id="rug-sub">Spread $0.01 (0.01 bps)</span></div>
-        </div>
-
-        <!-- 3: SIZER -->
-        <div class="agent-card">
-          <div class="agent-header">
-            <span class="agent-name">SIZER</span>
-            <span class="agent-state-tag tag-blue">ACTIVE</span>
-          </div>
-          <div class="agent-role">Binance MIN_NOTIONAL Guard</div>
-          <div class="agent-detail">min order $10.00 • risk cap 20%<br><span id="sizer-subtext">$10.00 min sizing</span></div>
-        </div>
-
-        <!-- 4: EXECUTOR -->
-        <div class="agent-card active-border">
-          <div class="agent-header">
-            <span class="agent-name">EXECUTOR</span>
-            <span class="agent-state-tag tag-cyan">LIVE</span>
-          </div>
-          <div class="agent-role">opens + closes, tracks slip</div>
-          <div class="agent-detail"><span class="cyan-txt">slippage cap 0.05%</span><br><span id="exec-subtext">LONG BTCUSDT</span></div>
-        </div>
-
-        <!-- 5: LOGGER -->
-        <div class="agent-card">
-          <div class="agent-header">
-            <span class="agent-name">LOGGER</span>
-            <span class="agent-state-tag tag-red">WRITE</span>
-          </div>
-          <div class="agent-role">writes every decision</div>
-          <div class="agent-detail">no trade without a reason<br><span id="logger-subtext">line #1 listening</span></div>
-        </div>
-
-        <!-- 6: EQUITY -->
-        <div class="agent-card">
-          <div class="agent-header">
-            <span class="agent-name">EQUITY</span>
-            <span class="agent-state-tag tag-blue">UPDATE</span>
-          </div>
-          <div class="agent-role">balance + curve</div>
-          <div class="agent-detail">updates on every close<br><span id="equity-subtext">0 closes</span></div>
-        </div>
-
-        <!-- 7: YOU -->
-        <div class="agent-card">
-          <div class="agent-header">
-            <span class="agent-name">YOU</span>
-            <span class="agent-state-tag" style="background:#334155; color:#cbd5e1;">SUPERVISOR</span>
-          </div>
-          <div class="agent-role">client session isolated</div>
-          <div class="agent-detail">100% private local storage<br><span id="lines-to-read" style="color:#60a5fa;">Session: USER-ISOLATED</span></div>
-        </div>
-      </aside>
-
-      <!-- Dashboard Main -->
-      <main class="dashboard-content">
-        <!-- Live Flow Pipeline -->
-        <section class="live-flow-panel">
-          <div class="flow-header">
-            <span style="font-weight:700; color:#fff;">LIVE FLOW</span>
-            <span>SCAN • CHECK • SIZE • EXEC • LOG</span>
-            <span id="speed-indicator">tick 1.0s</span>
-          </div>
-          <div class="flow-pipeline-viz">
-            <div class="flow-node token-pill" id="flow-tok-1">BTCUSDT <span class="sub">Binance Spot</span></div>
-            <div class="flow-node token-pill" id="flow-tok-2">ETHUSDT <span class="sub">Binance Spot</span></div>
-            <div class="flow-circle rug-check-circle">
-              <div style="font-size:11px;">▲</div>
-              <div>RISK CHECK</div>
-              <div class="green-txt" style="font-size:8px;" id="flow-rug-sub">SPREAD &lt; 15bps</div>
-            </div>
-            <div class="flow-metric-box">
-              <div class="metric-label red-txt">▲ FILTERED</div>
-              <div class="metric-val" id="filtered-val">0</div>
-              <div class="metric-foot">spread vetoes</div>
-            </div>
-            <div class="flow-metric-box">
-              <div class="metric-label blue-txt">◆ SIZER</div>
-              <div class="metric-val" id="sizer-eq-val">20% eq</div>
-              <div class="metric-foot" id="sizer-eq-sub">$20.00</div>
-            </div>
-            <div class="flow-circle exec-circle">
-              <div style="font-size:11px;">■</div>
-              <div>EXECUTOR</div>
-              <div class="cyan-txt" style="font-size:8px;" id="exec-node-sub">LIVE</div>
-            </div>
-            <div class="flow-metric-box">
-              <div class="metric-label red-txt">● LOGGER</div>
-              <div class="metric-val" id="logger-line-val">line #1</div>
-              <div class="metric-foot">fee audit (0.2%)</div>
-            </div>
-            <div class="flow-metric-box">
-              <div class="metric-label blue-txt">💧 EQUITY</div>
-              <div class="metric-val green-txt" id="equity-last-val">+$0.00</div>
-              <div class="metric-foot">last close</div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Middle Row: Trade Active & Night Log -->
-        <div class="middle-row">
-          <div class="trade-card">
-            <div class="card-bar">
-              <span style="font-weight:700; color:#fff;">TRADE • ENTRY vs EXIT</span>
-              <span class="badge-open" id="trade-open-badge">LIVE ACTIVE</span>
-            </div>
-            <div class="trade-symbol-row">
-              <span class="token-name" id="active-symbol">BTCUSDT</span>
-              <span class="badge-side" id="active-side">LONG (SPOT)</span>
-              <span class="live-pnl green-txt" id="active-pnl">+0.00% live</span>
-            </div>
-
-            <!-- Spot Coin Mini Candlestick Chart (Red, Blue, Green) -->
-            <div class="chart-container-box">
-              <canvas id="candlestick-canvas"></canvas>
-            </div>
-            <div class="trade-details-grid">
-              <div class="detail-label">bot:</div>
-              <div class="detail-val cyan-txt" id="active-bot">THE GAMBLER</div>
-              <div class="detail-label">entry:</div>
-              <div class="detail-val" id="active-entry">-</div>
-              <div class="detail-label">current:</div>
-              <div class="detail-val" id="active-current">-</div>
-              <div class="detail-label">fees (0.2%):</div>
-              <div class="detail-val red-txt" id="active-slip">-$0.02 (0.1% Buy + 0.1% Sell)</div>
-              <div class="detail-label">size:</div>
-              <div class="detail-val" id="active-size">$10.00 (Binance Min)</div>
-              <div class="detail-label">strategy:</div>
-              <div class="detail-val blue-txt" id="active-reason">EMA 9/21 Trend Breakout (Target 2:1 R:R)</div>
-            </div>
-          </div>
-
-          <div class="night-log-card">
-            <div class="card-bar">
-              <span style="font-weight:700; color:#fff;">$ tail -f binance_quant.log</span>
-              <span id="log-count-meta">live stream</span>
-            </div>
-            <div class="terminal-body" id="night-log-terminal"></div>
-          </div>
-        </div>
-
-        <!-- Result Comparison Bar -->
-        <div class="result-banner">
-          <div>
-            <div class="result-label">RESULT • start vs now</div>
-            <div class="result-sub">autonomous quant trading session</div>
-          </div>
-          <div class="result-amounts">
-            <div class="amount-col">
-              <span class="lbl">START</span>
-              <span class="val" id="start-bal-val">$0.00</span>
-            </div>
-            <div class="progress-bar-wrap">
-              <div class="progress-fill" id="prog-fill"></div>
-            </div>
-            <div class="amount-col">
-              <span class="lbl">NOW</span>
-              <span class="val green-txt bold" id="now-bal-val">$0.00</span>
-            </div>
-          </div>
-          <div class="record-stat" id="record-stat-val">0 W / 0 L</div>
-        </div>
-
-        <!-- Bottom Transaction Ledger -->
-        <section class="bottom-ledger">
-          <div class="ledger-header">
-            <span style="font-weight:700; color:#fff;">CLOSED TRADES & EXECUTIONS</span>
-            <span>reading the log</span>
-          </div>
-          <div id="ledger-rows"></div>
-        </section>
-      </main>
     </div>
   </div>
 
+  <!-- ============================================================
+       INSTITUTIONAL CLIENT SCRIPT ENGINE
+       ============================================================ -->
   <script>
-    // ============================================================
-    // INSTITUTIONAL QUANT ENGINE: CLIENT-ISOLATED & REAL BINANCE
-    // ============================================================
-
-    // 1. Client-Side User Isolation (Zero Cross-User Overlap)
-    let userSessionId = localStorage.getItem("grok_session_id");
-    if (!userSessionId) {
-      userSessionId = "USER-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-      localStorage.setItem("grok_session_id", userSessionId);
+    // 1. Client-Side User Isolation (Zero cross-user overlap)
+    let sessionId = localStorage.getItem("grok_pro_session");
+    if (!sessionId) {
+      sessionId = "USER-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+      localStorage.setItem("grok_pro_session", sessionId);
     }
-    document.getElementById("client-session-id").textContent = userSessionId;
-    const sessionDetailEl = document.getElementById("lines-to-read");
-    if (sessionDetailEl) sessionDetailEl.textContent = `Session: ${userSessionId} (Isolated)`;
+    document.getElementById("security-session-id").textContent = sessionId;
+    document.getElementById("modal-session-id").textContent = sessionId;
 
-    // User settings stored strictly in their own browser
-    let currentTradingMode = localStorage.getItem("grok_trading_mode") || "PAPER";
-    let userApiKey = localStorage.getItem("grok_user_api_key") || "";
-    let userApiSecret = localStorage.getItem("grok_user_api_secret") || "";
+    // Load wallet balance from isolated local storage (default $100.00 for realistic testing)
+    let savedBal = localStorage.getItem("grok_pro_balance");
+    let walletBalance = savedBal !== null ? Math.max(0, parseFloat(savedBal)) : 100.00;
 
-    const savedBal = localStorage.getItem("grok_user_balance");
-    const initialBal = savedBal !== null ? Math.max(0, parseFloat(savedBal)) : 0.0;
+    let tradingMode = localStorage.getItem("grok_pro_mode") || "PAPER";
+    let userApiKey = localStorage.getItem("grok_pro_key") || "";
+    let userApiSecret = localStorage.getItem("grok_pro_secret") || "";
 
     const STATE = {
-      running: true,
-      seconds: 0,
-      balance: initialBal,
-      startBalance: initialBal,
-      trades: 0,
-      wins: 0,
-      losses: 0,
-      filtered: 0,
-      botFleet: {
-        gambler: { trades: 0, wins: 0, pnl: 0 },
-        house:   { trades: 0, wins: 0, pnl: 0 },
-        spy:     { trades: 0, wins: 0, pnl: 0 }
-      },
-      activeTrade: null,
-      tradeDuration: 0,
-      logs: [],
-      pairs: [
-        { symbol: "BTCUSDT", price: 77000.0 },
-        { symbol: "ETHUSDT", price: 2450.0 },
-        { symbol: "SOLUSDT", price: 165.0 },
-        { symbol: "BNBUSDT", price: 585.0 }
-      ],
-      pairIdx: 0,
-      market: {
-        symbol: "BTCUSDT",
-        price: 77000.0,
-        high24h: 78000.0,
-        low24h: 76000.0,
-        vol24h: 15000.0,
-        spread: 0.01,
-        rsi: 50.0,
-        ema9: 77000.0,
-        ema21: 77000.0
-      }
+      activePair: "BTCUSDT",
+      price: 0,
+      high24h: 0,
+      low24h: 0,
+      vol24h: 0,
+      spread: 0.01,
+      rsi: 50.0,
+      ema9: 0,
+      ema21: 0,
+      activePosition: null, // Only 1 disciplined position at a time
+      orderHistory: [],
+      algoRunning: true,
+      timeframe: "1m"
     };
 
-    function saveUserState() {
-      localStorage.setItem("grok_user_balance", STATE.balance.toFixed(2));
-      localStorage.setItem("grok_trading_mode", currentTradingMode);
+    function saveState() {
+      localStorage.setItem("grok_pro_balance", walletBalance.toFixed(2));
+      localStorage.setItem("grok_pro_mode", tradingMode);
     }
 
-    function formatTime(s) {
-      const h = String(Math.floor(s / 3600)).padStart(2, '0');
-      const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
-      const sec = String(s % 60).padStart(2, '0');
-      return `${h}:${m}:${sec}`;
+    // Update wallet balance UI
+    function renderWallet() {
+      document.getElementById("wallet-balance-val").textContent = `$${walletBalance.toLocaleString('en-US', {minimumFractionDigits: 2})} USDT`;
     }
-
-    function logEvent(type, bot, token, pnl, reason, size) {
-      const d = new Date();
-      const timeStr = d.toTimeString().split(' ')[0];
-      STATE.logs.unshift({
-        time: timeStr,
-        type,
-        bot,
-        token,
-        pnl,
-        pnl_num: parseFloat(pnl.replace(/[^0-9.-]+/g, '')) || 0,
-        reason,
-        size
-      });
-      if (STATE.logs.length > 50) STATE.logs.pop();
-    }
+    renderWallet();
 
     // -------------------------------------------------------------
-    // Real Binance Kline & Ticker Data Fetchers
+    // Real Binance Kline & Orderbook Engine
     // -------------------------------------------------------------
-    const candleCanvas = document.getElementById("candlestick-canvas");
-    const candleCtx = candleCanvas ? candleCanvas.getContext("2d") : null;
-    let candleData = [];
+    const canvas = document.getElementById("candlestick-canvas");
+    const ctx = canvas ? canvas.getContext("2d") : null;
+    let klineData = [];
 
-    async function fetchRealBinanceData(symbol) {
+    async function fetchBinanceMarket(symbol) {
       try {
-        // 1. Fetch 1m historical klines
-        const klineRes = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1m&limit=25`);
-        if (klineRes.ok) {
-          const kData = await klineRes.json();
-          candleData = kData.map(k => ({
+        const startT = performance.now();
+        // 1. Fetch 1m historical klines (25 candles)
+        const kRes = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${STATE.timeframe}&limit=28`);
+        if (kRes.ok) {
+          const raw = await kRes.json();
+          klineData = raw.map(k => ({
             open: parseFloat(k[1]),
             high: parseFloat(k[2]),
             low: parseFloat(k[3]),
             close: parseFloat(k[4]),
             vol: parseFloat(k[5])
           }));
-          computeRealIndicators();
-          renderCandlesticks();
+          calculateIndicators();
+          renderCandles();
         }
 
-        // 2. Fetch 24h ticker & live price
-        const tickerRes = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
-        if (tickerRes.ok) {
-          const td = await tickerRes.json();
-          STATE.market.price = parseFloat(td.lastPrice);
-          STATE.market.high24h = parseFloat(td.highPrice);
-          STATE.market.low24h = parseFloat(td.lowPrice);
-          STATE.market.vol24h = parseFloat(td.volume);
+        // 2. Fetch 24hr ticker
+        const tRes = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
+        if (tRes.ok) {
+          const td = await tRes.json();
+          STATE.price = parseFloat(td.lastPrice);
+          STATE.high24h = parseFloat(td.highPrice);
+          STATE.low24h = parseFloat(td.lowPrice);
+          STATE.vol24h = parseFloat(td.quoteVolume);
+          const chgPct = parseFloat(td.priceChangePercent);
 
-          // Update Scanner text
-          const scanEl = document.getElementById("scanner-detail");
-          if (scanEl) scanEl.textContent = `${symbol} • 24h Vol: ${Math.round(STATE.market.vol24h).toLocaleString()} ${symbol.replace('USDT','')}`;
+          document.getElementById("ticker-price-val").textContent = `$${STATE.price.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+          const chgEl = document.getElementById("ticker-change-val");
+          chgEl.textContent = `${chgPct >= 0 ? '+' : ''}${chgPct.toFixed(2)}%`;
+          chgEl.className = chgPct >= 0 ? 'green-txt' : 'red-txt';
+
+          document.getElementById("ticker-high-val").textContent = `$${STATE.high24h.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+          document.getElementById("ticker-low-val").textContent = `$${STATE.low24h.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+          document.getElementById("ticker-vol-val").textContent = `$${(STATE.vol24h / 1e6).toFixed(1)}M`;
         }
 
-        // 3. Fetch Orderbook Depth for real spread
-        const depthRes = await fetch(`https://api.binance.com/api/v3/depth?symbol=${symbol}&limit=5`);
-        if (depthRes.ok) {
-          const dd = await depthRes.json();
-          if (dd.bids.length && dd.asks.length) {
-            const bestBid = parseFloat(dd.bids[0][0]);
-            const bestAsk = parseFloat(dd.asks[0][0]);
-            STATE.market.spread = +(bestAsk - bestBid).toFixed(2);
-            const rugEl = document.getElementById("rug-sub");
-            if (rugEl) rugEl.textContent = `Spread $${STATE.market.spread.toFixed(2)} (Bid $${bestBid.toFixed(2)} / Ask $${bestAsk.toFixed(2)})`;
-          }
+        // 3. Fetch Real Depth
+        const dRes = await fetch(`https://api.binance.com/api/v3/depth?symbol=${symbol}&limit=5`);
+        if (dRes.ok) {
+          const dd = await dRes.json();
+          renderOrderbook(dd.bids, dd.asks);
         }
-      } catch (err) {
-        // Quiet fallback if offline or rate-limited
-      }
+
+        const ping = Math.round(performance.now() - startT);
+        document.getElementById("feed-ping-val").textContent = `${ping}ms (Binance API)`;
+      } catch (err) {}
     }
 
-    function computeRealIndicators() {
-      if (candleData.length < 15) return;
-      const closes = candleData.map(c => c.close);
-      
-      // Real EMA 9
-      const k9 = 2 / (9 + 1);
-      let ema9 = closes[0];
-      for (let i = 1; i < closes.length; i++) ema9 = closes[i] * k9 + ema9 * (1 - k9);
-      STATE.market.ema9 = ema9;
+    function calculateIndicators() {
+      if (klineData.length < 15) return;
+      const closes = klineData.map(c => c.close);
 
-      // Real EMA 21
-      const k21 = 2 / (21 + 1);
-      let ema21 = closes[0];
-      for (let i = 1; i < closes.length; i++) ema21 = closes[i] * k21 + ema21 * (1 - k21);
-      STATE.market.ema21 = ema21;
+      // EMA 9 & 21
+      const k9 = 2 / 10;
+      let e9 = closes[0];
+      for (let i = 1; i < closes.length; i++) e9 = closes[i] * k9 + e9 * (1 - k9);
+      STATE.ema9 = e9;
 
-      // Real RSI 14
+      const k21 = 2 / 22;
+      let e21 = closes[0];
+      for (let i = 1; i < closes.length; i++) e21 = closes[i] * k21 + e21 * (1 - k21);
+      STATE.ema21 = e21;
+
+      // RSI 14
       let gains = 0, losses = 0;
       for (let i = closes.length - 14; i < closes.length; i++) {
         const diff = closes[i] - closes[i - 1];
         if (diff >= 0) gains += diff; else losses -= diff;
       }
-      const avgGain = gains / 14;
-      const avgLoss = losses / 14 || 0.0001;
-      const rs = avgGain / avgLoss;
-      STATE.market.rsi = +(100 - (100 / (1 + rs))).toFixed(1);
+      const rs = (gains / 14) / (losses / 14 || 0.0001);
+      STATE.rsi = +(100 - (100 / (1 + rs))).toFixed(1);
+
+      const rsiEl = document.getElementById("ticker-rsi-val");
+      if (rsiEl) {
+        rsiEl.textContent = `${STATE.rsi} (${STATE.rsi < 35 ? 'Oversold' : (STATE.rsi > 65 ? 'Overbought' : 'Neutral')})`;
+        rsiEl.className = `stat-val ${STATE.rsi < 35 ? 'green-txt' : (STATE.rsi > 65 ? 'red-txt' : '')}`;
+      }
     }
 
-    function renderCandlesticks() {
-      if (!candleCanvas || !candleCtx) return;
-      const w = candleCanvas.width = candleCanvas.offsetWidth || (candleCanvas.parentElement ? candleCanvas.parentElement.offsetWidth : 320);
-      const h = candleCanvas.height = candleCanvas.offsetHeight || 56;
+    function renderCandles() {
+      if (!canvas || !ctx || !klineData.length) return;
+      const w = canvas.width = canvas.offsetWidth;
+      const h = canvas.height = canvas.offsetHeight;
       if (w <= 0 || h <= 0) return;
-      candleCtx.clearRect(0, 0, w, h);
+      ctx.clearRect(0, 0, w, h);
 
-      // Subtle Blue baseline
-      candleCtx.strokeStyle = "rgba(59, 130, 246, 0.18)";
-      candleCtx.lineWidth = 1;
-      candleCtx.beginPath();
-      candleCtx.moveTo(0, h / 2);
-      candleCtx.lineTo(w, h / 2);
-      candleCtx.stroke();
-
-      if (!candleData.length) return;
+      // Chart background grid lines
+      ctx.strokeStyle = "rgba(30, 38, 56, 0.6)";
+      ctx.lineWidth = 1;
+      for (let y = 1; y < 4; y++) {
+        ctx.beginPath();
+        ctx.moveTo(0, (h / 4) * y);
+        ctx.lineTo(w, (h / 4) * y);
+        ctx.stroke();
+      }
 
       let allP = [];
-      candleData.forEach(c => allP.push(c.high, c.low));
+      klineData.forEach(c => allP.push(c.high, c.low));
       const min = Math.min(...allP);
       const max = Math.max(...allP);
       const range = (max - min) || 1;
 
-      const candleW = Math.max(3, Math.floor(w / candleData.length) - 3);
+      const candleW = Math.max(4, Math.floor(w / klineData.length) - 4);
 
-      candleData.forEach((c, i) => {
-        const x = i * (candleW + 3) + 3;
+      // Draw Candlesticks
+      klineData.forEach((c, i) => {
+        const x = i * (candleW + 4) + 6;
         const isUp = c.close >= c.open;
-        const color = isUp ? "#10b981" : "#ef4444"; // Green for bullish, Red for bearish
+        const color = isUp ? "#0ecb81" : "#f6465d";
 
-        const yHigh = h - ((c.high - min) / range) * (h - 10) - 5;
-        const yLow  = h - ((c.low - min)  / range) * (h - 10) - 5;
-        const yOpen = h - ((c.open - min) / range) * (h - 10) - 5;
-        const yClose= h - ((c.close - min)/ range) * (h - 10) - 5;
+        const yHigh = h - ((c.high - min) / range) * (h - 24) - 12;
+        const yLow  = h - ((c.low - min)  / range) * (h - 24) - 12;
+        const yOpen = h - ((c.open - min) / range) * (h - 24) - 12;
+        const yClose= h - ((c.close - min)/ range) * (h - 24) - 12;
 
         // Wick
-        candleCtx.beginPath();
-        candleCtx.moveTo(x + candleW / 2, yHigh);
-        candleCtx.lineTo(x + candleW / 2, yLow);
-        candleCtx.strokeStyle = color;
-        candleCtx.lineWidth = 1;
-        candleCtx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x + candleW / 2, yHigh);
+        ctx.lineTo(x + candleW / 2, yLow);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
 
         // Body
-        candleCtx.fillStyle = color;
+        ctx.fillStyle = color;
         const top = Math.min(yOpen, yClose);
         const height = Math.max(2, Math.abs(yClose - yOpen));
-        candleCtx.fillRect(x, top, candleW, height);
+        ctx.fillRect(x, top, candleW, height);
       });
+
+      // Price Scale on right
+      ctx.fillStyle = "#848e9c";
+      ctx.font = "10px monospace";
+      ctx.fillText(`$${max.toFixed(2)}`, w - 75, 16);
+      ctx.fillText(`$${((max + min) / 2).toFixed(2)}`, w - 75, h / 2);
+      ctx.fillText(`$${min.toFixed(2)}`, w - 75, h - 8);
+    }
+
+    function renderOrderbook(bids, asks) {
+      if (!bids.length || !asks.length) return;
+      const bestBid = parseFloat(bids[0][0]);
+      const bestAsk = parseFloat(asks[0][0]);
+      const spread = +(bestAsk - bestBid).toFixed(2);
+      STATE.spread = spread;
+
+      document.getElementById("ticker-spread-val").textContent = `$${spread} (${((spread / bestBid) * 10000).toFixed(2)} bps)`;
+      document.getElementById("ob-spread-mid").textContent = `$${spread}`;
+
+      const asksBox = document.getElementById("ob-asks-container");
+      const bidsBox = document.getElementById("ob-bids-container");
+
+      const maxVol = Math.max(...bids.map(b => parseFloat(b[1])), ...asks.map(a => parseFloat(a[1]))) || 1;
+
+      asksBox.innerHTML = asks.slice(0, 5).map(a => {
+        const p = parseFloat(a[0]);
+        const q = parseFloat(a[1]);
+        const pct = Math.min(100, Math.round((q / maxVol) * 100));
+        return `
+          <div class="ob-row ask">
+            <span class="red-txt">${p.toFixed(2)}</span>
+            <span style="text-align:right;">${q.toFixed(3)}</span>
+            <span style="text-align:right; color:var(--text-secondary);">${(p * q).toFixed(0)}</span>
+            <div class="depth-bar" style="width:${pct}%;"></div>
+          </div>
+        `;
+      }).join('');
+
+      bidsBox.innerHTML = bids.slice(0, 5).map(b => {
+        const p = parseFloat(b[0]);
+        const q = parseFloat(b[1]);
+        const pct = Math.min(100, Math.round((q / maxVol) * 100));
+        return `
+          <div class="ob-row bid">
+            <span class="green-txt">${p.toFixed(2)}</span>
+            <span style="text-align:right;">${q.toFixed(3)}</span>
+            <span style="text-align:right; color:var(--text-secondary);">${(p * q).toFixed(0)}</span>
+            <div class="depth-bar" style="width:${pct}%;"></div>
+          </div>
+        `;
+      }).join('');
     }
 
     // -------------------------------------------------------------
-    // Main Trading Tick (Executes every 1 second)
+    // Disciplined Trade Execution (Manual + Quant Engine)
     // -------------------------------------------------------------
-    async function tradingTick() {
-      if (!STATE.running) return;
-      STATE.seconds++;
-
-      const currentSymbol = STATE.pairs[STATE.pairIdx].symbol;
-      
-      // Periodically refresh real market data
-      if (STATE.seconds % 3 === 0) {
-        await fetchRealBinanceData(currentSymbol);
+    function executeOrder(side, sizeUsd, reason) {
+      // 1. Enforce Binance MIN_NOTIONAL rule
+      if (sizeUsd < 10.00) {
+        alert("⚠️ Binance Spot Rule: Minimum order size is $10.00 USDT (MIN_NOTIONAL).");
+        return;
       }
-
-      // If zero balance and no trade active, wait for deposit
-      if (STATE.balance <= 0 && !STATE.activeTrade) {
-        document.getElementById("active-symbol").textContent = "WAITING DEPOSIT";
-        document.getElementById("active-side").textContent = "$0.00";
-        document.getElementById("active-pnl").textContent = "deposit $10 min to trade";
-        document.getElementById("active-current").textContent = "-";
-        document.getElementById("exec-node-sub").textContent = "STANDBY";
-        document.getElementById("exec-pill").textContent = "AWAITING DEPOSIT • $0.00 BALANCE";
-        document.getElementById("trade-open-badge").style.display = "none";
-        render();
+      if (walletBalance < sizeUsd) {
+        alert(`⚠️ Insufficient balance! (Available: $${walletBalance.toFixed(2)} USDT, Required: $${sizeUsd.toFixed(2)} USDT). Please deposit funds.`);
         return;
       }
 
-      // 1. Manage Active Trade
-      if (STATE.activeTrade) {
-        STATE.tradeDuration++;
-        
-        // Sync live price from market
-        if (STATE.market.price > 0) {
-          STATE.activeTrade.currentPrice = STATE.market.price;
-        }
+      const execPrice = STATE.price || (klineData.length ? klineData[klineData.length - 1].close : 77000);
+      const estFee = +(sizeUsd * 0.002).toFixed(3); // 0.1% buy + 0.1% sell = 0.2% round-trip
 
-        // Calculate gross PnL %
-        const priceDiff = STATE.activeTrade.currentPrice - STATE.activeTrade.entryPrice;
-        const grossPct = +((priceDiff / STATE.activeTrade.entryPrice) * 100).toFixed(2);
-        const grossUsd = +((STATE.activeTrade.sizeUsd * (grossPct / 100))).toFixed(3);
+      walletBalance = +(walletBalance - sizeUsd).toFixed(2);
+      saveState();
+      renderWallet();
 
-        // Binance Spot Fee: 0.10% Taker on entry + 0.10% Taker on exit = 0.20% total
-        const feesPaid = +(STATE.activeTrade.sizeUsd * 0.002).toFixed(3);
-        const netUsd = +(grossUsd - feesPaid).toFixed(3);
-        const netPct = +((netUsd / STATE.activeTrade.sizeUsd) * 100).toFixed(2);
+      STATE.activePosition = {
+        symbol: STATE.activePair,
+        side: side,
+        sizeUsd: sizeUsd,
+        entryPrice: execPrice,
+        markPrice: execPrice,
+        estFee: estFee,
+        pnlPct: 0.0,
+        pnlUsd: 0.0,
+        reason: reason,
+        openedAt: new Date().toLocaleTimeString()
+      };
 
-        STATE.activeTrade.pnlPct = netPct;
-        STATE.activeTrade.pnlDollars = netUsd;
-        STATE.activeTrade.fees = feesPaid;
-
-        // Dynamic tick updates inside candleData
-        if (candleData.length) {
-          const lastCandle = candleData[candleData.length - 1];
-          lastCandle.close = STATE.activeTrade.currentPrice;
-          lastCandle.high = Math.max(lastCandle.high, STATE.activeTrade.currentPrice);
-          lastCandle.low = Math.min(lastCandle.low, STATE.activeTrade.currentPrice);
-          renderCandlesticks();
-        }
-
-        // Institutional Exit Strategy:
-        // Take Profit: +1.50% Net | Stop Loss: -1.00% Net | Max Duration: 24s
-        if (netPct >= 1.5 || netPct <= -1.0 || STATE.tradeDuration >= 24) {
-          const isWin = netUsd > 0;
-          STATE.balance = +(STATE.balance + netUsd).toFixed(2);
-          saveUserState();
-          
-          const botKey = STATE.activeTrade.bot.toLowerCase();
-          if (STATE.botFleet[botKey]) {
-            STATE.botFleet[botKey].trades++;
-            STATE.botFleet[botKey].pnl = +(STATE.botFleet[botKey].pnl + netUsd).toFixed(2);
-            if (isWin) STATE.botFleet[botKey].wins++;
-          }
-
-          if (isWin) STATE.wins++; else STATE.losses++;
-          STATE.trades++;
-
-          const pnlStr = (netUsd >= 0 ? "+$" : "-$") + Math.abs(netUsd).toFixed(2);
-          const exitReason = isWin 
-            ? `🎯 TAKE PROFIT (+${netPct}% net after $${feesPaid} fees)` 
-            : `🛑 STOP LOSS (${netPct}% net after $${feesPaid} fees)`;
-
-          logEvent("EXIT", STATE.activeTrade.bot, STATE.activeTrade.symbol, pnlStr, exitReason, `$${STATE.activeTrade.sizeUsd.toFixed(2)}`);
-          document.getElementById("equity-last-val").textContent = pnlStr;
-          STATE.activeTrade = null;
-          STATE.tradeDuration = 0;
-        }
-      } 
-      // 2. Open New Trade (When flat and balance >= $10 Binance MIN_NOTIONAL)
-      else if (STATE.seconds % 4 === 0 && STATE.balance >= 10.0) {
-        STATE.pairIdx = (STATE.pairIdx + 1) % STATE.pairs.length;
-        const currentPair = STATE.pairs[STATE.pairIdx];
-        await fetchRealBinanceData(currentPair.symbol);
-
-        // Select bot based on real indicator signals
-        let chosenBot = "GAMBLER";
-        let reason = `EMA 9/21 Trend Breakout (${STATE.market.ema9 > STATE.market.ema21 ? 'Bullish' : 'Neutral'})`;
-
-        if (STATE.market.rsi < 40) {
-          chosenBot = "HOUSE";
-          reason = `RSI(14) Mean Reversion (${STATE.market.rsi} Oversold Dip)`;
-        } else if (STATE.market.spread <= 0.02) {
-          chosenBot = "SPY";
-          reason = `Orderbook Depth Liquidity Flow (Spread $${STATE.market.spread})`;
-        }
-
-        // Binance MIN_NOTIONAL Rule: Minimum trade size is $10.00 USD
-        let sizeUsd = 10.0;
-        if (STATE.balance > 50.0) {
-          sizeUsd = +(STATE.balance * 0.20).toFixed(2);
-        } else {
-          sizeUsd = +(Math.min(STATE.balance, 10.0)).toFixed(2);
-        }
-
-        if (sizeUsd < 10.0) {
-          // Balance is less than Binance minimum trade size
-          return;
-        }
-
-        const sizePct = Math.round((sizeUsd / STATE.balance) * 100);
-        const livePrice = STATE.market.price > 0 ? STATE.market.price : currentPair.price;
-
-        STATE.activeTrade = {
-          symbol: currentPair.symbol,
-          bot: chosenBot,
-          side: "LONG (SPOT)",
-          entryPrice: livePrice,
-          currentPrice: livePrice,
-          pnlPct: 0.0,
-          pnlDollars: 0.0,
-          fees: +(sizeUsd * 0.002).toFixed(3),
-          sizeUsd: sizeUsd,
-          sizePct: sizePct,
-          reason: reason
-        };
-
-        logEvent("ENTER", chosenBot, currentPair.symbol, "FEE: $0.02", reason, `$${sizeUsd.toFixed(2)}`);
-      } else if (STATE.balance > 0 && STATE.balance < 10.0 && !STATE.activeTrade) {
-        document.getElementById("active-symbol").textContent = "BALANCE < $10";
-        document.getElementById("active-side").textContent = "MIN NOTIONAL";
-        document.getElementById("active-pnl").textContent = "deposit min $10 for Binance orders";
-        document.getElementById("active-current").textContent = "-";
-        document.getElementById("exec-node-sub").textContent = "LIMIT";
-        document.getElementById("exec-pill").textContent = "BINANCE RULE • $10 MIN NOTIONAL REQUIRED";
-        document.getElementById("trade-open-badge").style.display = "none";
-      }
-
-      render();
+      renderPositions();
     }
 
-    function render() {
-      document.getElementById("timer-val").textContent = formatTime(STATE.seconds);
-      document.getElementById("balance-val").textContent = `$${STATE.balance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-      document.getElementById("now-bal-val").textContent = `$${STATE.balance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-      document.getElementById("start-bal-val").textContent = `$${STATE.startBalance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-      document.getElementById("trades-count").textContent = `${STATE.trades} trades`;
-      document.getElementById("wins-count").textContent = `${STATE.wins} wins`;
-      document.getElementById("losses-count").textContent = `${STATE.losses} losses`;
-      document.getElementById("record-stat-val").textContent = `${STATE.wins} W / ${STATE.losses} L`;
-      document.getElementById("filtered-val").textContent = STATE.filtered;
+    function closePosition(exitPrice, exitReason) {
+      if (!STATE.activePosition) return;
+      const pos = STATE.activePosition;
 
-      // Update Mode Badge
-      const modeBadge = document.getElementById("mode-badge-el");
-      if (modeBadge) {
-        if (currentTradingMode === "LIVE") {
-          modeBadge.textContent = "live • binance key connected";
-          modeBadge.style.color = "#f87171";
-          modeBadge.style.borderColor = "rgba(239, 68, 68, 0.4)";
-          modeBadge.style.background = "rgba(239, 68, 68, 0.15)";
-        } else {
-          modeBadge.textContent = "paper • client isolated";
-          modeBadge.style.color = "#60a5fa";
-          modeBadge.style.borderColor = "rgba(59, 130, 246, 0.35)";
-          modeBadge.style.background = "rgba(59, 130, 246, 0.15)";
-        }
+      const priceDiff = pos.side === "LONG" ? (exitPrice - pos.entryPrice) : (pos.entryPrice - exitPrice);
+      const grossPct = +((priceDiff / pos.entryPrice) * 100).toFixed(2);
+      const grossUsd = +((pos.sizeUsd * (grossPct / 100))).toFixed(3);
+      const netUsd = +(grossUsd - pos.estFee).toFixed(3);
+
+      const returnedCapital = +(pos.sizeUsd + netUsd).toFixed(2);
+      walletBalance = +(walletBalance + returnedCapital).toFixed(2);
+      saveState();
+      renderWallet();
+
+      // Log to history
+      STATE.orderHistory.unshift({
+        time: new Date().toLocaleTimeString(),
+        symbol: pos.symbol,
+        side: pos.side,
+        price: `$${exitPrice.toFixed(2)}`,
+        qty: `${(pos.sizeUsd / pos.entryPrice).toFixed(4)}`,
+        fee: `-$${pos.estFee.toFixed(2)}`,
+        pnl: `${netUsd >= 0 ? '+' : ''}$${netUsd.toFixed(2)}`,
+        reason: exitReason
+      });
+
+      STATE.activePosition = null;
+      renderPositions();
+      renderHistory();
+    }
+
+    function renderPositions() {
+      const tbody = document.getElementById("positions-tbody");
+      const countEl = document.getElementById("pos-count");
+
+      if (!STATE.activePosition) {
+        countEl.textContent = "0";
+        tbody.innerHTML = `<tr><td colspan="8" class="empty-state">No open positions. Use the order ticket above or enable Algo Auto.</td></tr>`;
+        return;
       }
 
-      // Bot fleet stats
-      document.getElementById("gambler-pnl").textContent = `${STATE.botFleet.gambler.pnl >= 0 ? '+$' : '-$'}${Math.abs(STATE.botFleet.gambler.pnl).toFixed(2)}`;
-      document.getElementById("gambler-trades").textContent = `${STATE.botFleet.gambler.trades} trades (${STATE.botFleet.gambler.wins}W/${STATE.botFleet.gambler.trades - STATE.botFleet.gambler.wins}L)`;
+      countEl.textContent = "1";
+      const pos = STATE.activePosition;
+      const isUp = pos.pnlUsd >= 0;
 
-      document.getElementById("house-pnl").textContent = `${STATE.botFleet.house.pnl >= 0 ? '+$' : '-$'}${Math.abs(STATE.botFleet.house.pnl).toFixed(2)}`;
-      document.getElementById("house-trades").textContent = `${STATE.botFleet.house.trades} trades (${STATE.botFleet.house.wins}W/${STATE.botFleet.house.trades - STATE.botFleet.house.wins}L)`;
+      tbody.innerHTML = `
+        <tr>
+          <td class="bold">${pos.symbol}</td>
+          <td><span class="${pos.side === 'LONG' ? 'green-txt' : 'red-txt'} bold">${pos.side}</span></td>
+          <td>$${pos.sizeUsd.toFixed(2)}</td>
+          <td>$${pos.entryPrice.toFixed(2)}</td>
+          <td>$${pos.markPrice.toFixed(2)}</td>
+          <td class="red-txt">-$${pos.estFee.toFixed(2)}</td>
+          <td class="${isUp ? 'green-txt' : 'red-txt'} bold">${pos.pnlPct >= 0 ? '+' : ''}${pos.pnlPct}% (${pos.pnlUsd >= 0 ? '+' : ''}$${pos.pnlUsd.toFixed(2)})</td>
+          <td>
+            <button class="nav-action-btn" style="padding:2px 8px; font-size:10px; background:var(--sell-red-bg); color:var(--sell-red); border-color:var(--sell-red);" onclick="closePosition(STATE.price, 'Manual Close')">Close</button>
+          </td>
+        </tr>
+      `;
+    }
 
-      document.getElementById("spy-pnl").textContent = `${STATE.botFleet.spy.pnl >= 0 ? '+$' : '-$'}${Math.abs(STATE.botFleet.spy.pnl).toFixed(2)}`;
-      document.getElementById("spy-trades").textContent = `${STATE.botFleet.spy.trades} trades (${STATE.botFleet.spy.wins}W/${STATE.botFleet.spy.trades - STATE.botFleet.spy.wins}L)`;
+    function renderHistory() {
+      const tbody = document.getElementById("history-tbody");
+      document.getElementById("history-count").textContent = STATE.orderHistory.length;
 
-      // Active trade render
-      if (STATE.activeTrade) {
-        document.getElementById("active-symbol").textContent = STATE.activeTrade.symbol;
-        document.getElementById("active-bot").textContent = STATE.activeTrade.bot;
-        document.getElementById("active-side").textContent = STATE.activeTrade.side;
-        
-        const sign = STATE.activeTrade.pnlPct >= 0 ? "+" : "";
-        const pnlEl = document.getElementById("active-pnl");
-        pnlEl.textContent = `${sign}${STATE.activeTrade.pnlPct}% (Net ${sign}$${Math.abs(STATE.activeTrade.pnlDollars).toFixed(2)})`;
-        pnlEl.className = STATE.activeTrade.pnlPct >= 0 ? "live-pnl green-txt" : "live-pnl red-txt";
-        
-        document.getElementById("active-entry").textContent = `$${STATE.activeTrade.entryPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        document.getElementById("active-current").textContent = `$${STATE.activeTrade.currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        document.getElementById("active-size").textContent = `$${STATE.activeTrade.sizeUsd.toFixed(2)} (${STATE.activeTrade.sizePct}% eq)`;
-        document.getElementById("active-reason").textContent = STATE.activeTrade.reason;
-        document.getElementById("exec-node-sub").textContent = `LIVE ${STATE.activeTrade.symbol}`;
-        document.getElementById("exec-pill").textContent = `EXECUTOR • ENTERED ${STATE.activeTrade.symbol} ($${STATE.activeTrade.sizeUsd.toFixed(2)})`;
-        document.getElementById("trade-open-badge").style.display = "inline-block";
-      } else if (STATE.balance <= 0) {
-        document.getElementById("active-symbol").textContent = "WAITING DEPOSIT";
-        document.getElementById("active-side").textContent = "$0.00";
-        document.getElementById("active-pnl").textContent = "deposit $10 min to trade";
-        document.getElementById("active-current").textContent = "-";
-        document.getElementById("exec-node-sub").textContent = "STANDBY";
-        document.getElementById("exec-pill").textContent = "AWAITING DEPOSIT • $0.00 BALANCE";
-        document.getElementById("trade-open-badge").style.display = "none";
-      } else if (STATE.balance < 10.0) {
-        document.getElementById("active-symbol").textContent = "BALANCE < $10";
-        document.getElementById("active-side").textContent = "MIN NOTIONAL";
-        document.getElementById("active-pnl").textContent = "deposit min $10 for Binance orders";
-        document.getElementById("active-current").textContent = "-";
-        document.getElementById("exec-node-sub").textContent = "LIMIT";
-        document.getElementById("exec-pill").textContent = "BINANCE RULE • $10 MIN NOTIONAL REQUIRED";
-        document.getElementById("trade-open-badge").style.display = "none";
-      } else {
-        document.getElementById("active-symbol").textContent = "SCANNING";
-        document.getElementById("active-side").textContent = "BINANCE SPOT";
-        document.getElementById("active-pnl").textContent = "hunting setup";
-        document.getElementById("active-current").textContent = `$${STATE.market.price.toLocaleString('en-US')}`;
-        document.getElementById("exec-node-sub").textContent = "READY";
-        document.getElementById("exec-pill").textContent = "SCANNER • MONITORING LIVE KLINE";
-        document.getElementById("trade-open-badge").style.display = "none";
+      if (!STATE.orderHistory.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="empty-state">No executed trades yet in this session.</td></tr>`;
+        return;
       }
 
-      // Night terminal logs
-      const term = document.getElementById("night-log-terminal");
-      term.innerHTML = STATE.logs.slice(0, 15).map(l => {
-        const color = l.type === "EXIT" ? (l.pnl_num >= 0 ? "green-txt" : "red-txt") : (l.type === "ENTER" ? "cyan-txt" : "yellow-txt");
-        const botTag = l.bot ? `[${l.bot}] ` : '';
-        return `<div class="term-line"><span style="color:#64748b;">${l.time}</span> <span class="${color} bold">${l.type}</span> <span style="color:#60a5fa;">${botTag}</span><b>${l.token}</b> <span class="${color}">${l.pnl}</span> <span style="color:#94a3b8;">${l.reason}</span> <span style="color:#64748b;">${l.size}</span></div>`;
-      }).join("");
-
-      // Ledger table
-      const rows = document.getElementById("ledger-rows");
-      rows.innerHTML = STATE.logs.filter(l => l.type === "EXIT").slice(0, 8).map(l => {
-        const isWin = l.pnl_num > 0;
-        const color = isWin ? "green-txt" : "red-txt";
+      tbody.innerHTML = STATE.orderHistory.slice(0, 10).map(h => {
+        const isWin = h.pnl.includes('+');
         return `
-          <div class="ledger-row">
-            <span style="color:#64748b;">${l.time}</span>
-            <span class="${color} bold">${l.type}</span>
-            <b>${l.bot} • ${l.token}</b>
-            <span style="color:#94a3b8;">${l.reason}</span>
-            <span class="${color} bold">${l.pnl}</span>
-            <span style="color:#64748b;">${l.size}</span>
-          </div>
+          <tr>
+            <td style="color:var(--text-secondary);">${h.time}</td>
+            <td class="bold">${h.symbol}</td>
+            <td>${h.side}</td>
+            <td>${h.price}</td>
+            <td>${h.qty}</td>
+            <td class="red-txt">${h.fee}</td>
+            <td class="${isWin ? 'green-txt' : 'red-txt'} bold">${h.pnl}</td>
+            <td style="color:var(--text-secondary);">${h.reason}</td>
+          </tr>
         `;
-      }).join("");
+      }).join('');
     }
 
     // -------------------------------------------------------------
-    // API Modal & Account Controller
+    // Periodic Quant Engine Evaluation
     // -------------------------------------------------------------
-    const apiModal = document.getElementById("api-modal");
-    const modePaperBtn = document.getElementById("mode-paper-btn");
-    const modeLiveBtn = document.getElementById("mode-live-btn");
-    const liveFields = document.getElementById("live-api-fields");
-    const apiKeyInput = document.getElementById("user-api-key");
-    const apiSecretInput = document.getElementById("user-api-secret");
-    const apiStatus = document.getElementById("api-modal-status");
+    let tickCount = 0;
+    setInterval(async () => {
+      tickCount++;
+      await fetchBinanceMarket(STATE.activePair);
 
-    function updateModalModeDisplay() {
-      if (currentTradingMode === "LIVE") {
-        modeLiveBtn.style.borderColor = "#ef4444";
-        modeLiveBtn.style.background = "rgba(239,68,68,0.15)";
-        modePaperBtn.style.borderColor = "#334155";
-        modePaperBtn.style.background = "#1e293b";
-        liveFields.style.display = "block";
-      } else {
-        modePaperBtn.style.borderColor = "#10b981";
-        modePaperBtn.style.background = "rgba(16,185,129,0.15)";
-        modeLiveBtn.style.borderColor = "#334155";
-        modeLiveBtn.style.background = "#1e293b";
-        liveFields.style.display = "none";
+      // Manage Active Position (Take Profit +1.5% / Stop Loss -1.0%)
+      if (STATE.activePosition && STATE.price > 0) {
+        STATE.activePosition.markPrice = STATE.price;
+        const priceDiff = STATE.activePosition.side === "LONG" 
+          ? (STATE.price - STATE.activePosition.entryPrice) 
+          : (STATE.activePosition.entryPrice - STATE.price);
+
+        const grossPct = +((priceDiff / STATE.activePosition.entryPrice) * 100).toFixed(2);
+        const grossUsd = +((STATE.activePosition.sizeUsd * (grossPct / 100))).toFixed(3);
+        const netUsd = +(grossUsd - STATE.activePosition.estFee).toFixed(3);
+        const netPct = +((netUsd / STATE.activePosition.sizeUsd) * 100).toFixed(2);
+
+        STATE.activePosition.pnlPct = netPct;
+        STATE.activePosition.pnlUsd = netUsd;
+        renderPositions();
+
+        // Strict risk management targets
+        if (netPct >= 1.5) {
+          closePosition(STATE.price, `Take Profit (+${netPct}% net)`);
+        } else if (netPct <= -1.0) {
+          closePosition(STATE.price, `Stop Loss (${netPct}% net)`);
+        }
       }
-    }
+      // Automated Algo trigger check (runs every 6 seconds when flat)
+      else if (STATE.algoRunning && !STATE.activePosition && tickCount % 6 === 0 && walletBalance >= 10.0) {
+        // Real trigger 1: RSI Oversold Mean Reversion
+        if (STATE.rsi < 35) {
+          executeOrder("LONG", 10.00, `RSI(14) Oversold Dip (${STATE.rsi})`);
+        } 
+        // Real trigger 2: EMA 9 crosses above EMA 21
+        else if (STATE.ema9 > STATE.ema21 && STATE.spread <= 0.02) {
+          executeOrder("LONG", 10.00, `EMA 9/21 Trend Breakout`);
+        }
+      }
+    }, 1000);
 
-    document.getElementById("api-modal-btn").addEventListener("click", () => {
+    // -------------------------------------------------------------
+    // UI Event Handlers
+    // -------------------------------------------------------------
+    // Pair Switcher
+    document.querySelectorAll(".pair-tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".pair-tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        STATE.activePair = btn.getAttribute("data-pair");
+        document.getElementById("chart-title").textContent = `${STATE.activePair} • Spot Candlesticks`;
+        fetchBinanceMarket(STATE.activePair);
+      });
+    });
+
+    // Timeframe Switcher
+    document.querySelectorAll(".tf-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tf-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        STATE.timeframe = btn.getAttribute("data-tf");
+        fetchBinanceMarket(STATE.activePair);
+      });
+    });
+
+    // Manual Trade Execution Buttons
+    document.getElementById("btn-manual-buy").addEventListener("click", () => {
+      const size = parseFloat(document.getElementById("order-size-usd").value) || 10;
+      executeOrder("LONG", size, "Manual Spot Long Execution");
+    });
+
+    document.getElementById("btn-manual-sell").addEventListener("click", () => {
+      const size = parseFloat(document.getElementById("order-size-usd").value) || 10;
+      executeOrder("SHORT", size, "Manual Spot Short Execution");
+    });
+
+    // Size Percentage Chips
+    document.querySelectorAll(".chip-btn[data-pct]").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const pct = parseInt(chip.getAttribute("data-pct"));
+        const rawSize = (walletBalance * (pct / 100));
+        const finalSize = Math.max(10.00, Math.floor(rawSize));
+        document.getElementById("order-size-usd").value = finalSize.toFixed(2);
+      });
+    });
+
+    // Bottom Tabs Switcher
+    document.querySelectorAll(".pos-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".pos-tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        const target = tab.getAttribute("data-tab");
+        document.getElementById("tab-content-pos").style.display = target === 'pos' ? 'block' : 'none';
+        document.getElementById("tab-content-ledger").style.display = target === 'ledger' ? 'block' : 'none';
+        document.getElementById("tab-content-security").style.display = target === 'security' ? 'block' : 'none';
+      });
+    });
+
+    // Deposit Modal Controller
+    const depModal = document.getElementById("deposit-modal");
+    document.getElementById("btn-deposit-open").addEventListener("click", () => {
+      depModal.style.display = "flex";
+      document.getElementById("deposit-err-msg").textContent = "";
+    });
+    document.getElementById("deposit-close").addEventListener("click", () => { depModal.style.display = "none"; });
+    document.getElementById("btn-deposit-cancel").addEventListener("click", () => { depModal.style.display = "none"; });
+
+    document.querySelectorAll(".chip-btn[data-dep]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.getElementById("deposit-input-val").value = btn.getAttribute("data-dep");
+      });
+    });
+
+    document.getElementById("btn-deposit-confirm").addEventListener("click", () => {
+      const amt = parseFloat(document.getElementById("deposit-input-val").value);
+      if (isNaN(amt) || amt < 10) {
+        document.getElementById("deposit-err-msg").textContent = "⚠️ Minimum deposit is $10.00 USDT (Binance rule).";
+        return;
+      }
+      walletBalance = +(walletBalance + amt).toFixed(2);
+      saveState();
+      renderWallet();
+      depModal.style.display = "none";
+    });
+
+    // API & Security Modal Controller
+    const apiModal = document.getElementById("api-modal");
+    document.getElementById("btn-api-open").addEventListener("click", () => {
       apiModal.style.display = "flex";
-      apiKeyInput.value = userApiKey;
-      apiSecretInput.value = userApiSecret;
-      apiStatus.textContent = "";
-      updateModalModeDisplay();
+      document.getElementById("input-api-key").value = userApiKey;
+      document.getElementById("input-api-secret").value = userApiSecret;
+      document.getElementById("api-status-msg").textContent = "";
+    });
+    document.getElementById("api-close").addEventListener("click", () => { apiModal.style.display = "none"; });
+    document.getElementById("btn-api-cancel").addEventListener("click", () => { apiModal.style.display = "none"; });
+
+    document.getElementById("btn-select-paper").addEventListener("click", () => {
+      tradingMode = "PAPER";
+      document.getElementById("btn-select-paper").style.borderColor = "var(--buy-green)";
+      document.getElementById("btn-select-paper").style.background = "var(--buy-green-bg)";
+      document.getElementById("btn-select-live").style.borderColor = "var(--border-subtle)";
+      document.getElementById("btn-select-live").style.background = "var(--bg-surface-elevated)";
+      document.getElementById("live-api-block").style.display = "none";
     });
 
-    document.getElementById("api-modal-close").addEventListener("click", () => { apiModal.style.display = "none"; });
-    document.getElementById("api-modal-cancel").addEventListener("click", () => { apiModal.style.display = "none"; });
-
-    modePaperBtn.addEventListener("click", () => {
-      currentTradingMode = "PAPER";
-      updateModalModeDisplay();
+    document.getElementById("btn-select-live").addEventListener("click", () => {
+      tradingMode = "LIVE";
+      document.getElementById("btn-select-live").style.borderColor = "var(--sell-red)";
+      document.getElementById("btn-select-live").style.background = "var(--sell-red-bg)";
+      document.getElementById("btn-select-paper").style.borderColor = "var(--border-subtle)";
+      document.getElementById("btn-select-paper").style.background = "var(--bg-surface-elevated)";
+      document.getElementById("live-api-block").style.display = "block";
     });
 
-    modeLiveBtn.addEventListener("click", () => {
-      currentTradingMode = "LIVE";
-      updateModalModeDisplay();
-    });
-
-    document.getElementById("save-api-btn").addEventListener("click", () => {
-      if (currentTradingMode === "LIVE") {
-        const k = apiKeyInput.value.trim();
-        const s = apiSecretInput.value.trim();
+    document.getElementById("btn-api-save").addEventListener("click", () => {
+      if (tradingMode === "LIVE") {
+        const k = document.getElementById("input-api-key").value.trim();
+        const s = document.getElementById("input-api-secret").value.trim();
         if (!k || !s) {
-          apiStatus.textContent = "⚠️ Please enter both Binance API Key & Secret Key for Live Mode.";
-          apiStatus.style.color = "#ef4444";
+          document.getElementById("api-status-msg").textContent = "⚠️ Enter both API Key & Secret for Live Mode.";
+          document.getElementById("api-status-msg").className = "red-txt";
           return;
         }
         userApiKey = k;
         userApiSecret = s;
-        localStorage.setItem("grok_user_api_key", k);
-        localStorage.setItem("grok_user_api_secret", s);
-        apiStatus.textContent = "✅ Live API credentials saved in your private browser storage.";
-        apiStatus.style.color = "#34d399";
+        localStorage.setItem("grok_pro_key", k);
+        localStorage.setItem("grok_pro_secret", s);
+        document.getElementById("mode-label-txt").textContent = "LIVE BINANCE API";
+        document.getElementById("mode-pill-el").style.color = "var(--sell-red)";
       } else {
-        apiStatus.textContent = "✅ Paper Trading Mode active (Zero financial risk).";
-        apiStatus.style.color = "#34d399";
+        document.getElementById("mode-label-txt").textContent = "PAPER SANDBOX";
+        document.getElementById("mode-pill-el").style.color = "var(--buy-green)";
       }
-      saveUserState();
-      setTimeout(() => {
-        apiModal.style.display = "none";
-        render();
-      }, 700);
+      saveState();
+      document.getElementById("api-status-msg").textContent = "✅ Settings saved in private local storage.";
+      document.getElementById("api-status-msg").className = "green-txt";
+      setTimeout(() => { apiModal.style.display = "none"; }, 500);
     });
 
-    document.getElementById("clear-keys-btn").addEventListener("click", () => {
-      localStorage.removeItem("grok_user_api_key");
-      localStorage.removeItem("grok_user_api_secret");
+    document.getElementById("btn-clear-keys").addEventListener("click", () => {
+      localStorage.removeItem("grok_pro_key");
+      localStorage.removeItem("grok_pro_secret");
       userApiKey = "";
       userApiSecret = "";
-      apiKeyInput.value = "";
-      apiSecretInput.value = "";
-      currentTradingMode = "PAPER";
-      updateModalModeDisplay();
-      apiStatus.textContent = "🗑️ Keys removed. Switched to Paper Trading Mode.";
-      apiStatus.style.color = "#38bdf8";
-      saveUserState();
-      render();
+      document.getElementById("input-api-key").value = "";
+      document.getElementById("input-api-secret").value = "";
+      tradingMode = "PAPER";
+      document.getElementById("btn-select-paper").click();
+      document.getElementById("api-status-msg").textContent = "🗑️ Keys cleared. Switched to Paper Sandbox.";
+      document.getElementById("api-status-msg").className = "blue-txt";
+      saveState();
     });
 
-    // -------------------------------------------------------------
-    // Deposit Modal Controller (Min $10, Max $1000)
-    // -------------------------------------------------------------
-    const modal = document.getElementById("deposit-modal");
-    const modalInput = document.getElementById("deposit-input");
-    const errorMsg = document.getElementById("deposit-error-msg");
-
-    document.getElementById("deposit-btn").addEventListener("click", () => {
-      modal.style.display = "flex";
-      modalInput.value = "10";
-      errorMsg.textContent = "";
-      modalInput.focus();
-    });
-
-    document.getElementById("modal-close").addEventListener("click", () => { modal.style.display = "none"; });
-    document.getElementById("modal-cancel-btn").addEventListener("click", () => { modal.style.display = "none"; });
-
-    document.querySelectorAll(".preset-btn[data-amt]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        modalInput.value = btn.getAttribute("data-amt");
-        errorMsg.textContent = "";
-      });
-    });
-
-    document.getElementById("modal-confirm-btn").addEventListener("click", () => {
-      const rawVal = parseFloat(modalInput.value);
-      if (isNaN(rawVal) || rawVal < 10) {
-        errorMsg.textContent = "⚠️ Minimum deposit amount is $10.00 USD (Binance MIN_NOTIONAL rule)!";
-        return;
+    // Algo Toggle Handler
+    document.getElementById("algo-toggle").addEventListener("change", (e) => {
+      STATE.algoRunning = e.target.checked;
+      const st = document.getElementById("algo-status-line");
+      if (STATE.algoRunning) {
+        st.textContent = "● Status: ACTIVE • Scanning real 1m candles";
+        st.style.color = "var(--brand-blue)";
+      } else {
+        st.textContent = "○ Status: PAUSED • Manual execution only";
+        st.style.color = "var(--text-secondary)";
       }
-      if (rawVal > 1000) {
-        errorMsg.textContent = "⚠️ Maximum deposit limit is $1,000.00 USD!";
-        return;
-      }
-      if (STATE.balance + rawVal > 1000) {
-        errorMsg.textContent = `⚠️ Total balance cannot exceed $1,000.00 USD! (Current: $${STATE.balance.toFixed(2)})`;
-        return;
-      }
-
-      const val = +rawVal.toFixed(2);
-      STATE.balance = +(STATE.balance + val).toFixed(2);
-      if (STATE.startBalance === 0) STATE.startBalance = STATE.balance;
-      saveUserState();
-
-      logEvent("DEPOSIT", "DESK", "USDT", `+$${val.toFixed(2)}`, `Capital credited ($${val.toFixed(2)}). Session: ${userSessionId}.`, "100%");
-      modal.style.display = "none";
-      render();
     });
 
-    // Toggle Pause/Resume Button
-    document.getElementById("toggle-run-btn").addEventListener("click", () => {
-      STATE.running = !STATE.running;
-      document.getElementById("toggle-run-btn").textContent = STATE.running ? "PAUSE" : "RESUME";
-      document.getElementById("run-text").textContent = STATE.running ? "running" : "paused";
-      document.getElementById("run-dot").style.background = STATE.running ? "var(--neon-blue)" : "var(--neon-red)";
-    });
-
-    // Window Resize for Chart
-    window.addEventListener("resize", renderCandlesticks);
-
-    // Initial load: Fetch real Binance data and start engine
-    fetchRealBinanceData("BTCUSDT");
-    setTimeout(renderCandlesticks, 150);
-    setInterval(tradingTick, 1000);
-    render();
+    // Initial load
+    window.addEventListener("resize", renderCandles);
+    fetchBinanceMarket("BTCUSDT");
+    setTimeout(renderCandles, 200);
   </script>
 </body>
 </html>
