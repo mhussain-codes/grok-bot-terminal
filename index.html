@@ -805,32 +805,35 @@
       <div style="font-size:12px; color:#94a3b8; margin: 6px 0 12px 0; line-height:1.4;">
         Select how much capital the bot should trade with.
         <div style="background:rgba(234,179,8,0.1); border:1px solid rgba(234,179,8,0.3); border-radius:5px; padding:6px 10px; margin-top:6px; font-size:10.5px; color:#fef08a;">
-          ⚖️ <b>Binance Spot Rule:</b> Minimum order size is <b>$10.00 USDT</b>. Har real trade kam az kam $10 ki hoti hai taaki Binance order reject na ho.
+          ⚖️ <b>Binance Spot Rule:</b> Minimum order size is <b>$5.00 USDT</b>. (BTC, ETH, SOL, BNB sab pairs par $5 min order allowed hai, aap sirf $5 se start kar sakte hain!)
         </div>
       </div>
       
       <div style="font-size:10px; color:#64748b; margin-bottom: 6px; text-transform:uppercase; letter-spacing:0.5px;">Quick Amount Presets:</div>
       <div class="preset-grid">
-        <button class="preset-btn" data-amt="10" style="border-color:#3b82f6; color:#60a5fa; font-weight:700;">$10 (Min)</button>
+        <button class="preset-btn" data-amt="5" style="border-color:#10b981; color:#34d399; font-weight:800;">$5 (Min)</button>
+        <button class="preset-btn" data-amt="10" style="border-color:#3b82f6; color:#60a5fa; font-weight:700;">$10</button>
         <button class="preset-btn" data-amt="25">$25</button>
         <button class="preset-btn" data-amt="50">$50</button>
         <button class="preset-btn" data-amt="100">$100</button>
         <button class="preset-btn" data-amt="250">$250</button>
         <button class="preset-btn" data-amt="500">$500</button>
-        <button class="preset-btn" data-amt="750">$750</button>
         <button class="preset-btn" data-amt="1000" style="border-color:#ef4444; color:#f87171; font-weight:700;">$1000 (Max)</button>
       </div>
 
       <div style="margin-top:12px;">
-        <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:4px; font-weight:600;">Custom Capital Amount ($ USD, Min $10, Max $1000):</label>
-        <input type="number" id="deposit-input" min="10" max="1000" step="5" value="10" class="modal-input" placeholder="e.g. 10">
+        <label style="font-size:11px; color:#94a3b8; display:block; margin-bottom:4px; font-weight:600;">Custom Capital Amount ($ USD, Min $5, Max $1000):</label>
+        <input type="number" id="deposit-input" min="5" max="1000" step="5" value="5" class="modal-input" placeholder="e.g. 5">
       </div>
 
       <div id="deposit-error-msg" style="color:#ef4444; font-size:11px; margin-top:8px; min-height:16px; font-weight:600;"></div>
 
-      <div style="margin-top:10px; padding:8px 10px; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.25); border-radius:5px; display:flex; justify-content:space-between; align-items:center;">
+      <div style="margin-top:10px; padding:8px 10px; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.25); border-radius:5px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
         <span style="font-size:11px; color:#93c5fd;">⚡ Need Sandbox Practice Funds?</span>
-        <button type="button" id="quick-reset-demo-btn" style="background:#1d4ed8; color:#fff; border:1px solid #3b82f6; padding:5px 12px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;">Reset to $100 Demo</button>
+        <div style="display:flex; gap:6px;">
+          <button type="button" id="quick-reset-5-btn" style="background:#059669; color:#fff; border:1px solid #10b981; padding:5px 10px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;">⚡ $5 Demo (Starter)</button>
+          <button type="button" id="quick-reset-demo-btn" style="background:#1d4ed8; color:#fff; border:1px solid #3b82f6; padding:5px 10px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;">Reset $100 Demo</button>
+        </div>
       </div>
 
       <div style="display:flex; gap:10px; margin-top:14px;">
@@ -979,8 +982,8 @@
             <span class="agent-name">3. MONEY MANAGER</span>
             <span class="agent-state-tag tag-blue">SAFE SIZE</span>
           </div>
-          <div class="agent-role">Protects balance & sizes $10 min</div>
-          <div class="agent-detail">Safe sizing: $10.00 min • Max 20% equity<br><span id="sizer-subtext">$10.00 safe order</span></div>
+          <div class="agent-role">Protects balance & sizes $5 min</div>
+          <div class="agent-detail">Safe sizing: $5.00 min • Max 20% equity<br><span id="sizer-subtext">$5.00 safe order</span></div>
         </div>
 
         <!-- 4: AUTO-TRADER -->
@@ -1049,7 +1052,7 @@
             <div class="flow-metric-box">
               <div class="metric-label blue-txt">◆ ORDER SIZE</div>
               <div class="metric-val" id="sizer-eq-val">20% eq</div>
-              <div class="metric-foot" id="sizer-eq-sub">$10.00</div>
+              <div class="metric-foot" id="sizer-eq-sub">$5.00</div>
             </div>
             <div class="flow-circle exec-circle">
               <div style="font-size:11px;">⚡</div>
@@ -1153,7 +1156,7 @@
               <div class="detail-label">Binance Fee (0.2%):</div>
               <div class="detail-val red-txt" id="active-slip">-$0.02 (0.1% Buy + 0.1% Sell)</div>
               <div class="detail-label">Position Size:</div>
-              <div class="detail-val" id="active-size">$10.00 (Binance Min)</div>
+              <div class="detail-val" id="active-size">$5.00 (Binance Min)</div>
               <div class="detail-label">Target Profit:</div>
               <div class="detail-val green-txt" id="active-target">🎯 +1.50% Net (Auto-Sell)</div>
               <div class="detail-label">Safety Stop-Loss:</div>
@@ -1667,7 +1670,7 @@
       if (STATE.balance <= 0 && !STATE.activeTrade) {
         document.getElementById("active-symbol").textContent = "WAITING CAPITAL";
         document.getElementById("active-side").textContent = "$0.00 BALANCE";
-        document.getElementById("active-pnl").textContent = "Add $10 to start";
+        document.getElementById("active-pnl").textContent = "Add $5 to start";
         document.getElementById("active-current").textContent = "-";
         document.getElementById("exec-node-sub").textContent = "STANDBY";
         document.getElementById("exec-pill").textContent = "STANDBY • $0.00 BALANCE";
@@ -1819,7 +1822,7 @@
       // =========================================================
       // 2. SCAN & ENTER SPOT TRADE (ONLY WHEN SCORE >= 75)
       // =========================================================
-      else if (STATE.balance >= 10.0) {
+      else if (STATE.balance >= 5.0) {
         const currentPair = STATE.pairs[STATE.pairIdx];
         const score = STATE.confluenceScore || 0;
 
@@ -1858,15 +1861,17 @@
           reason = `A+ Whale Depth Absorption (${Math.round(STATE.market.bidRatio * 100)}% Bids) + Low Spread`;
         }
 
-        // Safe Sizing: Binance MIN_NOTIONAL rule requires min $10.00
-        let sizeUsd = 10.0;
+        // Safe Sizing: Binance MIN_NOTIONAL rule requires min $5.00
+        let sizeUsd = 5.0;
         if (STATE.balance >= 50.0) {
           sizeUsd = +(STATE.balance * 0.20).toFixed(2);
-        } else {
+        } else if (STATE.balance >= 10.0) {
           sizeUsd = 10.0;
+        } else {
+          sizeUsd = 5.0;
         }
 
-        if (sizeUsd < 10.0 || STATE.balance < 10.0) {
+        if (sizeUsd < 5.0 || STATE.balance < 5.0) {
           return;
         }
 
@@ -1919,13 +1924,13 @@
             logEvent("NET_ERR", chosenBot, currentPair.symbol, "FAIL", "Proxy error: " + err.message, `$${sizeUsd.toFixed(2)}`);
           });
         }
-      } else if (STATE.balance > 0 && STATE.balance < 10.0 && !STATE.activeTrade) {
-        document.getElementById("active-symbol").textContent = "BALANCE < $10";
+      } else if (STATE.balance > 0 && STATE.balance < 5.0 && !STATE.activeTrade) {
+        document.getElementById("active-symbol").textContent = "BALANCE < $5";
         document.getElementById("active-side").textContent = "MIN NOTIONAL";
-        document.getElementById("active-pnl").textContent = "deposit min $10 for Binance orders";
+        document.getElementById("active-pnl").textContent = "deposit min $5 for Binance orders";
         document.getElementById("active-current").textContent = "-";
         document.getElementById("exec-node-sub").textContent = "LIMIT";
-        document.getElementById("exec-pill").textContent = "BINANCE RULE • $10 MIN REQUIRED";
+        document.getElementById("exec-pill").textContent = "BINANCE RULE • $5 MIN REQUIRED";
         document.getElementById("trade-open-badge").style.display = "none";
       }
 
@@ -1934,6 +1939,24 @@
 
     function render() {
       document.getElementById("timer-val").textContent = formatTime(STATE.seconds);
+
+      const sizerEqVal = document.getElementById("sizer-eq-val");
+      const sizerEqSub = document.getElementById("sizer-eq-sub");
+      if (sizerEqVal && sizerEqSub) {
+        if (STATE.balance >= 50.0) {
+          sizerEqVal.textContent = "20% eq";
+          sizerEqSub.textContent = `$${(STATE.balance * 0.20).toFixed(2)}`;
+        } else if (STATE.balance >= 10.0) {
+          sizerEqVal.textContent = `${Math.round((10.0 / STATE.balance) * 100)}% eq`;
+          sizerEqSub.textContent = "$10.00";
+        } else if (STATE.balance >= 5.0) {
+          sizerEqVal.textContent = "100% eq";
+          sizerEqSub.textContent = "$5.00";
+        } else {
+          sizerEqVal.textContent = "0% eq";
+          sizerEqSub.textContent = "$0.00";
+        }
+      }
       document.getElementById("balance-val").textContent = `$${STATE.balance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
       document.getElementById("now-bal-val").textContent = `$${STATE.balance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
       document.getElementById("start-bal-val").textContent = `$${STATE.startBalance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
@@ -1995,18 +2018,18 @@
       } else if (STATE.balance <= 0) {
         document.getElementById("active-symbol").textContent = "WAITING CAPITAL";
         document.getElementById("active-side").textContent = "$0.00";
-        document.getElementById("active-pnl").textContent = "deposit $10 min to trade";
+        document.getElementById("active-pnl").textContent = "deposit $5 min to trade";
         document.getElementById("active-current").textContent = "-";
         document.getElementById("exec-node-sub").textContent = "STANDBY";
         document.getElementById("exec-pill").textContent = "AWAITING CAPITAL • $0.00";
         document.getElementById("trade-open-badge").style.display = "none";
-      } else if (STATE.balance < 10.0) {
-        document.getElementById("active-symbol").textContent = "BALANCE < $10";
+      } else if (STATE.balance < 5.0) {
+        document.getElementById("active-symbol").textContent = "BALANCE < $5";
         document.getElementById("active-side").textContent = "MIN NOTIONAL";
-        document.getElementById("active-pnl").textContent = "min $10 needed for Binance orders";
+        document.getElementById("active-pnl").textContent = "min $5 needed for Binance orders";
         document.getElementById("active-current").textContent = "-";
         document.getElementById("exec-node-sub").textContent = "LIMIT";
-        document.getElementById("exec-pill").textContent = "BINANCE RULE • $10 MIN REQUIRED";
+        document.getElementById("exec-pill").textContent = "BINANCE RULE • $5 MIN REQUIRED";
         document.getElementById("trade-open-badge").style.display = "none";
       } else {
         document.getElementById("active-symbol").textContent = "SCANNING";
@@ -2221,10 +2244,10 @@
             render();
 
             let msg = `✅ Authenticated! Real USDT Balance: $${detectedBal.toFixed(2)} USDT • Spot Trading: ${data.canTrade ? 'Active' : 'Disabled'}`;
-            if (detectedBal >= 10.0) {
+            if (detectedBal >= 5.0) {
               msg += ` • Ready for live auto-trading!`;
             } else {
-              msg += ` • (Note: Binance requires min $10 USDT to execute spot orders)`;
+              msg += ` • (Note: Binance requires min $5 USDT to execute spot orders)`;
             }
             apiStatus.textContent = msg;
             apiStatus.style.color = "#34d399";
@@ -2251,7 +2274,7 @@
 
     document.getElementById("deposit-btn").addEventListener("click", () => {
       modal.style.display = "flex";
-      modalInput.value = "10";
+      modalInput.value = "5";
       errorMsg.textContent = "";
       modalInput.focus();
     });
@@ -2268,8 +2291,8 @@
 
     document.getElementById("modal-confirm-btn").addEventListener("click", () => {
       const rawVal = parseFloat(modalInput.value);
-      if (isNaN(rawVal) || rawVal < 10) {
-        errorMsg.textContent = "⚠️ Minimum capital is $10.00 USD (Binance MIN_NOTIONAL rule)!";
+      if (isNaN(rawVal) || rawVal < 5) {
+        errorMsg.textContent = "⚠️ Minimum capital is $5.00 USD (Binance Spot Min Notional)!";
         return;
       }
       if (rawVal > 1000) {
@@ -2290,6 +2313,19 @@
       modal.style.display = "none";
       render();
     });
+
+    // Quick Reset to $5 Demo Funds (Starter Practice)
+    const reset5Btn = document.getElementById("quick-reset-5-btn");
+    if (reset5Btn) {
+      reset5Btn.addEventListener("click", () => {
+        STATE.balance = 5.0;
+        STATE.startBalance = 5.0;
+        saveUserState();
+        logEvent("DEPOSIT", "DESK", "USDT", "+$5.00", "Starter practice balance set to $5.00 Demo Funds.", "100%");
+        modal.style.display = "none";
+        render();
+      });
+    }
 
     // Quick Reset to $100 Demo Funds
     const resetDemoBtn = document.getElementById("quick-reset-demo-btn");

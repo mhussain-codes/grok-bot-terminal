@@ -223,11 +223,13 @@ class BinanceTradingEngine:
         self.pipeline_state["rug_check"]["status"] = "PASS"
         self.pipeline_state["rug_check"]["token"] = current_sym
 
-        # Dynamic sizing adapted to account capital
-        if self.current_equity <= 5.0:
-            order_size_usd = round(min(self.current_equity, 2.0), 2)
-        elif self.current_equity <= 20.0:
-            order_size_usd = round(self.current_equity * 0.35, 2)
+        # Dynamic sizing adapted to account capital (Binance Spot Min Notional = $5.00 USDT)
+        if self.current_equity < 5.0:
+            order_size_usd = round(self.current_equity, 2)
+        elif self.current_equity <= 10.0:
+            order_size_usd = 5.0
+        elif self.current_equity <= 25.0:
+            order_size_usd = round(self.current_equity * 0.40, 2)
         else:
             order_size_usd = round(self.current_equity * 0.20, 2)
 
