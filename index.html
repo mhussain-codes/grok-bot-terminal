@@ -2461,141 +2461,127 @@
       }
 
       // =========================================================
-      // 4. SCAN & ENTER SPOT TRADES ($5 CHALLENGE & RUNNER ENGINE, SCORE >= 70)
+      // 4. PROFESSIONAL BI-DIRECTIONAL EXECUTION (LONG 🟢 UP & SHORT 🔴 DOWN)
       // =========================================================
-      if (STATE.balance >= 4.50) {
+      if (STATE.balance >= 4.00) {
         const score = STATE.confluenceScore || 0;
         const volRatio = STATE.market.volRatio || 1.0;
         const bidRatio = STATE.market.bidRatio || 0.50;
-        const alreadyHoldingCoin = STATE.positions.some(pos => pos.symbol === currentPair.symbol);
+        const alreadyHoldingCoin = (STATE.positions || []).some(pos => pos.symbol === currentPair.symbol);
         const isBullishRibbon = STATE.market.ema7 > STATE.market.ema21;
+        const isBearishRibbon = STATE.market.ema7 < STATE.market.ema21;
         const isDeepOversoldDip = STATE.market.rsi <= 38 && (STATE.market.rsi >= (STATE.market.prevRsi || STATE.market.rsi));
-
-        // High-Probability Confluence Gate:
-        // Score >= 70 AND volRatio >= 0.85 (calibrated for current market) AND bidRatio >= 0.46
-        const trendOrDipValid = isBullishRibbon || isDeepOversoldDip;
+        const isOverboughtTop = STATE.market.rsi >= 64;
         const lastCandleGreen = isDeepOversoldDip || (candleData.length >= 2 && candleData[candleData.length - 2].close >= candleData[candleData.length - 2].open);
-        const entryDisqualified = STATE.confluenceDisqualified || score < 70 || volRatio < 0.85 || bidRatio < 0.46 || !trendOrDipValid || STATE.market.rsi > 67.0 || !lastCandleGreen;
 
-        if (alreadyHoldingCoin || entryDisqualified) {
-          // Increment SKIPPED DUMPS on each evaluation cycle
+        let setupApproved = false;
+        let side = "BUY";
+        let chosenBot = "Trend Rider";
+        let botKey = "gambler";
+        let reason = "";
+        let dynLev = 1;
+
+        if (STATE.marketType === "FUTURES") {
+          // Dynamic Auto-Leverage by Coin Type
+          if (["BTCUSDT", "ETHUSDT"].includes(currentPair.symbol)) dynLev = 20;
+          else if (["DOGEUSDT", "PEPEUSDT", "WIFUSDT"].includes(currentPair.symbol)) dynLev = 5;
+          else dynLev = 10;
+          STATE.leverage = dynLev;
+
+          // 1. PRO SHORT 🔴 (DOWN MOVE PROFIT) SETUP
+          // A: Bearish Death Cross (EMA 7 < EMA 21) + Ask Wall Absorption + Bearish Momentum
+          if (isBearishRibbon && (1 - bidRatio) >= 0.48 && STATE.market.rsi <= 56 && STATE.market.rsi >= 30) {
+            setupApproved = true;
+            side = "SHORT";
+            chosenBot = "Short Hunter";
+            botKey = "house";
+            reason = `⚡ Bearish Breakdown SHORT 🔴 (${dynLev}x Lev • EMA 7 < 21 Death Cross • Drop Profit)`;
+          } 
+          // B: Overbought Top Rejection (RSI >= 64 + Ask resistance)
+          else if (isOverboughtTop && (1 - bidRatio) >= 0.48) {
+            setupApproved = true;
+            side = "SHORT";
+            chosenBot = "Short Hunter";
+            botKey = "house";
+            reason = `⚡ Overbought Top SHORT 🔴 (${dynLev}x Lev • RSI ${STATE.market.rsi.toFixed(1)} Rejection)`;
+          }
+          // 2. PRO LONG 🟢 (UP MOVE PROFIT) SETUP
+          // A: Oversold Bounce Reversal (RSI <= 38 + Bid support)
+          else if (isDeepOversoldDip && bidRatio >= 0.48) {
+            setupApproved = true;
+            side = "LONG";
+            chosenBot = "Long Runner";
+            botKey = "gambler";
+            reason = `⚡ Oversold Dip LONG 🟢 (${dynLev}x Lev • RSI ${STATE.market.rsi.toFixed(1)} Whale Bids)`;
+          }
+          // B: Bullish Golden Alignment (EMA 7 > EMA 21 + Momentum)
+          else if (isBullishRibbon && bidRatio >= 0.48 && STATE.market.rsi >= 46 && STATE.market.rsi <= 66) {
+            setupApproved = true;
+            side = "LONG";
+            chosenBot = "Long Runner";
+            botKey = "gambler";
+            reason = `⚡ Bullish Momentum LONG 🟢 (${dynLev}x Lev • Golden Ribbon Confluence)`;
+          }
+        } else {
+          // SPOT MODE: 1x Long Only (Buy Dips & Golden Breakouts)
+          dynLev = 1;
+          if (isDeepOversoldDip && bidRatio >= 0.48) {
+            setupApproved = true;
+            side = "BUY";
+            chosenBot = "Dip Buyer";
+            botKey = "house";
+            reason = `A+ Oversold Reversal (RSI ${STATE.market.rsi.toFixed(1)} + ${Math.round(bidRatio * 100)}% Whale Bids)`;
+          } else if (isBullishRibbon && volRatio >= 0.85 && bidRatio >= 0.48 && STATE.market.rsi <= 65 && lastCandleGreen) {
+            setupApproved = true;
+            side = "BUY";
+            chosenBot = "Trend Rider";
+            botKey = "gambler";
+            reason = `A+ Bullish Breakout (EMA Golden Ribbon + ${volRatio}x Vol)`;
+          }
+        }
+
+        const canOpenNew = (STATE.positions || []).length < MAX_OPEN_POSITIONS;
+
+        if (alreadyHoldingCoin || !setupApproved || !canOpenNew) {
           if (STATE.seconds % 2 === 0) {
             STATE.filtered++;
-            
-            let skipReason = STATE.confluenceDisqualifyReason || `Score ${score}/100`;
-            if (alreadyHoldingCoin) {
-              skipReason = `Holding ${currentPair.symbol} Position`;
-            } else if (!STATE.confluenceDisqualifyReason) {
-              if (volRatio >= 1.35 && STATE.market.rsi < 50) {
-                skipReason = `Heavy Sell Dump (${volRatio}x Vol)`;
-              } else if (volRatio < 0.60) {
-                skipReason = `Dead Volume (${volRatio}x)`;
-              } else if (STATE.market.rsi > 67.0) {
-                skipReason = `Overbought Peak (RSI ${STATE.market.rsi.toFixed(1)} > 68)`;
-              } else if (bidRatio < 0.48) {
-                skipReason = `Ask Wall Resistance (${Math.round((1 - bidRatio) * 100)}% Asks)`;
-              } else if (!trendOrDipValid) {
-                skipReason = `Bearish Trend (EMA 7 < EMA 21 & No Dip)`;
-              } else if (volRatio < 0.85) {
-                skipReason = `Low Vol (${volRatio}x < 0.85x)`;
-              } else if (score < 70) {
-                skipReason = `Score ${score}/100 (Below 70 Grade A Threshold)`;
-              } else if (!lastCandleGreen) {
-                skipReason = `Red Candle (Awaiting Green Confirmation)`;
-              } else {
-                skipReason = `Score ${score}/100 (Filtering A+ Setup)`;
-              }
-            }
+            let skipReason = `Score ${score}/100 (Filtering A+ Setup)`;
+            if (alreadyHoldingCoin) skipReason = `Holding ${currentPair.symbol} Position`;
+            else if (!canOpenNew) skipReason = `Max Positions Held (${(STATE.positions || []).length}/${MAX_OPEN_POSITIONS})`;
+            else if (volRatio < 0.75) skipReason = `Low Vol (${volRatio}x < 0.75x)`;
+            else if (STATE.market.rsi > 66.0 && STATE.marketType !== "FUTURES") skipReason = `Overbought Peak (RSI ${STATE.market.rsi.toFixed(1)} > 66)`;
+            else if (bidRatio < 0.46 && STATE.marketType !== "FUTURES") skipReason = `Ask Resistance (${Math.round((1 - bidRatio) * 100)}% Asks)`;
 
-            // Populate Live Trading Stream with the exact coin and matching price
             logEvent("SCAN", "RADAR", currentPair.symbol, `${score}/100`, `PASS: ${skipReason}`, `$${fmtPrice(STATE.market.price)}`);
           }
 
-          if (STATE.positions.length === 0) {
+          if ((STATE.positions || []).length === 0) {
             document.getElementById("active-symbol").textContent = currentPair.symbol;
             document.getElementById("active-side").textContent = `RADAR: ${score}/100`;
-            document.getElementById("active-pnl").textContent = STATE.confluenceDisqualified ? `DISQUALIFIED: ${STATE.confluenceDisqualifyReason}` : (volRatio < 1.15 ? `low volume (${volRatio}x < 1.15x)` : "analyzing setup (min 76 required)");
+            document.getElementById("active-pnl").textContent = STATE.marketType === "FUTURES" ? `Analyzing Long/Short flow (${score}/100 • ${volRatio}x Vol)` : `Hunting Dip/Breakout (${score}/100 • ${volRatio}x Vol)`;
             document.getElementById("active-pnl").className = "live-pnl blue-txt";
             document.getElementById("active-current").textContent = `$${fmtPrice(STATE.market.price)}`;
             document.getElementById("exec-node-sub").textContent = "SCANNING";
-            document.getElementById("exec-pill").textContent = STATE.confluenceDisqualified ? `RADAR • PASS: ${STATE.confluenceDisqualifyReason}` : `RADAR • ANALYZING ${currentPair.symbol} (${score}/100 • ${volRatio}x Vol)`;
+            document.getElementById("exec-pill").textContent = `RADAR • ANALYZING ${currentPair.symbol} (${score}/100 • ${volRatio}x Vol)`;
             document.getElementById("trade-open-badge").style.display = "none";
           }
           render();
           return;
         }
 
-        // Setup Approved! Directional Strategy Gate (Spot: Buy Only | Futures: Long & Short)
-        let side = "BUY";
-        let chosenBot = "Trend Rider";
-        let botKey = "gambler";
-        let reason = "";
-        const lev = STATE.marketType === "FUTURES" ? (STATE.leverage || 10) : 1;
-
-        if (STATE.marketType === "FUTURES") {
-          const isBearishRibbon = STATE.market.ema7 < STATE.market.ema21;
-          const isOverboughtTop = STATE.market.rsi >= 65;
-
-          if (isBearishRibbon && bidRatio < 0.49) {
-            side = "SHORT";
-            chosenBot = "Short Hunter";
-            botKey = "house";
-            reason = `⚡ Bearish Breakdown SHORT (${lev}x Lev • EMA 7 < 21 Death Cross)`;
-          } else if (isOverboughtTop) {
-            side = "SHORT";
-            chosenBot = "Short Hunter";
-            botKey = "house";
-            reason = `⚡ Overbought Top SHORT (${lev}x Lev • RSI ${STATE.market.rsi.toFixed(1)} Resistance)`;
-          } else if (STATE.market.rsi <= 38 && bidRatio >= 0.49) {
-            side = "LONG";
-            chosenBot = "Long Runner";
-            botKey = "gambler";
-            reason = `⚡ Oversold Dip LONG (${lev}x Lev • RSI ${STATE.market.rsi.toFixed(1)} Whale Bids)`;
-          } else if (isBullishRibbon) {
-            side = "LONG";
-            chosenBot = "Long Runner";
-            botKey = "gambler";
-            reason = `⚡ Bullish Ribbon LONG (${lev}x Lev • Golden Ribbon Momentum)`;
-          } else {
-            return;
-          }
-        } else {
-          // Spot Mode: Long / Buy Only
-          side = "BUY";
-          if (STATE.market.rsi <= 38 && bidRatio >= 0.50) {
-            chosenBot = "Dip Buyer";
-            botKey = "house";
-            reason = `A+ Oversold Reversal (RSI ${STATE.market.rsi.toFixed(1)} + ${Math.round(bidRatio * 100)}% Whale Bids)`;
-          } else if (isBullishRibbon && volRatio >= 1.25) {
-            chosenBot = "Trend Rider";
-            botKey = "gambler";
-            reason = `A+ Bullish Breakout (EMA Golden Ribbon + ${volRatio}x Surge)`;
-          } else if (isBullishRibbon && bidRatio >= 0.56) {
-            chosenBot = "Smart Scalper";
-            botKey = "spy";
-            reason = `A+ Whale Orderbook Imbalance (${Math.round(bidRatio * 100)}% Bids + Golden Ribbon)`;
-          } else if (isBullishRibbon) {
-            chosenBot = "Trend Rider";
-            botKey = "gambler";
-            reason = `A+ Bullish Momentum Follower (${score}/100 pts)`;
-          } else {
-            return;
-          }
-        }
-
-        // Dynamic Position Sizing (Risk-Aware: subtracts committed capital)
+        // Dynamic Position Sizing (Risk-Aware)
         const committedCapital = (STATE.positions || []).reduce((sum, p) => sum + (p.sizeUsd || 0), 0);
         const availableBalance = Math.max(0, +(STATE.balance - committedCapital).toFixed(2));
 
-        if (availableBalance < 4.50) return; // Need at least $4.50 free capital for $5 order
+        if (availableBalance < 4.00) return;
 
-        // Standardized 22% Equity Sizing (matching screenshot: 22% of equity per trade)
         let sizeUsd = +(availableBalance * 0.22).toFixed(2);
-        if (sizeUsd < 5.0 && availableBalance >= 5.0) {
-          sizeUsd = availableBalance >= 10.0 ? 5.0 : availableBalance;
+        if (availableBalance <= 15.0) {
+          // Small & starter accounts: 100% capital concentration into 1 trade
+          sizeUsd = availableBalance;
         }
 
-        if (sizeUsd < 4.95) return;
+        if (sizeUsd < 4.00) return;
 
         const sizePct = Math.round((sizeUsd / STATE.balance) * 100);
         const livePrice = STATE.market.price > 0 ? STATE.market.price : currentPair.price;
