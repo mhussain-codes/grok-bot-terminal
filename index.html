@@ -1232,9 +1232,9 @@
               <div class="detail-label">Live Market Price:</div>
               <div class="detail-val" id="active-current">-</div>
               <div class="detail-label">Binance Fee (0.2%):</div>
-              <div class="detail-val red-txt" id="active-slip">-$0.02 (0.1% Buy + 0.1% Sell)</div>
+              <div class="detail-val red-txt" id="active-slip">-$0.20 (0.1% Buy + 0.1% Sell)</div>
               <div class="detail-label">Position Size:</div>
-              <div class="detail-val" id="active-size">$5.29 (100% eq)</div>
+              <div class="detail-val" id="active-size">$100.00 (20% eq)</div>
               <div class="detail-label">Target Profit:</div>
               <div class="detail-val green-txt" id="active-target">🎯 +0.75% Net Scalp</div>
               <div class="detail-label">Safety Stop-Loss:</div>
@@ -1358,6 +1358,17 @@
         reason: `Restored active ${savedTrade.symbol} position @ $${savedTrade.entryPrice}`,
         size: `$${(savedTrade.sizeUsd || 5.0).toFixed(2)}`
       });
+    }
+
+    // Dynamic price formatting for high-value and sub-dollar coins (DOGE, XRP, ADA, PEPE, BTC)
+    function fmtPrice(p) {
+      if (typeof p !== 'number' || isNaN(p)) return '0.00';
+      if (p === 0) return '0.00';
+      if (p < 0.0001) return p.toFixed(8);
+      if (p < 0.01) return p.toFixed(6);
+      if (p < 1) return p.toFixed(4);
+      if (p < 10) return p.toFixed(3);
+      return p.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     const STATE = {
@@ -1501,7 +1512,7 @@
           STATE.market.vol24h = parseFloat(td.volume);
 
           const scanEl = document.getElementById("scanner-detail");
-          if (scanEl) scanEl.textContent = `${symbol} • $${STATE.market.price.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+          if (scanEl) scanEl.textContent = `${symbol} • $${fmtPrice(STATE.market.price)}`;
         }
 
         if (depthRes && depthRes.ok) {
@@ -1509,14 +1520,14 @@
           if (dd.bids && dd.asks && dd.bids.length && dd.asks.length) {
             const bestBid = parseFloat(dd.bids[0][0]);
             const bestAsk = parseFloat(dd.asks[0][0]);
-            STATE.market.spread = +(bestAsk - bestBid).toFixed(2);
+            STATE.market.spread = Math.max(0.000001, +(bestAsk - bestBid));
             
             const sumBids = dd.bids.reduce((acc, b) => acc + parseFloat(b[1]), 0);
             const sumAsks = dd.asks.reduce((acc, a) => acc + parseFloat(a[1]), 0);
             STATE.market.bidRatio = (sumBids + sumAsks) > 0 ? +(sumBids / (sumBids + sumAsks)).toFixed(2) : 0.50;
 
             const rugEl = document.getElementById("rug-sub");
-            if (rugEl) rugEl.textContent = `Spread $${STATE.market.spread.toFixed(2)} • Bids ${Math.round(STATE.market.bidRatio * 100)}%`;
+            if (rugEl) rugEl.textContent = `Spread $${fmtPrice(STATE.market.spread)} • Bids ${Math.round(STATE.market.bidRatio * 100)}%`;
           }
         }
 
@@ -1559,11 +1570,20 @@
       const rs = avgGain / avgLoss;
       STATE.market.rsi = +(100 - (100 / (1 + rs))).toFixed(1);
 
-      // 4. Volume Surge Ratio (Current volume vs 10-bar average)
-      const last10Vol = vols.slice(-10);
-      const avgVol = last10Vol.reduce((a, b) => a + b, 0) / Math.max(1, last10Vol.length);
-      const curVol = vols[vols.length - 1] || avgVol;
-      STATE.market.volRatio = avgVol > 0 ? +(curVol / avgVol).toFixed(2) : 1.0;
+      // 4. Volume Surge Ratio (Normalize in-progress candle & compare to completed bars)
+      const completedVols = vols.slice(-16, -1);
+      const avgVol = completedVols.reduce((a, b) => a + b, 0) / Math.max(1, completedVols.length);
+      
+      const lastClosedVol = vols[vols.length - 2] || avgVol;
+      const formingVol = vols[vols.length - 1] || 0;
+      
+      // Project the current forming candle's volume based on elapsed seconds in current minute
+      const elapsedSecs = Math.max(5, new Date().getSeconds());
+      const projectedCurVol = formingVol * (60 / elapsedSecs);
+
+      // Effective volume: Max of last fully completed bar or the live projected volume
+      const effectiveVol = Math.max(lastClosedVol, projectedCurVol);
+      STATE.market.volRatio = avgVol > 0 ? +(effectiveVol / avgVol).toFixed(2) : 1.0;
     }
 
     // =============================================================
@@ -1766,7 +1786,7 @@
       const emaValEl = document.getElementById("sig-ema-val");
       const emaDescEl = document.getElementById("sig-ema-desc");
       if (emaPtsEl) emaPtsEl.textContent = `${emaPts} / 25`;
-      const formatEma = val => (typeof val === 'number' ? val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : val);
+      const formatEma = val => fmtPrice(val);
       if (emaValEl) emaValEl.textContent = `EMA 7: $${formatEma(ema7)} / 21: $${formatEma(ema21)}`;
       if (emaDescEl) emaDescEl.textContent = emaDesc;
 
@@ -2053,7 +2073,7 @@
 
             // Populate Live Trading Stream every 4 seconds so terminal is actively alive during scanning
             if (STATE.seconds % 4 === 0) {
-              logEvent("SCAN", "RADAR", currentPair.symbol, `${score}/100`, `PASS: ${skipReason}`, `$${STATE.market.price.toFixed(2)}`);
+              logEvent("SCAN", "RADAR", currentPair.symbol, `${score}/100`, `PASS: ${skipReason}`, `$${fmtPrice(STATE.market.price)}`);
             }
           }
 
@@ -2061,7 +2081,7 @@
           document.getElementById("active-side").textContent = `RADAR: ${score}/100`;
           document.getElementById("active-pnl").textContent = STATE.confluenceDisqualified ? `DISQUALIFIED: ${STATE.confluenceDisqualifyReason}` : (volRatio < 1.05 ? `low volume (${volRatio}x < 1.05x)` : "analyzing setup (min 75 required)");
           document.getElementById("active-pnl").className = "live-pnl blue-txt";
-          document.getElementById("active-current").textContent = `$${STATE.market.price.toLocaleString('en-US')}`;
+          document.getElementById("active-current").textContent = `$${fmtPrice(STATE.market.price)}`;
           document.getElementById("exec-node-sub").textContent = "SCANNING";
           document.getElementById("exec-pill").textContent = STATE.confluenceDisqualified ? `RADAR • PASS: ${STATE.confluenceDisqualifyReason}` : `RADAR • ANALYZING ${currentPair.symbol} (${score}/100 • ${volRatio}x Vol)`;
           document.getElementById("trade-open-badge").style.display = "none";
@@ -2311,8 +2331,8 @@
         pnlEl.textContent = `${pctSign}${STATE.activeTrade.pnlPct}% (Net ${dollarSign}${Math.abs(netUsd).toFixed(2)})`;
         pnlEl.className = STATE.activeTrade.pnlPct >= 0 ? "live-pnl green-txt" : "live-pnl red-txt";
         
-        document.getElementById("active-entry").textContent = `$${STATE.activeTrade.entryPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        document.getElementById("active-current").textContent = `$${STATE.activeTrade.currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        document.getElementById("active-entry").textContent = `$${fmtPrice(STATE.activeTrade.entryPrice)}`;
+        document.getElementById("active-current").textContent = `$${fmtPrice(STATE.activeTrade.currentPrice)}`;
         document.getElementById("active-size").textContent = `$${STATE.activeTrade.sizeUsd.toFixed(2)} (${STATE.activeTrade.sizePct}% eq)`;
         document.getElementById("active-reason").textContent = STATE.activeTrade.reason;
         
@@ -2351,7 +2371,7 @@
         document.getElementById("active-symbol").textContent = "SCANNING";
         document.getElementById("active-side").textContent = "BINANCE SPOT";
         document.getElementById("active-pnl").textContent = "hunting dip / breakout";
-        document.getElementById("active-current").textContent = `$${STATE.market.price.toLocaleString('en-US')}`;
+        document.getElementById("active-current").textContent = `$${fmtPrice(STATE.market.price)}`;
         document.getElementById("exec-node-sub").textContent = "READY";
         document.getElementById("exec-pill").textContent = "AUTO-TRADER • HUNTING A+ CONFLUENCE";
         document.getElementById("trade-open-badge").style.display = "none";
@@ -2370,15 +2390,27 @@
           reasonEl.textContent = "Waiting for A+ Confluence trigger...";
           reasonEl.className = "detail-val blue-txt";
         }
+        let dynOrderSize = 10.0;
+        let dynOrderPct = 20;
+        if (STATE.balance >= 50.0) {
+          dynOrderSize = +(STATE.balance * 0.20).toFixed(2);
+          dynOrderPct = 20;
+        } else if (STATE.balance >= 10.0) {
+          dynOrderSize = 10.0;
+          dynOrderPct = Math.round((10.0 / STATE.balance) * 100);
+        } else {
+          dynOrderSize = +(STATE.balance).toFixed(2);
+          dynOrderPct = 100;
+        }
+        const estFee = +(dynOrderSize * 0.002).toFixed(2);
+
         const activeSizeEl = document.getElementById("active-size");
         if (activeSizeEl) {
-          if (STATE.balance >= 10.0) {
-            activeSizeEl.textContent = "$10.00 (Safe Size)";
-          } else if (STATE.balance >= 5.0) {
-            activeSizeEl.textContent = `$${STATE.balance.toFixed(2)} (100% eq)`;
-          } else {
-            activeSizeEl.textContent = "$0.00";
-          }
+          activeSizeEl.textContent = `$${dynOrderSize.toFixed(2)} (${dynOrderPct}% eq)`;
+        }
+        const slipEl = document.getElementById("active-slip");
+        if (slipEl) {
+          slipEl.textContent = `-$${estFee.toFixed(2)} (0.1% Buy + 0.1% Sell)`;
         }
       }
 
