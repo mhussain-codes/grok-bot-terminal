@@ -1492,7 +1492,7 @@
       confluenceBreakdown: { rsiPts: 0, emaPts: 0, volPts: 0, depthPts: 0 },
       logs: savedLogs,
       positions: savedTrade ? [savedTrade] : [],
-      maxPositions: 3,
+      maxPositions: 1,
       pairs: [
         { symbol: "BTCUSDT",  name: "Bitcoin",  price: 77000.0 },
         { symbol: "ETHUSDT",  name: "Ethereum", price: 2450.0 },
@@ -2342,7 +2342,7 @@
           STATE.maxObservedPnl = 0.0;
           saveUserState();
 
-          logEvent("BOUGHT", chosenBot, currentPair.symbol, "FEE: $0.02", `[SCORE ${score}/100: RSI ${bDown.rsiPts}+EMA ${bDown.emaPts}+Vol ${bDown.volPts}+Depth ${bDown.depthPts}] ${reason}`, `$${sizeUsd.toFixed(2)}`);
+          logEvent("BOUGHT", chosenBot, currentPair.symbol, `FEE: $${(sizeUsd * 0.002).toFixed(2)}`, `[SCORE ${score}/100: RSI ${bDown.rsiPts}+EMA ${bDown.emaPts}+Vol ${bDown.volPts}+Depth ${bDown.depthPts}] ${reason}`, `$${sizeUsd.toFixed(2)}`);
         }
       } else if (STATE.balance > 0 && STATE.balance < 5.0 && !STATE.activeTrade) {
         document.getElementById("active-symbol").textContent = "BALANCE < $5";
@@ -2528,7 +2528,7 @@
       if (sizerDetail) {
         if (STATE.balance >= 50.0) {
           const orderSz = (STATE.balance * 0.20).toFixed(2);
-          sizerDetail.innerHTML = `Max 20% equity • Up to 3 positions<br><span id="sizer-subtext">$${orderSz} order size</span>`;
+          sizerDetail.innerHTML = `Max 20% equity • 1 active position at a time<br><span id="sizer-subtext">$${orderSz} order size</span>`;
         } else if (STATE.balance >= 10.0) {
           sizerDetail.innerHTML = `Min safe size: $10.00 • Max 20% equity<br><span id="sizer-subtext">$10.00 safe order</span>`;
         } else if (STATE.balance >= 5.0) {
