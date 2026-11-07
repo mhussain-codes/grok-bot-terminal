@@ -1113,7 +1113,7 @@
             <span class="agent-state-tag tag-cyan">ACTIVE</span>
           </div>
           <div class="agent-role">Buys low & auto-sells for profit</div>
-          <div class="agent-detail"><span class="cyan-txt">Target: +0.30% Net Scalp</span><br><span id="exec-subtext">HUNTING ENTRY</span></div>
+          <div class="agent-detail"><span class="cyan-txt">Target: +1.25% Net Spot Scalp</span><br><span id="exec-subtext">HUNTING ENTRY</span></div>
         </div>
 
         <!-- 5: PROFIT AUDITOR -->
@@ -1295,9 +1295,9 @@
               <div class="detail-label">Position Size:</div>
               <div class="detail-val" id="active-size">$20.00 (20% eq)</div>
               <div class="detail-label">Target Profit:</div>
-              <div class="detail-val green-txt" id="active-target">🎯 +0.30% Net Scalp</div>
+              <div class="detail-val green-txt" id="active-target">🎯 +1.25% Net Spot Scalp</div>
               <div class="detail-label">Safety Stop-Loss:</div>
-              <div class="detail-val red-txt" id="active-stop">🛑 -0.40% Net (Trail Lock @ +0.18%)</div>
+              <div class="detail-val red-txt" id="active-stop">🛑 -0.85% Net (Breakeven @ +0.55% • Trail)</div>
               <div class="detail-label">Entry Reason:</div>
               <div class="detail-val blue-txt" id="active-reason" style="grid-column: span 1;">Waiting for A+ Confluence trigger...</div>
             </div>
@@ -2156,12 +2156,12 @@
       }
 
       // =========================================================
-      // 2. FAST SCALPING TARGETS & TRAILING PROFIT LOCK MONITOR
+      // 2. INSTITUTIONAL SPOT PROFIT RUNNER & RISK SYSTEM
       // =========================================================
       const FEE_PCT = 0.20; // 0.1% Buy + 0.1% Sell
-      const TARGET_NET_PROFIT = 0.30; // +0.30% Net (+0.50% Gross move) -> Quick Scalp Win
-      const STOP_LOSS_NET = -0.40; // -0.40% Net Stop-Loss
-      const MAX_HOLD_MINUTES = 12; // Time-Stop: 12 min baad green ho toh close kar de
+      const TARGET_NET_PROFIT = 1.25; // +1.25% Net (+1.45% Gross) -> True Spot Scalp Win (+$1.25+ on $100 order)
+      const STOP_LOSS_NET = -0.85; // -0.85% Net Stop-Loss (gives 0.65% gross buffer to absorb 1m wicks & support retests)
+      const MAX_HOLD_MINUTES = 25; // Time-Stop: 25 min baad agar solid green ho toh book kar ke capital free kare
 
       for (let i = STATE.positions.length - 1; i >= 0; i--) {
         const pos = STATE.positions[i];
@@ -2181,28 +2181,36 @@
         if (pos.tradeDuration % 60 === 0) {
           const mins = Math.floor(pos.tradeDuration / 60);
           const pSign = netPct >= 0 ? "+" : "";
-          logEvent("HOLD", pos.bot, pos.symbol, `${pSign}${netPct}%`, `Monitoring @ $${fmtPrice(livePrice)} • TP +0.30% / Trail / SL -0.40% (${mins}m held)`, `$${pos.sizeUsd.toFixed(2)}`);
+          logEvent("HOLD", pos.bot, pos.symbol, `${pSign}${netPct}%`, `Monitoring @ $${fmtPrice(livePrice)} • TP +1.25% / Trail / SL -0.85% (${mins}m held)`, `$${pos.sizeUsd.toFixed(2)}`);
         }
 
-        // 1. Direct Take-Profit Hit (+0.30% Net)
+        // 1. Direct Take-Profit Hit (+1.25% Net = +$1.25+ Real Profit)
         const hitTakeProfit = netPct >= TARGET_NET_PROFIT;
-        // 2. Trailing Profit Lock: Agar +0.18% Net tak gaya aur wapas +0.08% par aaya, profit book kar lo
-        const hitTrailingProfit = pos.peakNetPct >= 0.18 && netPct <= 0.08;
-        // 3. Time-Based Scalp Win: Held >= 12 mins and in profit (> +0.05% Net)
-        const hitTimeScalpWin = heldMinutes >= MAX_HOLD_MINUTES && netPct >= 0.05;
-        // 4. Strict Stop-Loss Hit (-0.40% Net)
+        // 2. High-Profit Trailing Lock: Peak >= +0.90% Net reach kiya aur peak se 0.25% pullback kiya
+        const hitTrailingProfit = pos.peakNetPct >= 0.90 && netPct <= (pos.peakNetPct - 0.25);
+        // 3. Breakeven Profit Defense: Agar +0.55% Net reach kiya aur price retrace ho rahi hai, lock at +0.20% Net (Zero Loss Guarantee!)
+        const hitBreakevenLock = pos.peakNetPct >= 0.55 && netPct <= 0.20;
+        // 4. Time-Based Scalp Win: Held >= 25 mins and in solid profit (>= +0.35% Net)
+        const hitTimeScalpWin = heldMinutes >= MAX_HOLD_MINUTES && netPct >= 0.35;
+        // 5. Stale Chop Exit: Held >= 40 mins and price is negative (prevent dead bags)
+        const hitStaleExit = heldMinutes >= 40 && netPct < 0;
+        // 6. Professional Risk Stop-Loss (-0.85% Net)
         const hitStopLoss = netPct <= STOP_LOSS_NET;
 
-        if (hitTakeProfit || hitTrailingProfit || hitTimeScalpWin || hitStopLoss) {
+        if (hitTakeProfit || hitTrailingProfit || hitBreakevenLock || hitTimeScalpWin || hitStaleExit || hitStopLoss) {
           let exitReason = "";
           if (hitTakeProfit) {
-            exitReason = `🎯 SCALP TAKE PROFIT (+${netPct}% Net)`;
+            exitReason = `🎯 SPOT TAKE PROFIT (+${netPct}% Net • Target Hit)`;
           } else if (hitTrailingProfit) {
-            exitReason = `🛡️ TRAILING PROFIT LOCK (+${netPct}% Net locked from peak +${pos.peakNetPct}%)`;
+            exitReason = `🚀 TRAILING PROFIT LOCK (+${netPct}% Net locked from peak +${pos.peakNetPct}%)`;
+          } else if (hitBreakevenLock) {
+            exitReason = `🛡️ BREAKEVEN DEFENSE (+${netPct}% Net locked • Zero Loss)`;
           } else if (hitTimeScalpWin) {
-            exitReason = `⏱️ TIME SCALP WIN (+${netPct}% Net - 12m profit release)`;
+            exitReason = `⏱️ TIME SCALP WIN (+${netPct}% Net • 25m profit release)`;
+          } else if (hitStaleExit) {
+            exitReason = `⏳ STALE CHOP TIMEOUT (${netPct}% Net • 40m capital release)`;
           } else if (hitStopLoss) {
-            exitReason = `🛑 SCALP STOP LOSS (${netPct}% Net risk control)`;
+            exitReason = `🛑 SAFETY STOP LOSS (${netPct}% Net risk control)`;
           }
 
           await closePosition(pos, exitReason, netUsd, netPct);
@@ -2241,15 +2249,22 @@
       }
 
       // =========================================================
-      // 4. SCAN & ENTER SPOT TRADES (UP TO 4 POSITIONS, SCORE >= 72)
+      // 4. SCAN & ENTER SPOT TRADES (UP TO 4 POSITIONS, SCORE >= 76)
       // =========================================================
       if (STATE.balance >= 5.0) {
         const score = STATE.confluenceScore || 0;
         const volRatio = STATE.market.volRatio || 1.0;
+        const bidRatio = STATE.market.bidRatio || 0.50;
         const alreadyHoldingCoin = STATE.positions.some(pos => pos.symbol === currentPair.symbol);
+        const isBullishRibbon = STATE.market.ema7 > STATE.market.ema21;
+        const isDeepOversoldDip = STATE.market.rsi <= 38 && (STATE.market.rsi >= (STATE.market.prevRsi || STATE.market.rsi));
 
-        // Confluence Gate: Require score >= 72 AND volRatio >= 1.05 AND NOT Disqualified AND not holding this coin
-        if (alreadyHoldingCoin || STATE.confluenceDisqualified || score < 72 || volRatio < 1.05 || STATE.market.rsi > 70.0) {
+        // Professional Confluence Gate:
+        // Must have Score >= 76 AND volRatio >= 1.15 AND bidRatio >= 0.48 AND (Bullish Ribbon OR Oversold Bounce) AND NOT Disqualified
+        const trendOrDipValid = isBullishRibbon || isDeepOversoldDip;
+        const entryDisqualified = STATE.confluenceDisqualified || score < 76 || volRatio < 1.15 || bidRatio < 0.48 || !trendOrDipValid || STATE.market.rsi > 68.0;
+
+        if (alreadyHoldingCoin || entryDisqualified) {
           // Increment SKIPPED DUMPS on each evaluation cycle
           if (STATE.seconds % 2 === 0) {
             STATE.filtered++;
@@ -2262,12 +2277,18 @@
                 skipReason = `Heavy Sell Dump (${volRatio}x Vol)`;
               } else if (volRatio < 0.60) {
                 skipReason = `Dead Volume (${volRatio}x)`;
-              } else if (STATE.market.rsi > 70.0) {
-                skipReason = `Overbought Peak (RSI ${STATE.market.rsi.toFixed(1)} > 70)`;
-              } else if (score < 50) {
-                skipReason = `Weak Edge (Score ${score}/100)`;
+              } else if (STATE.market.rsi > 68.0) {
+                skipReason = `Overbought Peak (RSI ${STATE.market.rsi.toFixed(1)} > 68)`;
+              } else if (bidRatio < 0.48) {
+                skipReason = `Ask Wall Resistance (${Math.round((1 - bidRatio) * 100)}% Asks)`;
+              } else if (!trendOrDipValid) {
+                skipReason = `Bearish Trend (EMA 7 < EMA 21 & No Dip)`;
+              } else if (volRatio < 1.15) {
+                skipReason = `Low Momentum Vol (${volRatio}x < 1.15x)`;
+              } else if (score < 76) {
+                skipReason = `Score ${score}/100 (Below 76 Grade A Threshold)`;
               } else {
-                skipReason = `Score ${score}/100 (Below 72 Threshold)`;
+                skipReason = `Score ${score}/100 (Filtering for High-Probability Setup)`;
               }
             }
 
@@ -2278,7 +2299,7 @@
           if (STATE.positions.length === 0) {
             document.getElementById("active-symbol").textContent = currentPair.symbol;
             document.getElementById("active-side").textContent = `RADAR: ${score}/100`;
-            document.getElementById("active-pnl").textContent = STATE.confluenceDisqualified ? `DISQUALIFIED: ${STATE.confluenceDisqualifyReason}` : (volRatio < 1.05 ? `low volume (${volRatio}x < 1.05x)` : "analyzing setup (min 72 required)");
+            document.getElementById("active-pnl").textContent = STATE.confluenceDisqualified ? `DISQUALIFIED: ${STATE.confluenceDisqualifyReason}` : (volRatio < 1.15 ? `low volume (${volRatio}x < 1.15x)` : "analyzing setup (min 76 required)");
             document.getElementById("active-pnl").className = "live-pnl blue-txt";
             document.getElementById("active-current").textContent = `$${fmtPrice(STATE.market.price)}`;
             document.getElementById("exec-node-sub").textContent = "SCANNING";
@@ -2294,22 +2315,22 @@
         let botKey = "house";
         let reason = "";
 
-        if (STATE.market.rsi <= 35 && STATE.market.bidRatio >= 0.50) {
+        if (STATE.market.rsi <= 38 && bidRatio >= 0.50) {
           chosenBot = "Dip Buyer";
           botKey = "house";
-          reason = `A+ Oversold Dip (RSI ${STATE.market.rsi.toFixed(1)} <= 35) + ${Math.round(STATE.market.bidRatio * 100)}% Whale Buy Support`;
-        } else if (STATE.market.ema7 > STATE.market.ema21 && volRatio >= 1.20) {
+          reason = `A+ Oversold Reversal (RSI ${STATE.market.rsi.toFixed(1)} + ${Math.round(bidRatio * 100)}% Whale Bids)`;
+        } else if (isBullishRibbon && volRatio >= 1.30) {
           chosenBot = "Trend Rider";
           botKey = "gambler";
-          reason = `A+ Bullish Trend Alignment + ${volRatio}x Volume Surge`;
-        } else if (STATE.market.bidRatio >= 0.54) {
+          reason = `A+ Bullish Breakout (EMA Golden Ribbon + ${volRatio}x Surge)`;
+        } else if (bidRatio >= 0.55) {
           chosenBot = "Smart Scalper";
           botKey = "spy";
-          reason = `A+ Whale Depth Absorption (${Math.round(STATE.market.bidRatio * 100)}% Bids)`;
+          reason = `A+ Whale Depth Absorption (${Math.round(bidRatio * 100)}% Bids + ${volRatio}x Vol)`;
         } else {
           chosenBot = "Smart Scalper";
           botKey = "spy";
-          reason = `A+ Confluence Setup (${score}/100 pts) + Momentum`;
+          reason = `A+ High-Confluence Setup (${score}/100 pts • Momentum)`;
         }
 
         // Dynamic Position Sizing (20% equity for up to 4 parallel positions)
@@ -2602,7 +2623,7 @@
         if (emergencyBtn) emergencyBtn.style.display = "inline-block";
         const execSubEl = document.getElementById("exec-subtext");
         if (execSubEl) {
-          execSubEl.textContent = `HOLDING (${(STATE.positions || []).length}/4) • TP +0.30%`;
+          execSubEl.textContent = `HOLDING (${(STATE.positions || []).length}/4) • TP +1.25%`;
           execSubEl.style.color = "#34d399";
         }
 
