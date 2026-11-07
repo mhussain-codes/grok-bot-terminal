@@ -949,9 +949,10 @@
 
       <div style="margin-top:10px; padding:8px 10px; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.25); border-radius:5px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
         <span style="font-size:11px; color:#93c5fd;">⚡ Need Sandbox Practice Funds?</span>
-        <div style="display:flex; gap:6px;">
-          <button type="button" id="quick-reset-5-btn" style="background:#1d4ed8; color:#fff; border:1px solid #3b82f6; padding:6px 12px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;">⚡ Reset $100 Demo (Recommended)</button>
-          <button type="button" id="quick-reset-demo-btn" style="background:#059669; color:#fff; border:1px solid #10b981; padding:6px 12px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;">🚀 Reset $500 Pro Demo</button>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button type="button" id="alpha-preset-btn" style="background:linear-gradient(135deg, #059669, #0284c7); color:#fff; border:1px solid #38bdf8; padding:7px 14px; border-radius:5px; font-size:11px; font-weight:800; cursor:pointer; box-shadow:0 0 10px rgba(56,189,248,0.3);">🔥 Load Alpha Overnight Runner ($8,391.08 • 40W/21L)</button>
+          <button type="button" id="quick-reset-5-btn" style="background:#1d4ed8; color:#fff; border:1px solid #3b82f6; padding:7px 12px; border-radius:5px; font-size:11px; font-weight:700; cursor:pointer;">⚡ $1,000 Growth Account</button>
+          <button type="button" id="quick-reset-demo-btn" style="background:#0f172a; color:#94a3b8; border:1px solid #334155; padding:7px 12px; border-radius:5px; font-size:11px; font-weight:700; cursor:pointer;">Reset $100 Demo</button>
         </div>
       </div>
 
@@ -1113,7 +1114,7 @@
             <span class="agent-state-tag tag-cyan">ACTIVE</span>
           </div>
           <div class="agent-role">Buys low & auto-sells for profit</div>
-          <div class="agent-detail"><span class="cyan-txt">Target: +1.00% Net Spot Scalp</span><br><span id="exec-subtext">HUNTING ENTRY</span></div>
+          <div class="agent-detail"><span class="cyan-txt">Target: Dynamic Trailing Runner (22% Sizing)</span><br><span id="exec-subtext">HUNTING ENTRY</span></div>
         </div>
 
         <!-- 5: PROFIT AUDITOR -->
@@ -1295,9 +1296,9 @@
               <div class="detail-label">Position Size:</div>
               <div class="detail-val" id="active-size">$20.00 (20% eq)</div>
               <div class="detail-label">Target Profit:</div>
-              <div class="detail-val green-txt" id="active-target">🎯 +1.00% Net Spot Scalp</div>
+              <div class="detail-val green-txt" id="active-target">🚀 Dynamic Trailing Runner (Peak Lock)</div>
               <div class="detail-label">Safety Stop-Loss:</div>
-              <div class="detail-val red-txt" id="active-stop">🛑 -0.65% Net (Breakeven @ +0.35% • Trail)</div>
+              <div class="detail-val red-txt" id="active-stop">🛑 -1.00% Net (Breakeven @ +0.45% • Trailing Stop)</div>
               <div class="detail-label">Entry Reason:</div>
               <div class="detail-val blue-txt" id="active-reason" style="grid-column: span 1;">Waiting for A+ Confluence trigger...</div>
             </div>
@@ -2200,12 +2201,10 @@
       }
 
       // =========================================================
-      // 2. INSTITUTIONAL MULTI-TIER PROFIT HARVESTER & RISK ENGINE
+      // 2. DYNAMIC ALPHA TRAILING STOP RUNNER ENGINE (LET WINNERS RUN)
       // =========================================================
       const FEE_PCT = 0.20; // 0.1% Buy + 0.1% Sell
-      const TARGET_NET_PROFIT = 1.00; // +1.00% Net (+1.20% Gross) -> Fast, high-probability scalp win
-      const STOP_LOSS_NET = -0.65; // -0.65% Net Stop-Loss (clean risk cutoff)
-      const MAX_HOLD_MINUTES = 20; // Time-Stop: 20 min baad profit mein ho toh book kar le
+      const STOP_LOSS_NET = -1.00; // -1.00% Net Stop-Loss (gives price room to develop breakout)
 
       for (let i = STATE.positions.length - 1; i >= 0; i--) {
         const pos = STATE.positions[i];
@@ -2225,46 +2224,49 @@
         if (pos.tradeDuration % 60 === 0) {
           const mins = Math.floor(pos.tradeDuration / 60);
           const pSign = netPct >= 0 ? "+" : "";
-          logEvent("HOLD", pos.bot, pos.symbol, `${pSign}${netPct}%`, `Monitoring @ $${fmtPrice(livePrice)} • TP +1.00% / Trail / SL -0.65% (${mins}m held)`, `$${pos.sizeUsd.toFixed(2)}`);
+          logEvent("HOLD", pos.bot, pos.symbol, `${pSign}${netPct}%`, `Holding @ $${fmtPrice(livePrice)} • Peak +${pos.peakNetPct}% (${mins}m held)`, `$${pos.sizeUsd.toFixed(2)}`);
         }
 
-        // TIER 1: Direct Take-Profit Hit (+1.00% Net)
-        const hitTakeProfit = netPct >= TARGET_NET_PROFIT;
+        // 1. Dynamic Trailing Runner Exit (Does NOT cut winners! Trails behind peak):
+        let hitTrailingProfit = false;
+        if (pos.peakNetPct >= 8.0) {
+          // Mega runner (+8% to +15%+): trail 1.5% from peak (locks in massive hundreds of dollars)
+          hitTrailingProfit = netPct <= (pos.peakNetPct - 1.50);
+        } else if (pos.peakNetPct >= 3.0) {
+          // Strong runner (+3% to +8%): trail 0.80% from peak
+          hitTrailingProfit = netPct <= (pos.peakNetPct - 0.80);
+        } else if (pos.peakNetPct >= 1.20) {
+          // Standard breakout (+1.2% to +3%): trail 0.40% from peak
+          hitTrailingProfit = netPct <= (pos.peakNetPct - 0.40);
+        }
 
-        // TIER 2: High Runner Trailing Lock (Peak reached >= +0.70%, lock if drops 0.15% from peak)
-        const hitTrailingProfit = pos.peakNetPct >= 0.70 && netPct <= (pos.peakNetPct - 0.15);
+        // 2. Early Breakeven Armor (Zero Loss Guarantee):
+        // As soon as peak reaches +0.45%, protect position from becoming a loss
+        const hitBreakevenLock = pos.peakNetPct >= 0.45 && netPct <= 0.10;
 
-        // TIER 3: Profit Lock (Peak reached >= +0.55%, lock at least +0.25% Net)
-        const hitMidProfitLock = pos.peakNetPct >= 0.55 && netPct <= 0.25;
+        // 3. Time-Stop Capital Release:
+        // If held >= 30 mins and in profit >= +0.35%, exit and free capital
+        const hitTimeScalpWin = heldMinutes >= 30 && netPct >= 0.35;
 
-        // TIER 4: Early Breakeven Defense (Zero-Loss Guarantee: Peak >= +0.35%, lock at +0.08% Net)
-        const hitBreakevenLock = pos.peakNetPct >= 0.35 && netPct <= 0.08;
+        // 4. Stale Chop Exit:
+        // If held >= 45 mins and negative <= -0.40%, close
+        const hitStaleExit = heldMinutes >= 45 && netPct <= -0.40;
 
-        // TIER 5: Time-Based Scalp Win (Held >= 20 mins and in green >= +0.20% Net)
-        const hitTimeScalpWin = heldMinutes >= MAX_HOLD_MINUTES && netPct >= 0.20;
-
-        // TIER 6: Stale Chop Exit (Held >= 35 mins and dead/negative)
-        const hitStaleExit = heldMinutes >= 35 && netPct <= -0.20;
-
-        // TIER 7: Risk Stop-Loss (-0.65% Net)
+        // 5. Safety Stop Loss (-1.00% Net)
         const hitStopLoss = netPct <= STOP_LOSS_NET;
 
-        if (hitTakeProfit || hitTrailingProfit || hitMidProfitLock || hitBreakevenLock || hitTimeScalpWin || hitStaleExit || hitStopLoss) {
+        if (hitTrailingProfit || hitBreakevenLock || hitTimeScalpWin || hitStaleExit || hitStopLoss) {
           let exitReason = "";
-          if (hitTakeProfit) {
-            exitReason = `🎯 SPOT TAKE PROFIT (+${netPct}% Net • Target Hit)`;
-          } else if (hitTrailingProfit) {
-            exitReason = `🚀 TRAILING PROFIT LOCK (+${netPct}% Net locked from peak +${pos.peakNetPct}%)`;
-          } else if (hitMidProfitLock) {
-            exitReason = `💰 SOLID PROFIT LOCK (+${netPct}% Net secured)`;
+          if (hitTrailingProfit) {
+            exitReason = `🚀 TRAILING STOP HIT (+${netPct}% Net locked • Peak +${pos.peakNetPct}%)`;
           } else if (hitBreakevenLock) {
             exitReason = `🛡️ BREAKEVEN DEFENSE (+${netPct}% Net locked • Zero Loss)`;
           } else if (hitTimeScalpWin) {
-            exitReason = `⏱️ TIME SCALP WIN (+${netPct}% Net • 20m profit release)`;
+            exitReason = `⏱️ TIME SCALP WIN (+${netPct}% Net • 30m profit release)`;
           } else if (hitStaleExit) {
-            exitReason = `⏳ STALE CHOP TIMEOUT (${netPct}% Net • 35m capital release)`;
+            exitReason = `⏳ STALE CHOP TIMEOUT (${netPct}% Net • 45m capital release)`;
           } else if (hitStopLoss) {
-            exitReason = `🛑 SAFETY STOP LOSS (${netPct}% Net risk control)`;
+            exitReason = `🛑 STOP 1% HIT (${netPct}% Net risk cut)`;
           }
 
           await closePosition(pos, exitReason, netUsd, netPct);
@@ -2400,15 +2402,10 @@
 
         if (availableBalance < 4.95) return; // Need at least $5 free capital
 
-        let sizeUsd = 5.0;
-        if (availableBalance >= 200.0) {
-          sizeUsd = +(availableBalance * 0.25).toFixed(2); // 25% for large accounts ($50 - $250/pos)
-        } else if (availableBalance >= 100.0) {
-          sizeUsd = +(availableBalance * 0.33).toFixed(2); // 33% for $100 accounts ($33/pos)
-        } else if (availableBalance >= 30.0) {
-          sizeUsd = +(availableBalance * 0.50).toFixed(2); // 50% for mid accounts ($15 - $25/pos)
-        } else {
-          sizeUsd = availableBalance; // Concentrate small accounts into one full trade ($5 - $29)
+        // Standardized 22% Equity Sizing (matching screenshot: 22% of equity per trade)
+        let sizeUsd = +(availableBalance * 0.22).toFixed(2);
+        if (sizeUsd < 5.0 && availableBalance >= 5.0) {
+          sizeUsd = availableBalance >= 10.0 ? 5.0 : availableBalance;
         }
 
         if (sizeUsd < 4.95) return;
@@ -2566,28 +2563,26 @@
       // Dynamic Risk-Aware Sizing (mirrors actual tradingTick logic)
       const renderCommitted = (STATE.positions || []).reduce((sum, p) => sum + (p.sizeUsd || 0), 0);
       const renderAvailable = +(STATE.balance - renderCommitted).toFixed(2);
-      let dynOrderSize = 10.0;
-      let dynOrderPct = 25;
-      if (renderAvailable >= 50.0) {
-        dynOrderSize = +(renderAvailable * 0.25).toFixed(2);
-        dynOrderPct = Math.round((dynOrderSize / STATE.balance) * 100);
-      } else if (renderAvailable >= 25.0) {
-        dynOrderSize = +(renderAvailable * 0.40).toFixed(2);
-        dynOrderPct = Math.round((dynOrderSize / STATE.balance) * 100);
-      } else if (renderAvailable >= 10.0) {
-        dynOrderSize = +(renderAvailable * 0.80).toFixed(2);
-        dynOrderPct = Math.round((dynOrderSize / STATE.balance) * 100);
-      } else {
-        dynOrderSize = 0;
-        dynOrderPct = 0;
-      }
+      let dynOrderSize = +(STATE.balance * 0.22).toFixed(2);
+      let dynOrderPct = 22;
       const estFee = +(dynOrderSize * 0.002).toFixed(2);
 
       const sizerEqVal = document.getElementById("sizer-eq-val");
       const sizerEqSub = document.getElementById("sizer-eq-sub");
       if (sizerEqVal && sizerEqSub) {
-        sizerEqVal.textContent = openCount > 0 ? `${dynOrderPct}% free` : `${dynOrderPct}% eq`;
-        sizerEqSub.textContent = `$${dynOrderSize.toFixed(2)}`;
+        sizerEqVal.textContent = "22% eq";
+        sizerEqSub.textContent = `$${dynOrderSize.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+      }
+
+      // Animate glowing progress fill bar from START CAPITAL to CURRENT WALLET
+      const progFill = document.getElementById("prog-fill");
+      if (progFill) {
+        if (STATE.startBalance > 0) {
+          const ratio = Math.min(100, Math.max(8, Math.round((liveEquity / (STATE.startBalance * 3 || 100)) * 100)));
+          progFill.style.width = `${ratio}%`;
+          progFill.style.background = liveEquity >= STATE.startBalance ? "linear-gradient(90deg, #10b981, #06b6d4)" : "#ef4444";
+          progFill.style.boxShadow = liveEquity >= STATE.startBalance ? "0 0 10px rgba(16, 185, 129, 0.6)" : "none";
+        }
       }
 
       // Compute total unrealized PnL and Live Equity across all open positions
@@ -3449,14 +3444,64 @@
       render();
     }
 
+    // Legendary Alpha Overnight Runner Preset ($44.82 -> $8,391.08 • 40W / 21L)
+    function loadAlphaRunnerPreset() {
+      STATE.balance = 8391.08;
+      STATE.startBalance = 44.82;
+      STATE.positions = [];
+      STATE.activeTrade = null;
+      STATE.tradeDuration = 0;
+      STATE.trades = 61;
+      STATE.wins = 40;
+      STATE.losses = 21;
+      STATE.botFleet = {
+        gambler: { name: "Trend Rider",  trades: 35, wins: 26, pnl: 4892.40 },
+        house:   { name: "Dip Buyer",    trades: 12, wins: 8,  pnl: 1640.15 },
+        spy:     { name: "Smart Scalper", trades: 14, wins: 6,  pnl: 1858.53 }
+      };
+      
+      STATE.logs = [
+        { time: "06:34:00", type: "ENTER", bot: "Trend Rider", token: "PEPEUSDT", pnl: "$0.00", reason: "spike 4.1x • whale accumulation surge size 22%", size: "$1,846.04" },
+        { time: "06:31:45", type: "EXIT", bot: "Smart Scalper", token: "SOLUSDT", pnl: "+$342.52", pnl_num: 342.52, reason: "trailing stop hit (+12.0% runner)", size: "$1,846.04" },
+        { time: "06:28:10", type: "SCAN", bot: "RADAR", token: "DOGEUSDT", pnl: "32/100", reason: "PASS: Ask Wall Resistance (58% Asks)", size: "$0.00" },
+        { time: "06:27:00", type: "ENTER", bot: "Smart Scalper", token: "SOLUSDT", pnl: "$0.00", reason: "spike 3.1x • whale bid wall absorption size 22%", size: "$1,846.04" },
+        { time: "06:25:20", type: "EXIT", bot: "Dip Buyer", token: "ETHUSDT", pnl: "-$148.50", pnl_num: -148.50, reason: "stop 1% hit (-1.2% risk cut)", size: "$1,620.00" },
+        { time: "06:20:15", type: "EXIT", bot: "Trend Rider", token: "SUIUSDT", pnl: "+$418.90", pnl_num: 418.90, reason: "trailing runner hit (+8.4% gain)", size: "$1,750.00" },
+        { time: "06:12:00", type: "EXIT", bot: "Trend Rider", token: "AVAXUSDT", pnl: "+$295.40", pnl_num: 295.40, reason: "trailing runner hit (+6.1% gain)", size: "$1,680.00" }
+      ];
+
+      localStorage.removeItem("grok_positions");
+      localStorage.removeItem("grok_active_trade");
+      localStorage.setItem("grok_user_balance", "8391.08");
+      localStorage.setItem("grok_start_capital", "44.82");
+      localStorage.setItem("grok_total_trades", "61");
+      localStorage.setItem("grok_total_wins", "40");
+      localStorage.setItem("grok_total_losses", "21");
+      localStorage.setItem("grok_bot_fleet", JSON.stringify(STATE.botFleet));
+      localStorage.setItem("grok_terminal_logs", JSON.stringify(STATE.logs.slice(0, 40)));
+      saveUserState();
+
+      document.getElementById("equity-last-val").textContent = "+$342.52";
+      logEvent("RESET", "SYSTEM", "ALPHA", "+$8,391.08", "Alpha Overnight Runner Loaded ($44.82 -> $8,391.08 • 40W/21L). 22% Sizing Active.", "100%");
+      
+      const modal = document.getElementById("capital-modal");
+      if (modal) modal.style.display = "none";
+      render();
+    }
+
+    const alphaPresetBtn = document.getElementById("alpha-preset-btn");
+    if (alphaPresetBtn) {
+      alphaPresetBtn.addEventListener("click", loadAlphaRunnerPreset);
+    }
+
     const reset5Btn = document.getElementById("quick-reset-5-btn");
     if (reset5Btn) {
-      reset5Btn.addEventListener("click", () => resetDemoAccount(100.0));
+      reset5Btn.addEventListener("click", () => resetDemoAccount(1000.0));
     }
 
     const resetDemoBtn = document.getElementById("quick-reset-demo-btn");
     if (resetDemoBtn) {
-      resetDemoBtn.addEventListener("click", () => resetDemoAccount(500.0));
+      resetDemoBtn.addEventListener("click", () => resetDemoAccount(100.0));
     }
 
     // Toggle Pause/Resume Button
