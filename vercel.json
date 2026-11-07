@@ -1,6 +1,11 @@
 {
   "version": 2,
   "regions": ["fra1"],
+  "functions": {
+    "api/*.py": {
+      "regions": ["fra1"]
+    }
+  },
   "rewrites": [
     {
       "source": "/api/state",

@@ -1026,7 +1026,7 @@
       <aside class="agents-column">
         <div class="panel-header">
           <span>AUTOMATION ENGINE</span>
-          <span>6 MODULES ACTIVE</span>
+          <span>7 MODULES ACTIVE</span>
         </div>
 
         <!-- 1: RADAR -->
@@ -1110,8 +1110,10 @@
             <span id="speed-indicator">live tick</span>
           </div>
           <div class="flow-pipeline-viz">
-            <div class="flow-node token-pill" id="flow-tok-1">BTCUSDT <span class="sub">Binance Spot</span></div>
-            <div class="flow-node token-pill" id="flow-tok-2">ETHUSDT <span class="sub">Binance Spot</span></div>
+            <div class="flow-node token-pill" id="flow-tok-1">BTCUSDT <span class="sub">Spot</span></div>
+            <div class="flow-node token-pill" id="flow-tok-2">ETHUSDT <span class="sub">Spot</span></div>
+            <div class="flow-node token-pill" id="flow-tok-3">SOLUSDT <span class="sub">Spot</span></div>
+            <div class="flow-node token-pill" id="flow-tok-4">BNBUSDT <span class="sub">Spot</span></div>
             <div class="flow-circle rug-check-circle">
               <div style="font-size:11px;">🛡️</div>
               <div>SAFETY</div>
@@ -1207,7 +1209,10 @@
           <div class="trade-card">
             <div class="card-bar">
               <span style="font-weight:700; color:#fff;">📊 LIVE SPOT POSITION</span>
-              <span class="badge-open" id="trade-open-badge">HOLDING COIN</span>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button type="button" id="emergency-reset-btn" style="display:none; background:rgba(239,68,68,0.2); border:1px solid #ef4444; color:#f87171; font-size:10px; font-weight:700; padding:3px 8px; border-radius:4px; cursor:pointer;" title="Reset or clear stuck position from local storage / cache">⚡ CLOSE / RESET POSITION</button>
+                <span class="badge-open" id="trade-open-badge">HOLDING COIN</span>
+              </div>
             </div>
             <div class="trade-symbol-row">
               <span class="token-name" id="active-symbol">BTCUSDT</span>
@@ -1324,9 +1329,35 @@
       const rawTrade = localStorage.getItem("grok_active_trade");
       if (rawTrade) {
         savedTrade = JSON.parse(rawTrade);
-        savedDuration = savedTrade.tradeDuration || 0;
+        // Clean old corrupt / legacy mock positions (e.g. 0.97x or 0.19x volume surge)
+        if (savedTrade && savedTrade.reason && (savedTrade.reason.includes("0.97x") || savedTrade.reason.includes("0.19x"))) {
+          savedTrade = null;
+          localStorage.removeItem("grok_active_trade");
+        } else {
+          savedDuration = savedTrade.tradeDuration || 0;
+        }
       }
     } catch (e) {}
+
+    let savedLogs = [];
+    try {
+      const rawLogs = localStorage.getItem("grok_terminal_logs");
+      if (rawLogs) {
+        savedLogs = JSON.parse(rawLogs);
+      }
+    } catch (e) {}
+
+    if (savedTrade) {
+      savedLogs.unshift({
+        time: new Date().toTimeString().split(' ')[0],
+        type: "RESTORE",
+        bot: savedTrade.bot || "TREND RIDER",
+        token: savedTrade.symbol || "SOLUSDT",
+        pnl: "$0.00",
+        reason: `Restored active ${savedTrade.symbol} position @ $${savedTrade.entryPrice}`,
+        size: `$${(savedTrade.sizeUsd || 5.0).toFixed(2)}`
+      });
+    }
 
     const STATE = {
       running: true,
@@ -1345,7 +1376,7 @@
       activeTrade: savedTrade,
       tradeDuration: savedDuration,
       maxObservedPnl: 0.0,
-      logs: [],
+      logs: savedLogs,
       pairs: [
         { symbol: "BTCUSDT", name: "Bitcoin", price: 77000.0 },
         { symbol: "ETHUSDT", name: "Ethereum", price: 2450.0 },
@@ -1369,6 +1400,9 @@
     function saveUserState() {
       localStorage.setItem("grok_user_balance", STATE.balance.toFixed(2));
       localStorage.setItem("grok_trading_mode", currentTradingMode);
+      if (STATE.logs && STATE.logs.length) {
+        localStorage.setItem("grok_terminal_logs", JSON.stringify(STATE.logs.slice(0, 30)));
+      }
       if (STATE.activeTrade) {
         localStorage.setItem("grok_active_trade", JSON.stringify({
           ...STATE.activeTrade,
@@ -1660,7 +1694,8 @@
       const emaValEl = document.getElementById("sig-ema-val");
       const emaDescEl = document.getElementById("sig-ema-desc");
       if (emaPtsEl) emaPtsEl.textContent = `${emaPts} / 25`;
-      if (emaValEl) emaValEl.textContent = `EMA 7: $${Math.round(ema7).toLocaleString()} / 21: $${Math.round(ema21).toLocaleString()}`;
+      const formatEma = val => (val >= 1000 ? Math.round(val).toLocaleString() : val.toFixed(2));
+      if (emaValEl) emaValEl.textContent = `EMA 7: $${formatEma(ema7)} / 21: $${formatEma(ema21)}`;
       if (emaDescEl) emaDescEl.textContent = emaDesc;
 
       const volPtsEl = document.getElementById("sig-vol-pts");
@@ -2137,9 +2172,11 @@
         document.getElementById("active-bot").textContent = STATE.activeTrade.bot.toUpperCase();
         document.getElementById("active-side").textContent = STATE.activeTrade.side;
         
-        const sign = STATE.activeTrade.pnlPct >= 0 ? "+" : "";
+        const netUsd = STATE.activeTrade.pnlDollars;
+        const dollarSign = netUsd >= 0 ? "+$" : "-$";
+        const pctSign = STATE.activeTrade.pnlPct >= 0 ? "+" : "";
         const pnlEl = document.getElementById("active-pnl");
-        pnlEl.textContent = `${sign}${STATE.activeTrade.pnlPct}% (Net ${sign}$${Math.abs(STATE.activeTrade.pnlDollars).toFixed(2)})`;
+        pnlEl.textContent = `${pctSign}${STATE.activeTrade.pnlPct}% (Net ${dollarSign}${Math.abs(netUsd).toFixed(2)})`;
         pnlEl.className = STATE.activeTrade.pnlPct >= 0 ? "live-pnl green-txt" : "live-pnl red-txt";
         
         document.getElementById("active-entry").textContent = `$${STATE.activeTrade.entryPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
@@ -2154,6 +2191,14 @@
         document.getElementById("exec-node-sub").textContent = `HOLDING ${STATE.activeTrade.symbol}`;
         document.getElementById("exec-pill").textContent = `AUTO-TRADER • HOLDING ${STATE.activeTrade.symbol} ($${STATE.activeTrade.sizeUsd.toFixed(2)})`;
         document.getElementById("trade-open-badge").style.display = "inline-block";
+
+        const emergencyBtn = document.getElementById("emergency-reset-btn");
+        if (emergencyBtn) emergencyBtn.style.display = "inline-block";
+        const execSubEl = document.getElementById("exec-subtext");
+        if (execSubEl) {
+          execSubEl.textContent = `HOLDING ${STATE.activeTrade.symbol} (MONITORING TP/SL)`;
+          execSubEl.style.color = "#34d399";
+        }
       } else if (STATE.balance <= 0) {
         document.getElementById("active-symbol").textContent = "WAITING CAPITAL";
         document.getElementById("active-side").textContent = "$0.00";
@@ -2178,6 +2223,14 @@
         document.getElementById("exec-node-sub").textContent = "READY";
         document.getElementById("exec-pill").textContent = "AUTO-TRADER • HUNTING A+ CONFLUENCE";
         document.getElementById("trade-open-badge").style.display = "none";
+
+        const emergencyBtn = document.getElementById("emergency-reset-btn");
+        if (emergencyBtn) emergencyBtn.style.display = "none";
+        const execSubEl = document.getElementById("exec-subtext");
+        if (execSubEl) {
+          execSubEl.textContent = "HUNTING ENTRY";
+          execSubEl.style.color = "#38bdf8";
+        }
       }
 
       // Terminal logs
@@ -2342,7 +2395,16 @@
               render();
             }, 1000);
           } else {
-            apiStatus.textContent = `❌ ${data.error || 'Authentication failed'}`;
+            const errStr = data.error || 'Authentication failed';
+            if (errStr.includes("restricted location")) {
+              apiStatus.innerHTML = `❌ <b>Binance Cloud IP Restriction Detected:</b><br>
+              Binance security blocks cloud datacenter IPs (like Vercel US servers) from placing signed orders.<br>
+              <div style="margin-top:6px; padding:6px; background:rgba(37,99,235,0.15); border:1px solid #3b82f6; border-radius:4px; color:#93c5fd; line-height:1.4;">
+                <b>🚀 Direct Solution:</b> Run the bot locally on your PC via <code>python server.py</code> and open <code>http://localhost:8000</code>. This routes directly through your local residential internet with <b>Zero restrictions & instant live execution!</b>
+              </div>`;
+            } else {
+              apiStatus.textContent = `❌ ${errStr}`;
+            }
             apiStatus.style.color = "#ef4444";
           }
         } catch (err) {
@@ -2624,6 +2686,23 @@
     }
     renderAuthUI();
 
+    // Emergency Reset / Force Close Stuck Position Button
+    const emergencyResetBtn = document.getElementById("emergency-reset-btn");
+    if (emergencyResetBtn) {
+      emergencyResetBtn.addEventListener("click", () => {
+        if (confirm("Reset active position? This will clear any stuck position state and let the bot start hunting fresh trades.")) {
+          const prevSymbol = STATE.activeTrade ? STATE.activeTrade.symbol : "COIN";
+          STATE.activeTrade = null;
+          STATE.tradeDuration = 0;
+          STATE.maxObservedPnl = 0.0;
+          localStorage.removeItem("grok_active_trade");
+          logEvent("RESET", "SYSTEM", prevSymbol, "$0.00", "Position manually cleared by user. Resumed scanning.", "0%");
+          saveUserState();
+          render();
+        }
+      });
+    }
+
     // Test Binance Connection & Detect Balance
     const testApiBtn = document.getElementById("test-api-btn");
     if (testApiBtn) {
@@ -2672,7 +2751,16 @@
             apiStatus.textContent = msg;
             apiStatus.style.color = "#34d399";
           } else {
-            apiStatus.textContent = `❌ ${data.error || 'Authentication failed'}`;
+            const errStr = data.error || 'Authentication failed';
+            if (errStr.includes("restricted location")) {
+              apiStatus.innerHTML = `❌ <b>Binance Cloud IP Restriction Detected:</b><br>
+              Binance security blocks cloud datacenter IPs (like Vercel US servers) from placing signed orders.<br>
+              <div style="margin-top:6px; padding:6px; background:rgba(37,99,235,0.15); border:1px solid #3b82f6; border-radius:4px; color:#93c5fd; line-height:1.4;">
+                <b>🚀 Direct Solution:</b> Run the bot locally on your PC via <code>python server.py</code> and open <code>http://localhost:8000</code>. This routes directly through your local residential internet with <b>Zero restrictions & instant live execution!</b>
+              </div>`;
+            } else {
+              apiStatus.textContent = `❌ ${errStr}`;
+            }
             apiStatus.style.color = "#ef4444";
           }
         } catch (err) {
