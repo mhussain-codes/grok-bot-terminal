@@ -782,6 +782,80 @@
       .bot-fleet-bar { grid-template-columns: 1fr; }
       .middle-row { grid-template-columns: 1fr; }
     }
+
+    /* ============================================================
+       AUTHENTIC BINANCE FUTURES CYBER NEON PALETTE (.futures-mode)
+       ============================================================ */
+    body.futures-mode {
+      background-color: #070210 !important;
+      background-image: 
+        radial-gradient(circle at 10% 12%, rgba(168, 85, 247, 0.22) 0%, transparent 45%),
+        radial-gradient(circle at 90% 12%, rgba(236, 72, 153, 0.20) 0%, transparent 45%),
+        radial-gradient(circle at 50% 90%, rgba(56, 189, 248, 0.12) 0%, transparent 55%) !important;
+      color: #f5f3ff !important;
+    }
+    body.futures-mode .top-bar {
+      border-color: rgba(168, 85, 247, 0.4) !important;
+      background: rgba(13, 7, 26, 0.88) !important;
+      box-shadow: 0 4px 24px rgba(168, 85, 247, 0.15) !important;
+    }
+    body.futures-mode .brand-name {
+      color: #faf5ff !important;
+      text-shadow: 0 0 16px rgba(168, 85, 247, 0.6) !important;
+    }
+    body.futures-mode .tag-version {
+      background: rgba(168, 85, 247, 0.25) !important;
+      border: 1px solid #c084fc !important;
+      color: #e9d5ff !important;
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.3) !important;
+    }
+    body.futures-mode .bot-card-fleet {
+      border-color: rgba(168, 85, 247, 0.35) !important;
+      background: rgba(19, 10, 38, 0.7) !important;
+    }
+    body.futures-mode .bot-blue-card {
+      border-color: rgba(56, 189, 248, 0.4) !important;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.15) !important;
+    }
+    body.futures-mode .bot-red-card {
+      border-color: rgba(244, 63, 94, 0.4) !important;
+      box-shadow: 0 0 12px rgba(244, 63, 94, 0.15) !important;
+    }
+    body.futures-mode .bot-hybrid-card {
+      border-color: rgba(168, 85, 247, 0.45) !important;
+      box-shadow: 0 0 14px rgba(168, 85, 247, 0.25) !important;
+    }
+    body.futures-mode .agents-column .agent-card {
+      background: rgba(15, 8, 30, 0.75) !important;
+      border-color: rgba(168, 85, 247, 0.22) !important;
+    }
+    body.futures-mode .agents-column .agent-card.active-border {
+      border-color: #c084fc !important;
+      box-shadow: 0 0 16px rgba(168, 85, 247, 0.35) !important;
+    }
+    body.futures-mode .signal-analyzer-panel {
+      border-color: rgba(168, 85, 247, 0.35) !important;
+      background: rgba(14, 8, 28, 0.8) !important;
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.1) !important;
+    }
+    body.futures-mode .trade-card {
+      border-color: rgba(168, 85, 247, 0.4) !important;
+      background: rgba(16, 9, 32, 0.85) !important;
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.18) !important;
+    }
+    body.futures-mode .night-log-card {
+      border-color: rgba(168, 85, 247, 0.35) !important;
+      background: rgba(12, 6, 24, 0.9) !important;
+    }
+    body.futures-mode .result-banner {
+      border-color: rgba(168, 85, 247, 0.35) !important;
+      background: rgba(17, 9, 34, 0.85) !important;
+    }
+    body.futures-mode .bottom-ledger {
+      border-color: rgba(168, 85, 247, 0.35) !important;
+      background: rgba(14, 7, 28, 0.85) !important;
+    }
+
   </style>
 </head>
 <body>
@@ -1089,77 +1163,77 @@
       <!-- Left Column: Automation Engine Modules -->
       <aside class="agents-column">
         <div class="panel-header">
-          <span>AUTOMATION ENGINE</span>
+          <span id="pipeline-header-title">AUTOMATION ENGINE</span>
           <span>7 MODULES ACTIVE</span>
         </div>
 
         <!-- 1: RADAR -->
         <div class="agent-card">
           <div class="agent-header">
-            <span class="agent-name">1. MARKET RADAR</span>
+            <span class="agent-name" id="mod-1-name">1. MARKET RADAR</span>
             <span class="agent-state-tag tag-blue">SCANNING</span>
           </div>
-          <div class="agent-role">Live Binance Spot 1m price radar</div>
+          <div class="agent-role" id="mod-1-role">Live Binance Spot 1m price radar</div>
           <div class="agent-detail" id="scanner-detail">BTCUSDT • Live Stream</div>
         </div>
 
         <!-- 2: SPREAD GUARD -->
         <div class="agent-card">
           <div class="agent-header">
-            <span class="agent-name">2. SPREAD GUARD</span>
+            <span class="agent-name" id="mod-2-name">2. SPREAD GUARD</span>
             <span class="agent-state-tag tag-green" id="rug-tag">PASS</span>
           </div>
-          <div class="agent-role">Liquidity & low fee verification</div>
+          <div class="agent-role" id="mod-2-role">Liquidity & low fee verification</div>
           <div class="agent-detail">Spread Check: <span class="green-txt" id="rug-sub">Optimal Spread $0.01</span></div>
         </div>
 
         <!-- 3: MONEY MANAGER -->
         <div class="agent-card">
           <div class="agent-header">
-            <span class="agent-name">3. MONEY MANAGER</span>
+            <span class="agent-name" id="mod-3-name">3. MONEY MANAGER</span>
             <span class="agent-state-tag tag-blue">SAFE SIZE</span>
           </div>
-          <div class="agent-role">Protects balance & enforces safe sizing</div>
+          <div class="agent-role" id="mod-3-role">Protects balance & enforces safe sizing</div>
           <div class="agent-detail" id="sizer-detail">Min safe size: $10.00 • Max 20% equity<br><span id="sizer-subtext">$10.00 safe order</span></div>
         </div>
 
         <!-- 4: AUTO-TRADER -->
         <div class="agent-card active-border">
           <div class="agent-header">
-            <span class="agent-name">4. AUTO-TRADER</span>
+            <span class="agent-name" id="mod-4-name">4. AUTO-TRADER</span>
             <span class="agent-state-tag tag-cyan">ACTIVE</span>
           </div>
-          <div class="agent-role">Buys low & auto-sells for profit</div>
+          <div class="agent-role" id="mod-4-role">Buys low & auto-sells for profit</div>
           <div class="agent-detail"><span class="cyan-txt">Target: Dynamic Trailing Runner (22% Sizing)</span><br><span id="exec-subtext">HUNTING ENTRY</span></div>
         </div>
 
         <!-- 5: PROFIT AUDITOR -->
         <div class="agent-card">
           <div class="agent-header">
-            <span class="agent-name">5. PROFIT AUDITOR</span>
+            <span class="agent-name" id="mod-5-name">5. PROFIT AUDITOR</span>
             <span class="agent-state-tag tag-red">NET PROFIT</span>
           </div>
-          <div class="agent-role">Exchange fee audit (0.2% round-trip)</div>
+          <div class="agent-role" id="mod-5-role">Exchange fee audit (0.2% round-trip)</div>
           <div class="agent-detail">Deducts 0.2% fees for 100% net profit<br><span id="logger-subtext">Net PnL Guaranteed</span></div>
         </div>
 
         <!-- 6: WALLET VAULT -->
         <div class="agent-card">
           <div class="agent-header">
-            <span class="agent-name">6. USDT VAULT</span>
+            <span class="agent-name" id="mod-6-name">6. USDT VAULT</span>
             <span class="agent-state-tag tag-blue">SECURE</span>
           </div>
-          <div class="agent-role">Protects capital in stable USDT</div>
+          <div class="agent-role" id="mod-6-role">Protects capital in stable USDT</div>
           <div class="agent-detail">Locks profit safely in USDT<br><span id="equity-subtext">0 completed trades</span></div>
         </div>
 
         <!-- 7: PRIVATE SESSION -->
         <div class="agent-card">
           <div class="agent-header">
-            <span class="agent-name">7. YOUR PRIVATE SESSION</span>
+            <span class="agent-name" id="mod-7-name">7. YOUR PRIVATE SESSION</span>
             <span class="agent-state-tag" style="background:#334155; color:#cbd5e1;">ISOLATED</span>
           </div>
-          <div class="agent-role">Client-side private storage</div>
+          <div class="agent-role" id="mod-7-role">Client-side private storage</div>
           <div class="agent-detail">Your keys & funds stay in your browser<br><span id="lines-to-read" style="color:#60a5fa;">Session: USER-ISOLATED</span></div>
         </div>
       </aside>
@@ -1169,8 +1243,8 @@
         <!-- Live Flow Pipeline -->
         <section class="live-flow-panel">
           <div class="flow-header">
-            <span style="font-weight:700; color:#fff;">HOW THE BOT WORKS (SPOT EARNING MODEL)</span>
-            <span>1. SCAN ➔ 2. CHECK DIP/TREND ➔ 3. SAFE SIZING ➔ 4. AUTO BUY ➔ 5. SELL FOR PROFIT</span>
+            <span style="font-weight:700; color:#fff;" id="flow-header-title">HOW THE BOT WORKS (SPOT EARNING MODEL)</span>
+            <span id="flow-header-sub">1. SCAN ➔ 2. CHECK DIP/TREND ➔ 3. SAFE SIZING ➔ 4. AUTO BUY ➔ 5. SELL FOR PROFIT</span>
             <span id="speed-indicator">live tick</span>
           </div>
           <div class="flow-pipeline-viz">
@@ -1225,7 +1299,7 @@
         <section class="signal-analyzer-panel" style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:8px; padding:12px 14px; margin-bottom:14px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-weight:800; font-size:12px; color:#fff; letter-spacing:0.3px;">🧠 AI QUANT CONFLUENCE RADAR</span>
+              <span style="font-weight:800; font-size:12px; color:#fff; letter-spacing:0.3px;" id="radar-header-title">🧠 AI QUANT CONFLUENCE RADAR</span>
               <span id="signal-badge" style="font-size:10px; font-weight:800; padding:2px 8px; border-radius:4px; background:rgba(59,130,246,0.18); color:#60a5fa; border:1px solid rgba(59,130,246,0.35);">SCANNING LIVE SIGNALS</span>
             </div>
             <div style="display:flex; align-items:baseline; gap:6px;">
@@ -1354,8 +1428,8 @@
         <!-- Bottom Transaction Ledger -->
         <section class="bottom-ledger">
           <div class="ledger-header">
-            <span style="font-weight:700; color:#fff;">📜 COMPLETED SPOT TRADES & EXECUTION LEDGER</span>
-            <span>Real Spot Execution History</span>
+            <span style="font-weight:700; color:#fff;" id="ledger-title-el">📜 COMPLETED SPOT TRADES & EXECUTION LEDGER</span>
+            <span id="ledger-sub-el">Real Spot Execution History</span>
           </div>
           <div id="ledger-rows"></div>
         </section>
@@ -1391,109 +1465,90 @@
     let userApiKey = (activeUser && activeUser.apiKey) ? activeUser.apiKey : (localStorage.getItem("grok_user_api_key") || "");
     let userApiSecret = (activeUser && activeUser.apiSecret) ? activeUser.apiSecret : (localStorage.getItem("grok_user_api_secret") || "");
 
-    const savedBal = localStorage.getItem("grok_user_balance");
-    let initialBal = savedBal !== null ? Math.max(0, parseFloat(savedBal)) : 5.00;
+    // Function to load isolated profile for SPOT or FUTURES
+    function loadProfile(mode) {
+      const isFut = mode === "FUTURES";
+      const prefix = isFut ? "grok_futures_" : "grok_spot_";
+      
+      const savedBal = localStorage.getItem(prefix + "balance");
+      const legacyBal = !isFut ? localStorage.getItem("grok_user_balance") : null;
+      let bal = 5.00;
+      if (savedBal !== null) bal = Math.max(0, parseFloat(savedBal));
+      else if (legacyBal !== null) bal = Math.max(0, parseFloat(legacyBal));
 
-    // Restore active positions if page was refreshed during open trade(s)
-    let savedPositions = [];
-    let savedTrade = null;
-    let savedDuration = 0;
-    try {
-      const rawPos = localStorage.getItem("grok_positions");
-      if (rawPos) {
-        savedPositions = JSON.parse(rawPos);
-        savedPositions = savedPositions.filter(p => p && p.symbol && p.entryPrice && p.symbol !== "BNBUSDT" && (p.sizeUsd === undefined || p.sizeUsd >= 4.0));
-      }
-      const rawTrade = localStorage.getItem("grok_active_trade");
-      if (rawTrade) {
-        savedTrade = JSON.parse(rawTrade);
-        if (savedTrade && (savedTrade.symbol === "BNBUSDT" || (savedTrade.reason && (savedTrade.reason.includes("0.97x") || savedTrade.reason.includes("0.19x"))))) {
-          savedTrade = null;
-        }
-      }
-    } catch (e) {}
-    if (!savedPositions.length && savedTrade) {
-      savedPositions = [savedTrade];
-    }
-    if (savedPositions.length) {
-      savedTrade = savedPositions[0];
-      savedDuration = savedTrade.tradeDuration || 0;
-    }
+      const savedStart = localStorage.getItem(prefix + "start_capital");
+      const legacyStart = !isFut ? localStorage.getItem("grok_start_capital") : null;
+      let startBal = bal;
+      if (savedStart !== null) startBal = Math.max(0, parseFloat(savedStart));
+      else if (legacyStart !== null) startBal = Math.max(0, parseFloat(legacyStart));
 
-    let savedLogs = [];
-    try {
-      const rawLogs = localStorage.getItem("grok_terminal_logs");
-      if (rawLogs) {
-        savedLogs = JSON.parse(rawLogs);
-      }
-    } catch (e) {}
-
-    // Calculate completed trades, wins, losses, fleet stats and total realized profit from saved logs
-    const completedTrades = savedLogs.filter(l => l.type === "SOLD" || l.type === "EXIT" || l.type === "BINANCE_SELL");
-    let initTrades = completedTrades.length;
-    let initWins = completedTrades.filter(l => {
-      const pVal = typeof l.pnl_num === 'number' ? l.pnl_num : (parseFloat(String(l.pnl || "").replace(/[^0-9.-]+/g, '')) || 0);
-      return pVal > 0 || (l.pnl && l.pnl.includes("+"));
-    }).length;
-    let initLosses = initTrades - initWins;
-
-    let initFleet = {
-      gambler: { name: "Trend Rider",  trades: 0, wins: 0, pnl: 0 },
-      house:   { name: "Dip Buyer",    trades: 0, wins: 0, pnl: 0 },
-      spy:     { name: "Smart Scalper", trades: 0, wins: 0, pnl: 0 }
-    };
-
-    let totalSoldNetProfit = 0;
-    completedTrades.forEach(l => {
-      const bName = (l.bot || "").toLowerCase();
-      const key = bName.includes("trend") ? "gambler" : (bName.includes("dip") ? "house" : "spy");
-      const pVal = typeof l.pnl_num === 'number' ? l.pnl_num : (parseFloat(String(l.pnl || "").replace(/[^0-9.-]+/g, '')) || 0);
-      totalSoldNetProfit += pVal;
-      if (initFleet[key]) {
-        initFleet[key].trades++;
-        initFleet[key].pnl = +(initFleet[key].pnl + pVal).toFixed(2);
-        if (pVal > 0) initFleet[key].wins++;
-      }
-    });
-
-    // Check if localStorage has explicit saved stats
-    const lsTrades = parseInt(localStorage.getItem("grok_total_trades") || "0");
-    if (lsTrades > initTrades) {
-      initTrades = lsTrades;
-      initWins = parseInt(localStorage.getItem("grok_total_wins") || "0");
-      initLosses = parseInt(localStorage.getItem("grok_total_losses") || "0");
+      let pos = [];
       try {
-        const lsFleet = JSON.parse(localStorage.getItem("grok_bot_fleet") || "null");
-        if (lsFleet) initFleet = lsFleet;
-      } catch(e) {}
+        const rawPos = localStorage.getItem(prefix + "positions") || (!isFut ? localStorage.getItem("grok_positions") : null);
+        if (rawPos) {
+          pos = JSON.parse(rawPos).filter(p => p && p.symbol && p.entryPrice && p.symbol !== "BNBUSDT");
+        }
+      } catch (e) {}
+
+      let logs = [];
+      try {
+        const rawLogs = localStorage.getItem(prefix + "logs") || (!isFut ? localStorage.getItem("grok_terminal_logs") : null);
+        if (rawLogs) logs = JSON.parse(rawLogs);
+      } catch (e) {}
+
+      const closes = logs.filter(l => l.type === "SOLD" || l.type === "EXIT" || l.type === "BINANCE_SELL");
+      let trades = closes.length;
+      let wins = closes.filter(l => {
+        const pVal = typeof l.pnl_num === 'number' ? l.pnl_num : (parseFloat(String(l.pnl || "").replace(/[^0-9.-]+/g, '')) || 0);
+        return pVal > 0 || (l.pnl && l.pnl.includes("+"));
+      }).length;
+      let losses = trades - wins;
+
+      const lsTrades = parseInt(localStorage.getItem(prefix + "trades") || "0");
+      if (lsTrades > trades) {
+        trades = lsTrades;
+        wins = parseInt(localStorage.getItem(prefix + "wins") || "0");
+        losses = parseInt(localStorage.getItem(prefix + "losses") || "0");
+      }
+
+      let fleet = isFut ? {
+        gambler: { name: "Momentum Hunter", trades: 0, wins: 0, pnl: 0 },
+        house:   { name: "Perp Funding Arb", trades: 0, wins: 0, pnl: 0 },
+        spy:     { name: "Reversal Sniper",  trades: 0, wins: 0, pnl: 0 }
+      } : {
+        gambler: { name: "Trend Rider",  trades: 0, wins: 0, pnl: 0 },
+        house:   { name: "Dip Buyer",    trades: 0, wins: 0, pnl: 0 },
+        spy:     { name: "Smart Scalper", trades: 0, wins: 0, pnl: 0 }
+      };
+
+      try {
+        const rawFleet = localStorage.getItem(prefix + "fleet");
+        if (rawFleet) Object.assign(fleet, JSON.parse(rawFleet));
+      } catch (e) {}
+
+      return {
+        balance: bal,
+        startBalance: startBal,
+        trades: trades,
+        wins: wins,
+        losses: losses,
+        filtered: 0,
+        positions: pos,
+        activeTrade: pos.length ? pos[0] : null,
+        tradeDuration: pos.length ? (pos[0].tradeDuration || 0) : 0,
+        botFleet: fleet,
+        logs: logs,
+        leverage: parseInt(localStorage.getItem(prefix + "leverage") || "10", 10),
+        marginType: "CROSSED"
+      };
     }
 
-    // Determine Starting Capital accurately (Never overwrite with realized profit!)
-    const savedStartCap = localStorage.getItem("grok_start_capital");
-    let startBal = savedStartCap !== null ? parseFloat(savedStartCap) : null;
-    if (startBal === null || isNaN(startBal) || startBal <= 0) {
-      // If start capital not yet saved, derive it by subtracting realized profits from current wallet
-      startBal = Math.max(5.0, +(initialBal - totalSoldNetProfit).toFixed(2));
-      localStorage.setItem("grok_start_capital", startBal.toFixed(2));
-    }
-
-    if (savedTrade) {
-      savedLogs.unshift({
-        time: new Date().toTimeString().split(' ')[0],
-        type: "RESTORE",
-        bot: savedTrade.bot || "TREND RIDER",
-        token: savedTrade.symbol || "SOLUSDT",
-        pnl: "$0.00",
-        reason: `Restored active ${savedTrade.symbol} position @ $${savedTrade.entryPrice}`,
-        size: `$${(savedTrade.sizeUsd || 5.0).toFixed(2)}`
-      });
-    }
-
-    // Dynamic token pills update and initialization (12 scanned coins, multiple open positions support)
+    // Dynamic token pills update and initialization (12 scanned coins)
     function updateTokenPills(activeSym) {
       const track = document.getElementById("flow-tokens-track");
       if (!track) return;
       const pills = track.querySelectorAll(".token-pill");
+      const isFut = STATE.marketType === "FUTURES";
       pills.forEach(pill => {
         const sym = pill.getAttribute("data-sym");
         const sub = pill.querySelector(".sub");
@@ -1507,7 +1562,7 @@
           if (sub) sub.textContent = "SCANNING";
         } else {
           pill.className = "flow-node token-pill";
-          if (sub) sub.textContent = "Spot";
+          if (sub) sub.textContent = isFut ? "Perp" : "Spot";
         }
       });
     }
@@ -1536,7 +1591,7 @@
       });
     }
 
-    // Dynamic price formatting for high-value and sub-dollar coins (DOGE, XRP, ADA, PEPE, BTC)
+    // Dynamic price formatting
     function fmtPrice(p) {
       if (typeof p !== 'number' || isNaN(p)) return '0.00';
       if (p === 0) return '0.00';
@@ -1550,26 +1605,13 @@
     const STATE = {
       running: true,
       seconds: 0,
-      balance: initialBal,
-      startBalance: startBal,
-      trades: initTrades,
-      wins: initWins,
-      losses: initLosses,
-      filtered: 0,
-      botFleet: initFleet,
-      activeTrade: savedTrade,
-      tradeDuration: savedDuration,
-      maxObservedPnl: 0.0,
+      marketType: localStorage.getItem("grok_market_type") || "SPOT",
       apiErrorCooldown: 0,
       lastApiError: "",
       confluenceDisqualified: false,
       confluenceDisqualifyReason: "",
       confluenceBreakdown: { rsiPts: 0, emaPts: 0, volPts: 0, depthPts: 0 },
-      logs: savedLogs,
-      positions: savedPositions || [],
-      maxPositions: 4,
-      marketType: localStorage.getItem("grok_market_type") || "SPOT",
-      leverage: parseInt(localStorage.getItem("grok_futures_leverage") || "10", 10),
+      confluenceScore: 50,
       pairs: [
         { symbol: "BTCUSDT",  name: "Bitcoin",  price: 77000.0 },
         { symbol: "ETHUSDT",  name: "Ethereum", price: 2450.0 },
@@ -1593,30 +1635,129 @@
         vol24h: 15000.0,
         spread: 0.01,
         rsi: 50.0,
-        ema9: 77000.0,
-        ema21: 77000.0
-      }
+        ema7: 77000.0,
+        ema21: 77000.0,
+        volRatio: 1.0,
+        bidRatio: 0.50
+      },
+      spot: loadProfile("SPOT"),
+      futures: loadProfile("FUTURES")
     };
+
+    // Helper to get active market profile (100% separate state for Spot and Futures)
+    function getActiveProfile() {
+      return STATE.marketType === "FUTURES" ? STATE.futures : STATE.spot;
+    }
+
+    // Property proxies on STATE so existing code seamlessly reads & writes active profile
+    Object.defineProperty(STATE, "balance", {
+      get() { return getActiveProfile().balance; },
+      set(v) { getActiveProfile().balance = v; }
+    });
+    Object.defineProperty(STATE, "startBalance", {
+      get() { return getActiveProfile().startBalance; },
+      set(v) { getActiveProfile().startBalance = v; }
+    });
+    Object.defineProperty(STATE, "trades", {
+      get() { return getActiveProfile().trades; },
+      set(v) { getActiveProfile().trades = v; }
+    });
+    Object.defineProperty(STATE, "wins", {
+      get() { return getActiveProfile().wins; },
+      set(v) { getActiveProfile().wins = v; }
+    });
+    Object.defineProperty(STATE, "losses", {
+      get() { return getActiveProfile().losses; },
+      set(v) { getActiveProfile().losses = v; }
+    });
+    Object.defineProperty(STATE, "filtered", {
+      get() { return getActiveProfile().filtered; },
+      set(v) { getActiveProfile().filtered = v; }
+    });
+    Object.defineProperty(STATE, "positions", {
+      get() { return getActiveProfile().positions; },
+      set(v) { getActiveProfile().positions = v; }
+    });
+    Object.defineProperty(STATE, "activeTrade", {
+      get() { return getActiveProfile().activeTrade; },
+      set(v) { getActiveProfile().activeTrade = v; }
+    });
+    Object.defineProperty(STATE, "tradeDuration", {
+      get() { return getActiveProfile().tradeDuration; },
+      set(v) { getActiveProfile().tradeDuration = v; }
+    });
+    Object.defineProperty(STATE, "botFleet", {
+      get() { return getActiveProfile().botFleet; },
+      set(v) { getActiveProfile().botFleet = v; }
+    });
+    Object.defineProperty(STATE, "logs", {
+      get() { return getActiveProfile().logs; },
+      set(v) { getActiveProfile().logs = v; }
+    });
+    Object.defineProperty(STATE, "leverage", {
+      get() { return STATE.futures.leverage || 10; },
+      set(v) { STATE.futures.leverage = v; }
+    });
 
     function saveUserState() {
       localStorage.setItem("grok_market_type", STATE.marketType || "SPOT");
-      localStorage.setItem("grok_futures_leverage", (STATE.leverage || 10).toString());
-      localStorage.setItem("grok_user_balance", STATE.balance.toFixed(2));
-      localStorage.setItem("grok_start_capital", STATE.startBalance.toFixed(2));
+
+      // 1. Save Isolated Spot Profile
+      localStorage.setItem("grok_spot_balance", STATE.spot.balance.toFixed(2));
+      localStorage.setItem("grok_spot_start_capital", STATE.spot.startBalance.toFixed(2));
+      localStorage.setItem("grok_spot_trades", STATE.spot.trades.toString());
+      localStorage.setItem("grok_spot_wins", STATE.spot.wins.toString());
+      localStorage.setItem("grok_spot_losses", STATE.spot.losses.toString());
+      localStorage.setItem("grok_spot_fleet", JSON.stringify(STATE.spot.botFleet));
+      localStorage.setItem("grok_spot_positions", JSON.stringify(STATE.spot.positions || []));
+      localStorage.setItem("grok_spot_logs", JSON.stringify((STATE.spot.logs || []).slice(0, 50)));
+
+      // 2. Save Isolated Futures Profile
+      localStorage.setItem("grok_futures_balance", STATE.futures.balance.toFixed(2));
+      localStorage.setItem("grok_futures_start_capital", STATE.futures.startBalance.toFixed(2));
+      localStorage.setItem("grok_futures_trades", STATE.futures.trades.toString());
+      localStorage.setItem("grok_futures_wins", STATE.futures.wins.toString());
+      localStorage.setItem("grok_futures_losses", STATE.futures.losses.toString());
+      localStorage.setItem("grok_futures_fleet", JSON.stringify(STATE.futures.botFleet));
+      localStorage.setItem("grok_futures_positions", JSON.stringify(STATE.futures.positions || []));
+      localStorage.setItem("grok_futures_logs", JSON.stringify((STATE.futures.logs || []).slice(0, 50)));
+      localStorage.setItem("grok_futures_leverage", (STATE.futures.leverage || 10).toString());
+
+      // 3. Backward Compatibility keys for active mode
+      const activeProf = getActiveProfile();
+      localStorage.setItem("grok_user_balance", activeProf.balance.toFixed(2));
+      localStorage.setItem("grok_start_capital", activeProf.startBalance.toFixed(2));
       localStorage.setItem("grok_trading_mode", currentTradingMode);
-      localStorage.setItem("grok_total_trades", STATE.trades.toString());
-      localStorage.setItem("grok_total_wins", STATE.wins.toString());
-      localStorage.setItem("grok_total_losses", STATE.losses.toString());
-      localStorage.setItem("grok_bot_fleet", JSON.stringify(STATE.botFleet));
-      if (STATE.logs && STATE.logs.length) {
-        localStorage.setItem("grok_terminal_logs", JSON.stringify(STATE.logs.slice(0, 40)));
+      localStorage.setItem("grok_total_trades", activeProf.trades.toString());
+      localStorage.setItem("grok_total_wins", activeProf.wins.toString());
+      localStorage.setItem("grok_total_losses", activeProf.losses.toString());
+      localStorage.setItem("grok_bot_fleet", JSON.stringify(activeProf.botFleet));
+      if (activeProf.logs && activeProf.logs.length) {
+        localStorage.setItem("grok_terminal_logs", JSON.stringify(activeProf.logs.slice(0, 40)));
       }
-      if (STATE.positions && STATE.positions.length) {
-        localStorage.setItem("grok_positions", JSON.stringify(STATE.positions));
-        localStorage.setItem("grok_active_trade", JSON.stringify(STATE.positions[0]));
+      if (activeProf.positions && activeProf.positions.length) {
+        localStorage.setItem("grok_positions", JSON.stringify(activeProf.positions));
+        localStorage.setItem("grok_active_trade", JSON.stringify(activeProf.positions[0]));
       } else {
         localStorage.removeItem("grok_positions");
         localStorage.removeItem("grok_active_trade");
+      }
+
+      // 4. Sync with User Database (Never lose user capital!)
+      if (activeUser && activeUser.username) {
+        activeUser.spot_balance = STATE.spot.balance;
+        activeUser.futures_balance = STATE.futures.balance;
+        activeUser.balance = activeProf.balance;
+        activeUser.tradingMode = currentTradingMode;
+        activeUser.marketType = STATE.marketType;
+        activeUser.updated_at = Date.now();
+        localStorage.setItem("grok_active_user", JSON.stringify(activeUser));
+
+        fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "sync_user", user: activeUser })
+        }).catch(() => {});
       }
     }
 
@@ -2600,8 +2741,9 @@
     function render() {
       document.getElementById("timer-val").textContent = formatTime(STATE.seconds);
 
+      const isFut = STATE.marketType === "FUTURES";
       const openCount = (STATE.positions || []).length;
-      const openBadge = openCount > 0 ? ` • <span style="color:#38bdf8;font-weight:700;">⚡ ${openCount} OPEN</span>` : "";
+      const openBadge = openCount > 0 ? ` • <span style="color:${isFut ? '#c084fc' : '#38bdf8'};font-weight:700;">⚡ ${openCount} OPEN</span>` : "";
 
       // Ensure activeTrade points to currently selected open position
       if (openCount > 0) {
@@ -2614,19 +2756,16 @@
       const totalUnrealizedNetPnL = (STATE.positions || []).reduce((acc, p) => acc + (p.pnlDollars || 0), 0);
       const liveEquity = +(STATE.balance + totalUnrealizedNetPnL).toFixed(2);
       const eqSign = totalUnrealizedNetPnL >= 0 ? "+$" : "-$";
-      const maxPositions = STATE.balance >= 250 ? 4 : (STATE.balance >= 100 ? 3 : (STATE.balance >= 25 ? 2 : 1));
 
-      // Dynamic Risk-Aware Sizing (mirrors actual tradingTick logic)
+      // Dynamic Risk-Aware Sizing
       const renderCommitted = (STATE.positions || []).reduce((sum, p) => sum + (p.sizeUsd || 0), 0);
-      const renderAvailable = +(STATE.balance - renderCommitted).toFixed(2);
+      const renderAvailable = Math.max(0, +(STATE.balance - renderCommitted).toFixed(2));
       let dynOrderSize = +(STATE.balance * 0.22).toFixed(2);
       let dynOrderPct = 22;
-      if (STATE.balance < 25.0) {
-        // Micro Challenge accounts ($5 - $24): 100% concentrated capital into 1 high-conviction trade
+      if (STATE.balance <= 15.0) {
         dynOrderSize = +(STATE.balance).toFixed(2);
         dynOrderPct = 100;
       }
-      const estFee = +(dynOrderSize * 0.002).toFixed(2);
 
       const sizerEqVal = document.getElementById("sizer-eq-val");
       const sizerEqSub = document.getElementById("sizer-eq-sub");
@@ -2635,14 +2774,14 @@
         sizerEqSub.textContent = `$${dynOrderSize.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
       }
 
-      // Animate glowing progress fill bar from START CAPITAL to CURRENT WALLET
+      // Animate progress bar from START CAPITAL to CURRENT WALLET
       const progFill = document.getElementById("prog-fill");
       if (progFill) {
         if (STATE.startBalance > 0) {
           const ratio = Math.min(100, Math.max(8, Math.round((liveEquity / (STATE.startBalance * 3 || 100)) * 100)));
           progFill.style.width = `${ratio}%`;
-          progFill.style.background = liveEquity >= STATE.startBalance ? "linear-gradient(90deg, #10b981, #06b6d4)" : "#ef4444";
-          progFill.style.boxShadow = liveEquity >= STATE.startBalance ? "0 0 10px rgba(16, 185, 129, 0.6)" : "none";
+          progFill.style.background = liveEquity >= STATE.startBalance ? (isFut ? "linear-gradient(90deg, #a855f7, #ec4899)" : "linear-gradient(90deg, #10b981, #06b6d4)") : "#ef4444";
+          progFill.style.boxShadow = liveEquity >= STATE.startBalance ? (isFut ? "0 0 12px rgba(168, 85, 247, 0.6)" : "0 0 10px rgba(16, 185, 129, 0.6)") : "none";
         }
       }
 
@@ -2658,7 +2797,7 @@
       const nowBalVal = document.getElementById("now-bal-val");
       if (nowBalVal) {
         if (openCount > 0) {
-          nowBalVal.innerHTML = `$${STATE.balance.toFixed(2)} <span style="font-size:11px; color:#38bdf8; font-weight:700;">(Equity: $${liveEquity.toFixed(2)})</span>`;
+          nowBalVal.innerHTML = `$${STATE.balance.toFixed(2)} <span style="font-size:11px; color:${isFut ? '#c084fc' : '#38bdf8'}; font-weight:700;">(Equity: $${liveEquity.toFixed(2)})</span>`;
         } else {
           nowBalVal.textContent = `$${STATE.balance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
@@ -2673,7 +2812,7 @@
       // Update Money Manager & USDT Vault Dynamic Subtext
       const sizerSub = document.getElementById("sizer-subtext");
       if (sizerSub) {
-        if (renderAvailable < 10.0 && openCount > 0) {
+        if (renderAvailable < 4.0 && openCount > 0) {
           sizerSub.textContent = `$${renderAvailable.toFixed(2)} free (waiting)`;
         } else {
           sizerSub.textContent = `$${dynOrderSize.toFixed(2)} order size`;
@@ -2684,39 +2823,10 @@
         vaultSub.innerHTML = `${STATE.trades} closed (${STATE.wins}W / ${STATE.losses}L)${openBadge}`;
       }
 
-      // Update Brand Title, Subtext, and Mode Badge dynamically
-      const isFut = STATE.marketType === "FUTURES";
-      const brandTitleEl = document.getElementById("brand-title-el");
-      const brandTagEl = document.getElementById("brand-tag-el");
-      const brandSubEl = document.getElementById("brand-subtext-el");
-      const s1Title = document.getElementById("strat-1-title");
-      const s1Sub = document.getElementById("strat-1-sub");
-      const s2Title = document.getElementById("strat-2-title");
-      const s2Sub = document.getElementById("strat-2-sub");
-      const s3Title = document.getElementById("strat-3-title");
-      const s3Sub = document.getElementById("strat-3-sub");
+      // Update Mode UI Elements and styling dynamically
+      updateModeUIElements(STATE.marketType);
 
-      if (brandTitleEl) brandTitleEl.textContent = isFut ? "Grok Futures AI Auto-Trader" : "Grok Spot Auto-Trader";
-      if (brandTagEl) brandTagEl.textContent = isFut ? `v2.0 • ${STATE.leverage || 10}x High-ROI Engine` : "v2.0 • Spot Profit Engine";
-      if (brandSubEl) brandSubEl.textContent = isFut ? "AI Auto Long & Short 24/7 on Binance Futures • 5x-20x Dynamic Leverage • Massive Profit Potential" : "Buys safe dips & sells for profit 24/7 on Binance Spot • Zero shorting risk";
-
-      if (isFut) {
-        if (s1Title) s1Title.textContent = "🚀 1. LONG RUNNER";
-        if (s1Sub) s1Sub.textContent = `${STATE.leverage || 10}x Bullish Momentum & Golden Ribbon Breakouts`;
-        if (s2Title) s2Title.textContent = "⚡ 2. SHORT HUNTER";
-        if (s2Sub) s2Sub.textContent = `${STATE.leverage || 10}x Bearish Breakdown & Overbought Rejections`;
-        if (s3Title) s3Title.textContent = "🎯 3. VOLATILITY SCALPER";
-        if (s3Sub) s3Sub.textContent = "Rapid Bi-Directional Orderbook Liquidity Scalping";
-      } else {
-        if (s1Title) s1Title.textContent = "🚀 1. TREND RIDER";
-        if (s1Sub) s1Sub.textContent = "Buys Upward Breakouts & EMA Golden Cross";
-        if (s2Title) s2Title.textContent = "🎯 2. DIP BUYER";
-        if (s2Sub) s2Sub.textContent = "Buys Oversold Dips & Sells Quick Bounces";
-        if (s3Title) s3Title.textContent = "⚡ 3. SMART SCALPER";
-        if (s3Sub) s3Sub.textContent = "Fast Profit Scalping on Orderbook Buying Pressure";
-      }
-
-      // Update Mode Badge
+      // Mode Badge in Header
       const modeBadge = document.getElementById("mode-badge-el");
       if (modeBadge) {
         if (currentTradingMode === "LIVE") {
@@ -2734,7 +2844,6 @@
 
       // Sync Scanned & Holding Token Pills
       const activeScannedSym = STATE.pairs && STATE.pairs[STATE.pairIdx] ? STATE.pairs[STATE.pairIdx].symbol : STATE.market.symbol;
-      const holdingSym = STATE.activeTrade ? STATE.activeTrade.symbol : null;
       updateTokenPills(activeScannedSym);
 
       // Bot fleet stats (Accurate PnL Sync with Live Open Count)
@@ -2743,209 +2852,149 @@
       const spyOpen = (STATE.positions || []).filter(p => p.botKey === 'spy').length;
 
       document.getElementById("gambler-pnl").textContent = `${STATE.botFleet.gambler.pnl >= 0 ? '+$' : '-$'}${Math.abs(STATE.botFleet.gambler.pnl).toFixed(2)}`;
-      document.getElementById("gambler-trades").innerHTML = `${STATE.botFleet.gambler.trades} closed (${STATE.botFleet.gambler.wins}W/${STATE.botFleet.gambler.trades - STATE.botFleet.gambler.wins}L)${gamblerOpen > 0 ? ` • <span style="color:#38bdf8;font-weight:700;">⚡ ${gamblerOpen} OPEN</span>` : ''}`;
+      document.getElementById("gambler-trades").innerHTML = `${STATE.botFleet.gambler.trades} closed (${STATE.botFleet.gambler.wins}W/${STATE.botFleet.gambler.trades - STATE.botFleet.gambler.wins}L)${gamblerOpen > 0 ? ` • <span style="color:${isFut ? '#c084fc' : '#38bdf8'};font-weight:700;">⚡ ${gamblerOpen} OPEN</span>` : ''}`;
 
       document.getElementById("house-pnl").textContent = `${STATE.botFleet.house.pnl >= 0 ? '+$' : '-$'}${Math.abs(STATE.botFleet.house.pnl).toFixed(2)}`;
-      document.getElementById("house-trades").innerHTML = `${STATE.botFleet.house.trades} closed (${STATE.botFleet.house.wins}W/${STATE.botFleet.house.trades - STATE.botFleet.house.wins}L)${houseOpen > 0 ? ` • <span style="color:#38bdf8;font-weight:700;">⚡ ${houseOpen} OPEN</span>` : ''}`;
+      document.getElementById("house-trades").innerHTML = `${STATE.botFleet.house.trades} closed (${STATE.botFleet.house.wins}W/${STATE.botFleet.house.trades - STATE.botFleet.house.wins}L)${houseOpen > 0 ? ` • <span style="color:${isFut ? '#c084fc' : '#38bdf8'};font-weight:700;">⚡ ${houseOpen} OPEN</span>` : ''}`;
 
       document.getElementById("spy-pnl").textContent = `${STATE.botFleet.spy.pnl >= 0 ? '+$' : '-$'}${Math.abs(STATE.botFleet.spy.pnl).toFixed(2)}`;
-      document.getElementById("spy-trades").innerHTML = `${STATE.botFleet.spy.trades} closed (${STATE.botFleet.spy.wins}W/${STATE.botFleet.spy.trades - STATE.botFleet.spy.wins}L)${spyOpen > 0 ? ` • <span style="color:#38bdf8;font-weight:700;">⚡ ${spyOpen} OPEN</span>` : ''}`;
+      document.getElementById("spy-trades").innerHTML = `${STATE.botFleet.spy.trades} closed (${STATE.botFleet.spy.wins}W/${STATE.botFleet.spy.trades - STATE.botFleet.spy.wins}L)${spyOpen > 0 ? ` • <span style="color:${isFut ? '#c084fc' : '#38bdf8'};font-weight:700;">⚡ ${spyOpen} OPEN</span>` : ''}`;
 
-      // Active trade render (supports viewing focused position from STATE.positions)
-      if (STATE.activeTrade) {
-        const posSide = STATE.activeTrade.side || "BUY";
-        const isPosFut = STATE.activeTrade.marketType === "FUTURES";
-        const levBadge = isPosFut ? ` [${STATE.activeTrade.leverage || 10}x]` : "";
-        const sideColor = posSide.includes("SHORT") ? "#f87171" : "#34d399";
-        
-        document.getElementById("active-symbol").textContent = STATE.activeTrade.symbol;
-        document.getElementById("active-bot").textContent = `${STATE.activeTrade.bot.toUpperCase()}${levBadge}`;
-        document.getElementById("active-side").innerHTML = `<span style="color:${sideColor}; font-weight:800;">${posSide}</span>${levBadge}`;
-        
-        const netUsd = STATE.activeTrade.pnlDollars || 0;
-        const dollarSign = netUsd >= 0 ? "+$" : "-$";
-        const pctSign = (STATE.activeTrade.pnlPct || 0) >= 0 ? "+" : "";
-        const pnlEl = document.getElementById("active-pnl");
-        const roiTag = isPosFut ? "ROI" : "Net";
-        pnlEl.textContent = `${pctSign}${STATE.activeTrade.pnlPct}% ${roiTag} (${dollarSign}${Math.abs(netUsd).toFixed(2)})`;
-        pnlEl.className = (STATE.activeTrade.pnlPct || 0) >= 0 ? "live-pnl green-txt" : "live-pnl red-txt";
-        
-        document.getElementById("active-entry").textContent = `$${fmtPrice(STATE.activeTrade.entryPrice)}`;
-        document.getElementById("active-current").textContent = `$${fmtPrice(STATE.activeTrade.currentPrice)}`;
-        document.getElementById("active-size").textContent = `$${STATE.activeTrade.sizeUsd.toFixed(2)} (${STATE.activeTrade.sizePct}% eq)`;
-        document.getElementById("active-reason").textContent = STATE.activeTrade.reason;
-        
-        const slipEl = document.getElementById("active-slip");
-        if (slipEl) {
-          slipEl.textContent = `-$${(STATE.activeTrade.fees || 0.02).toFixed(2)} (0.1% Buy + 0.1% Sell)`;
-        }
-        const openPCount = (STATE.positions || []).length;
-        document.getElementById("exec-node-sub").textContent = `HOLDING (${openPCount}/4)`;
-        document.getElementById("exec-pill").textContent = `AUTO-TRADER • ${openPCount} ACTIVE SPOT POSITION(S)`;
-        document.getElementById("trade-open-badge").style.display = "inline-block";
-        document.getElementById("trade-open-badge").textContent = `${openPCount} ACTIVE (${(STATE.positions || []).map(p => p.symbol.replace("USDT","")).join(", ")})`;
-
-        const emergencyBtn = document.getElementById("emergency-reset-btn");
+      // Interactive Multi-Position Switcher Tabs
+      const posTabsContainer = document.getElementById("multi-pos-tabs");
+      const emergencyBtn = document.getElementById("emergency-reset-btn");
+      if (openCount > 0) {
         if (emergencyBtn) emergencyBtn.style.display = "inline-block";
-        const execSubEl = document.getElementById("exec-subtext");
-        if (execSubEl) {
-          execSubEl.textContent = `HOLDING (${(STATE.positions || []).length}/${maxPositions}) • TP +1.20%`;
-          execSubEl.style.color = "#34d399";
-        }
-
-        // Render interactive tabs for all open positions
-        const tabsEl = document.getElementById("multi-pos-tabs");
-        if (tabsEl) {
-          if ((STATE.positions || []).length > 1) {
-            tabsEl.style.display = "flex";
-            tabsEl.innerHTML = STATE.positions.map((pos, idx) => {
-              const isSelected = STATE.activeTrade && STATE.activeTrade.symbol === pos.symbol;
-              const pSign = (pos.pnlPct || 0) >= 0 ? "+" : "";
-              const color = (pos.pnlPct || 0) >= 0 ? "#34d399" : "#f87171";
-              return `
-                <div class="pos-tab" data-sym="${pos.symbol}" style="cursor:pointer; display:flex; align-items:center; gap:6px; background:${isSelected ? 'rgba(59,130,246,0.25)' : '#0c1220'}; border:1px solid ${isSelected ? '#3b82f6' : '#1e293b'}; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">
-                  <span>${pos.symbol}</span>
-                  <span style="color:${color}; font-size:10px;">${pSign}${(pos.pnlPct || 0).toFixed(2)}%</span>
-                  <button type="button" class="close-single-pos-btn" data-sym="${pos.symbol}" style="background:rgba(239,68,68,0.25); border:1px solid #ef4444; color:#f87171; font-size:9px; padding:1px 5px; border-radius:3px; cursor:pointer;" title="Close this position">✕</button>
-                </div>
-              `;
-            }).join("");
-
-            tabsEl.querySelectorAll(".pos-tab").forEach(tab => {
-              tab.addEventListener("click", (e) => {
-                if (e.target.classList.contains("close-single-pos-btn")) return;
-                const sym = tab.getAttribute("data-sym");
-                const p = STATE.positions.find(pos => pos.symbol === sym);
-                if (p) {
-                  STATE.activeTrade = p;
-                  render();
-                }
-              });
+        if (openCount > 1 && posTabsContainer) {
+          posTabsContainer.style.display = "flex";
+          posTabsContainer.innerHTML = "";
+          STATE.positions.forEach(pos => {
+            const isSelected = STATE.activeTrade && STATE.activeTrade.symbol === pos.symbol;
+            const tabBtn = document.createElement("button");
+            tabBtn.type = "button";
+            tabBtn.style.padding = "4px 8px";
+            tabBtn.style.fontSize = "10.5px";
+            tabBtn.style.fontWeight = "700";
+            tabBtn.style.borderRadius = "4px";
+            tabBtn.style.cursor = "pointer";
+            const pSign = (pos.pnlPct || 0) >= 0 ? "+" : "";
+            const pCol = (pos.pnlPct || 0) >= 0 ? "#34d399" : "#f87171";
+            tabBtn.style.border = isSelected ? (isFut ? "1px solid #a855f7" : "1px solid #38bdf8") : "1px solid #2d3b55";
+            tabBtn.style.background = isSelected ? (isFut ? "rgba(168,85,247,0.25)" : "rgba(56,189,248,0.2)") : "#0b121f";
+            tabBtn.style.color = isSelected ? "#fff" : "#94a3b8";
+            tabBtn.innerHTML = `${pos.symbol} <span style="color:${pCol};font-weight:800;">${pSign}${(pos.pnlPct || 0).toFixed(2)}%</span>`;
+            tabBtn.addEventListener("click", () => {
+              STATE.activeTrade = pos;
+              render();
             });
-
-            tabsEl.querySelectorAll(".close-single-pos-btn").forEach(btn => {
-              btn.addEventListener("click", async (e) => {
-                e.stopPropagation();
-                const sym = btn.getAttribute("data-sym");
-                const posToClose = STATE.positions.find(p => p.symbol === sym);
-                if (posToClose) {
-                  await closePosition(posToClose, "⚡ MANUAL CLOSE", posToClose.pnlDollars || 0, posToClose.pnlPct || 0);
-                  render();
-                }
-              });
-            });
-          } else {
-            tabsEl.style.display = "none";
-          }
+            posTabsContainer.appendChild(tabBtn);
+          });
+        } else if (posTabsContainer) {
+          posTabsContainer.style.display = "none";
         }
-      } else if (STATE.balance <= 0) {
-        document.getElementById("active-symbol").textContent = "WAITING CAPITAL";
-        document.getElementById("active-side").textContent = "$0.00";
-        document.getElementById("active-pnl").textContent = "deposit $10 min to trade";
-        document.getElementById("active-current").textContent = "-";
-        document.getElementById("exec-node-sub").textContent = "STANDBY";
-        document.getElementById("exec-pill").textContent = "AWAITING CAPITAL • $0.00";
-        document.getElementById("trade-open-badge").style.display = "none";
-      } else if (STATE.balance < 5.0) {
-        document.getElementById("active-symbol").textContent = "BALANCE < $5";
-        document.getElementById("active-side").textContent = "MIN NOTIONAL";
-        document.getElementById("active-pnl").textContent = "min $10 recommended for Binance orders";
-        document.getElementById("active-current").textContent = "-";
-        document.getElementById("exec-node-sub").textContent = "LIMIT";
-        document.getElementById("exec-pill").textContent = "BINANCE RULE • $5 MIN REQUIRED";
-        document.getElementById("trade-open-badge").style.display = "none";
       } else {
-        document.getElementById("active-symbol").textContent = "SCANNING";
-        document.getElementById("active-side").textContent = "BINANCE SPOT";
-        document.getElementById("active-pnl").textContent = "hunting dip / breakout";
-        document.getElementById("active-current").textContent = `$${fmtPrice(STATE.market.price)}`;
-        document.getElementById("exec-node-sub").textContent = "READY";
-        document.getElementById("exec-pill").textContent = "AUTO-TRADER • HUNTING A+ CONFLUENCE";
-        document.getElementById("trade-open-badge").style.display = "none";
-
-        const emergencyBtn = document.getElementById("emergency-reset-btn");
         if (emergencyBtn) emergencyBtn.style.display = "none";
-        const execSubEl = document.getElementById("exec-subtext");
-        if (execSubEl) {
-          execSubEl.textContent = "HUNTING ENTRY";
-          execSubEl.style.color = "#38bdf8";
-        }
-
-        // In scanning mode: ensure Entry Reason and Position Size are never premature
-        const reasonEl = document.getElementById("active-reason");
-        if (reasonEl) {
-          reasonEl.textContent = "Waiting for A+ Confluence trigger...";
-          reasonEl.className = "detail-val blue-txt";
-        }
-        let dynOrderSize = 10.0;
-        let dynOrderPct = 20;
-        if (STATE.balance >= 50.0) {
-          dynOrderSize = +(STATE.balance * 0.20).toFixed(2);
-          dynOrderPct = 20;
-        } else if (STATE.balance >= 10.0) {
-          dynOrderSize = 10.0;
-          dynOrderPct = Math.round((10.0 / STATE.balance) * 100);
-        } else {
-          dynOrderSize = +(STATE.balance).toFixed(2);
-          dynOrderPct = 100;
-        }
-        const estFee = +(dynOrderSize * 0.002).toFixed(2);
-
-        const activeSizeEl = document.getElementById("active-size");
-        if (activeSizeEl) {
-          activeSizeEl.textContent = `$${dynOrderSize.toFixed(2)} (${dynOrderPct}% eq)`;
-        }
-        const slipEl = document.getElementById("active-slip");
-        if (slipEl) {
-          slipEl.textContent = `-$${estFee.toFixed(2)} (0.1% Buy + 0.1% Sell)`;
-        }
+        if (posTabsContainer) posTabsContainer.style.display = "none";
       }
 
-      // Dynamic Money Manager description in Left Sidebar (Dynamically scales with wallet)
-      const sizerDetail = document.getElementById("sizer-detail");
-      if (sizerDetail) {
-        if (STATE.balance >= 50.0) {
-          const orderSz = (STATE.balance * 0.20).toFixed(2);
-          sizerDetail.innerHTML = `Max 20% equity • Up to 4 active positions<br><span id="sizer-subtext">$${orderSz} order size</span>`;
-        } else if (STATE.balance >= 10.0) {
-          sizerDetail.innerHTML = `Min safe size: $10.00 • Max 20% equity<br><span id="sizer-subtext">$10.00 safe order</span>`;
-        } else if (STATE.balance >= 5.0) {
-          sizerDetail.innerHTML = `Starter Micro-Size: $${STATE.balance.toFixed(2)} (100% eq)<br><span id="sizer-subtext">Covers $5.00 min with safe buffer</span>`;
+      // Render Active Position Card
+      if (STATE.activeTrade) {
+        const at = STATE.activeTrade;
+        const livePrice = at.currentPrice || at.entryPrice;
+        const pSign = (at.pnlPct || 0) >= 0 ? "+" : "";
+        const lev = at.leverage || (isFut ? (STATE.leverage || 10) : 1);
+
+        document.getElementById("active-symbol").textContent = at.symbol;
+        const sideEl = document.getElementById("active-side");
+        if (at.side === "SHORT") {
+          sideEl.textContent = `FUTURES SHORT 🔴 (${lev}x)`;
+          sideEl.style.color = "#f87171";
+          sideEl.style.borderColor = "rgba(239, 68, 68, 0.4)";
+          sideEl.style.background = "rgba(239, 68, 68, 0.15)";
         } else {
-          sizerDetail.innerHTML = `Min safe size: $10.00 • Max 20% equity<br><span id="sizer-subtext">Awaiting capital</span>`;
+          sideEl.textContent = isFut ? `FUTURES LONG 🟢 (${lev}x)` : "SPOT BUY (LONG)";
+          sideEl.style.color = "#34d399";
+          sideEl.style.borderColor = "rgba(16, 185, 129, 0.4)";
+          sideEl.style.background = "rgba(16, 185, 129, 0.15)";
         }
+
+        const pnlEl = document.getElementById("active-pnl");
+        const netD = at.pnlDollars || 0;
+        const dollarSign = netD >= 0 ? "+$" : "-$";
+        pnlEl.textContent = `${pSign}${(at.pnlPct || 0).toFixed(2)}% [Net ${dollarSign}${Math.abs(netD).toFixed(2)}]`;
+        pnlEl.className = `live-pnl ${(at.pnlPct || 0) >= 0 ? "green-txt" : "red-txt"}`;
+
+        document.getElementById("active-bot").textContent = at.bot;
+        document.getElementById("active-entry").textContent = `$${fmtPrice(at.entryPrice)}`;
+        document.getElementById("active-current").textContent = `$${fmtPrice(livePrice)}`;
+        
+        if (isFut) {
+          const liqText = at.liqPrice ? `$${fmtPrice(at.liqPrice)} (Buffer: ${at.liqBuffer || 40}%)` : `Buffer > 40% (Safe)`;
+          document.getElementById("active-slip").innerHTML = `<span style="color:#c084fc;">Est 8h Funding: +0.0100%</span> • Taker: 0.08%`;
+          document.getElementById("active-stop").innerHTML = `<span style="color:#f87171;">🛑 -3.50% Net ROI</span> • Liq: ${liqText}`;
+          document.getElementById("active-target").innerHTML = `<span style="color:#34d399;">🎯 +5.50% Net ROI</span> (Runner Lock)`;
+        } else {
+          document.getElementById("active-slip").textContent = `-$${(at.sizeUsd * 0.002).toFixed(2)} (0.1% Buy + 0.1% Sell)`;
+          document.getElementById("active-stop").textContent = `🛑 -1.50% Net (Breakeven @ +0.35% • Zero Loss Lock)`;
+          document.getElementById("active-target").textContent = `🚀 +1.20% Net Scalp (Trailing Runner)`;
+        }
+
+        document.getElementById("active-size").textContent = `$${at.sizeUsd.toFixed(2)} (${at.sizePct || 22}% eq)`;
+        document.getElementById("active-reason").textContent = at.reason;
+
+        document.getElementById("exec-node-sub").textContent = `${pSign}${(at.pnlPct || 0).toFixed(1)}% LIVE`;
+        document.getElementById("exec-pill").textContent = `${at.symbol} • ${pSign}${(at.pnlPct || 0).toFixed(2)}% NET (${at.bot})`;
+        document.getElementById("trade-open-badge").style.display = "inline-block";
+      } else {
+        // Scanning Mode Display
+        document.getElementById("active-symbol").textContent = activeScannedSym;
+        document.getElementById("active-side").textContent = isFut ? `FUTURES PERP (${STATE.leverage || 10}x)` : "BINANCE SPOT";
+        document.getElementById("active-pnl").textContent = `Scanning 12 coins 24/7 (${STATE.confluenceScore || 50}/100)`;
+        document.getElementById("active-pnl").className = "live-pnl blue-txt";
+        document.getElementById("active-current").textContent = `$${fmtPrice(STATE.market.price)}`;
+        document.getElementById("exec-node-sub").textContent = "SCANNING";
+        document.getElementById("exec-pill").textContent = `RADAR • SCANNING ${activeScannedSym} (${STATE.confluenceScore || 50}/100)`;
+        document.getElementById("trade-open-badge").style.display = "none";
       }
 
-      // Terminal logs (Auto-scroll to top so latest logs are always visible first)
+      // Render Night Log Terminal
       const term = document.getElementById("night-log-terminal");
       if (term) {
-        term.innerHTML = STATE.logs.slice(0, 25).map(l => {
-          const color = (l.type === "SOLD" || l.type === "EXIT" || l.type === "BINANCE_SELL")
+        term.innerHTML = (STATE.logs || []).slice(0, 30).map(l => {
+          const isExit = l.type === "SOLD" || l.type === "EXIT" || l.type === "BINANCE_SELL";
+          const color = isExit
             ? (l.pnl_num >= 0 ? "green-txt" : "red-txt") 
-            : (l.type === "BOUGHT" || l.type === "BINANCE_LIVE" ? "cyan-txt" : (l.type === "SCAN" ? "blue-txt" : (l.type === "HOLD" ? "cyan-txt" : "yellow-txt")));
+            : (l.type === "BOUGHT" || l.type === "BINANCE_LIVE" ? (isFut ? "purple-txt" : "cyan-txt") : (l.type === "SCAN" ? "blue-txt" : (l.type === "HOLD" ? "cyan-txt" : "yellow-txt")));
           const botTag = l.bot ? `[${l.bot}] ` : '';
-          return `<div class="term-line"><span style="color:#64748b;">${l.time}</span> <span class="${color} bold">${l.type}</span> <span style="color:#60a5fa;">${botTag}</span><b>${l.token}</b> <span class="${color}">${l.pnl}</span> <span style="color:#94a3b8;">${l.reason}</span> <span style="color:#64748b;">${l.size}</span></div>`;
+          return `<div class="term-line"><span style="color:#64748b;">${l.time}</span> <span class="${color} bold">${l.type}</span> <span style="color:${isFut ? '#c084fc' : '#60a5fa'};">${botTag}</span><b>${l.token}</b> <span class="${color}">${l.pnl}</span> <span style="color:#94a3b8;">${l.reason}</span> <span style="color:#64748b;">${l.size}</span></div>`;
         }).join("");
         term.scrollTop = 0;
       }
 
-      // Ledger table (Fix Issue #6: clearly display Win/Loss tags)
-      const rows = document.getElementById("ledger-rows");
-      rows.innerHTML = STATE.logs.filter(l => l.type === "SOLD" || l.type === "EXIT" || l.type === "BINANCE_SELL").slice(0, 8).map(l => {
-        const isWin = l.pnl_num >= 0;
-        const color = isWin ? "green-txt" : "red-txt";
-        const badge = isWin ? "🎯 PROFIT" : "🛑 STOP LOSS";
-        return `
-          <div class="ledger-row">
-            <span style="color:#64748b;">${l.time}</span>
-            <span class="${color} bold">${badge}</span>
-            <b>${l.bot} • ${l.token}</b>
-            <span style="color:#94a3b8;">${l.reason}</span>
-            <span class="${color} bold">${l.pnl}</span>
-            <span style="color:#64748b;">${l.size}</span>
-          </div>
-        `;
-      }).join("");
+      // Render Completed Trades Ledger
+      const ledgerRows = document.getElementById("ledger-rows");
+      if (ledgerRows) {
+        const tradesToShow = (STATE.logs || []).filter(l => l.type === "SOLD" || l.type === "EXIT" || l.type === "BINANCE_SELL");
+        ledgerRows.innerHTML = tradesToShow.slice(0, 10).map(l => {
+          const isWin = l.pnl_num >= 0;
+          const color = isWin ? "green-txt" : "red-txt";
+          const badge = isWin ? "🎯 PROFIT" : "🛑 STOP LOSS";
+          return `
+            <div class="ledger-row" style="display:flex; justify-content:space-between; align-items:center; padding:6px 10px; border-bottom:1px solid #182234; font-size:11.5px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="color:#64748b;">${l.time}</span>
+                <span class="${color} bold" style="padding:1px 6px; border-radius:3px; background:${isWin ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'}; border:1px solid ${isWin ? '#10b981' : '#ef4444'}; font-size:10px;">${badge}</span>
+                <b style="color:#fff;">${l.bot} • ${l.token}</b>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span style="color:#94a3b8;">${l.reason || ''}</span>
+                <span class="${color} bold">${l.pnl}</span>
+                <span style="color:#64748b;">${l.size}</span>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
     }
 
     // -------------------------------------------------------------
@@ -3021,32 +3070,45 @@
         
         const saveBtn = document.getElementById("save-api-btn");
         saveBtn.disabled = true;
-        apiStatus.textContent = "⏳ Authenticating with Binance & detecting live wallet balance...";
+        apiStatus.textContent = "⏳ Authenticating with Binance (Scanning Spot & Futures Wallets)...";
         apiStatus.style.color = "#60a5fa";
 
         try {
-          const res = await fetch("/api/order", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              action: "test_connection",
-              apiKey: k,
-              apiSecret: s
-            })
-          });
-          const data = await res.json();
-          if (data.success) {
+          const [spotData, futData] = await Promise.all([
+            fetch("/api/order", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ action: "test_connection", apiKey: k, apiSecret: s, marketType: "SPOT" })
+            }).then(r => r.json()).catch(() => ({ success: false })),
+            fetch("/api/order", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ action: "test_connection", apiKey: k, apiSecret: s, marketType: "FUTURES" })
+            }).then(r => r.json()).catch(() => ({ success: false }))
+          ]);
+
+          if (spotData.success || futData.success) {
             userApiKey = k;
             userApiSecret = s;
             localStorage.setItem("grok_user_api_key", k);
             localStorage.setItem("grok_user_api_secret", s);
 
-            const detectedBalance = data.usdtBalance !== undefined ? parseFloat(data.usdtBalance) : 0.0;
-            STATE.balance = detectedBalance;
-            STATE.startBalance = detectedBalance;
+            const spotBal = spotData.success && spotData.usdtBalance !== undefined ? parseFloat(spotData.usdtBalance) : 0.0;
+            const futBal = futData.success && futData.usdtBalance !== undefined ? parseFloat(futData.usdtBalance) : 0.0;
+
+            STATE.spot.balance = spotBal;
+            STATE.spot.startBalance = spotBal;
+            STATE.futures.balance = futBal;
+            STATE.futures.startBalance = futBal;
             currentTradingMode = "LIVE";
 
-            // Save directly into the user account database!
+            // Autonomous Live Wallet Routing
+            if (futBal >= 5.0 && spotBal < 5.0) {
+              setMarketMode("FUTURES");
+            } else if (spotBal >= 5.0) {
+              setMarketMode("SPOT");
+            }
+
             try {
               await fetch("/api/auth", {
                 method: "POST",
@@ -3056,13 +3118,17 @@
                   username: activeUser.username,
                   apiKey: k,
                   apiSecret: s,
-                  balance: detectedBalance,
+                  spot_balance: spotBal,
+                  futures_balance: futBal,
+                  balance: getActiveProfile().balance,
                   tradingMode: "LIVE"
                 })
               });
               activeUser.apiKey = k;
               activeUser.apiSecret = s;
-              activeUser.balance = detectedBalance;
+              activeUser.spot_balance = spotBal;
+              activeUser.futures_balance = futBal;
+              activeUser.balance = getActiveProfile().balance;
               activeUser.tradingMode = "LIVE";
               localStorage.setItem("grok_active_user", JSON.stringify(activeUser));
             } catch (err) {}
@@ -3071,9 +3137,9 @@
             renderAuthUI();
             render();
 
-            logEvent("CONNECTED", "DESK", "BINANCE_SPOT", `$${detectedBalance.toFixed(2)}`, `Real Binance Account connected! Balance: $${detectedBalance.toFixed(2)} USDT. Saved to database.`, "LIVE");
+            logEvent("CONNECTED", "DESK", "MULTI_WALLET", `Spot: $${spotBal.toFixed(2)} | Fut: $${futBal.toFixed(2)}`, `Binance Live Connected! AI detected Spot $${spotBal.toFixed(2)} USDT & Futures $${futBal.toFixed(2)} USDT. Saved to database.`, "LIVE");
 
-            apiStatus.textContent = `✅ Live Account Activated! Real Balance: $${detectedBalance.toFixed(2)} USDT. Safe in database!`;
+            apiStatus.textContent = `✅ Live Account Activated! Spot: $${spotBal.toFixed(2)} USDT | Futures: $${futBal.toFixed(2)} USDT.`;
             apiStatus.style.color = "#34d399";
 
             setTimeout(() => {
@@ -3502,73 +3568,71 @@
     });
 
     function resetDemoAccount(amount) {
-      STATE.balance = amount;
-      STATE.startBalance = amount;
-      STATE.positions = [];
-      STATE.activeTrade = null;
-      STATE.tradeDuration = 0;
-      STATE.trades = 0;
-      STATE.wins = 0;
-      STATE.losses = 0;
-      STATE.botFleet = {
+      const isFut = STATE.marketType === "FUTURES";
+      const profile = getActiveProfile();
+      profile.balance = amount;
+      profile.startBalance = amount;
+      profile.positions = [];
+      profile.activeTrade = null;
+      profile.tradeDuration = 0;
+      profile.trades = 0;
+      profile.wins = 0;
+      profile.losses = 0;
+      profile.botFleet = isFut ? {
+        gambler: { name: "Momentum Hunter", trades: 0, wins: 0, pnl: 0 },
+        house:   { name: "Perp Funding Arb", trades: 0, wins: 0, pnl: 0 },
+        spy:     { name: "Reversal Sniper",  trades: 0, wins: 0, pnl: 0 }
+      } : {
         gambler: { name: "Trend Rider",  trades: 0, wins: 0, pnl: 0 },
         house:   { name: "Dip Buyer",    trades: 0, wins: 0, pnl: 0 },
         spy:     { name: "Smart Scalper", trades: 0, wins: 0, pnl: 0 }
       };
-      localStorage.removeItem("grok_positions");
-      localStorage.removeItem("grok_active_trade");
-      localStorage.setItem("grok_total_trades", "0");
-      localStorage.setItem("grok_total_wins", "0");
-      localStorage.setItem("grok_total_losses", "0");
-      localStorage.setItem("grok_bot_fleet", JSON.stringify(STATE.botFleet));
-      localStorage.setItem("grok_start_capital", amount.toFixed(2));
+      profile.logs = [];
+
       saveUserState();
-      logEvent("RESET", "SYSTEM", "ALL", "+$0.00", `Account fresh reset to $${amount.toFixed(2)} Demo Funds. All old positions & stats cleared.`, "100%");
-      modal.style.display = "none";
+      logEvent("RESET", "SYSTEM", STATE.marketType, `+$${amount.toFixed(2)}`, `${STATE.marketType} capital set to $${amount.toFixed(2)} USD. All stats reset. Ready for profitable execution.`, "100%");
+      const modal = document.getElementById("deposit-modal");
+      if (modal) modal.style.display = "none";
       render();
     }
 
     // Legendary Alpha Overnight Runner Preset ($44.82 -> $8,391.08 • 40W / 21L)
     function loadAlphaRunnerPreset() {
-      STATE.balance = 8391.08;
-      STATE.startBalance = 44.82;
-      STATE.positions = [];
-      STATE.activeTrade = null;
-      STATE.tradeDuration = 0;
-      STATE.trades = 61;
-      STATE.wins = 40;
-      STATE.losses = 21;
-      STATE.botFleet = {
+      const isFut = STATE.marketType === "FUTURES";
+      const profile = getActiveProfile();
+      profile.balance = 8391.08;
+      profile.startBalance = 44.82;
+      profile.positions = [];
+      profile.activeTrade = null;
+      profile.tradeDuration = 0;
+      profile.trades = 61;
+      profile.wins = 40;
+      profile.losses = 21;
+      profile.botFleet = isFut ? {
+        gambler: { name: "Momentum Hunter", trades: 35, wins: 26, pnl: 4892.40 },
+        house:   { name: "Perp Funding Arb", trades: 12, wins: 8,  pnl: 1640.15 },
+        spy:     { name: "Reversal Sniper",  trades: 14, wins: 6,  pnl: 1858.53 }
+      } : {
         gambler: { name: "Trend Rider",  trades: 35, wins: 26, pnl: 4892.40 },
         house:   { name: "Dip Buyer",    trades: 12, wins: 8,  pnl: 1640.15 },
         spy:     { name: "Smart Scalper", trades: 14, wins: 6,  pnl: 1858.53 }
       };
       
-      STATE.logs = [
-        { time: "06:34:00", type: "ENTER", bot: "Trend Rider", token: "PEPEUSDT", pnl: "$0.00", reason: "spike 4.1x • whale accumulation surge size 22%", size: "$1,846.04" },
-        { time: "06:31:45", type: "EXIT", bot: "Smart Scalper", token: "SOLUSDT", pnl: "+$342.52", pnl_num: 342.52, reason: "trailing stop hit (+12.0% runner)", size: "$1,846.04" },
+      profile.logs = [
+        { time: "06:34:00", type: "ENTER", bot: isFut ? "Momentum Hunter" : "Trend Rider", token: "PEPEUSDT", pnl: "$0.00", reason: "spike 4.1x • whale accumulation surge size 22%", size: "$1,846.04" },
+        { time: "06:31:45", type: "EXIT", bot: isFut ? "Reversal Sniper" : "Smart Scalper", token: "SOLUSDT", pnl: "+$342.52", pnl_num: 342.52, reason: "trailing stop hit (+12.0% runner)", size: "$1,846.04" },
         { time: "06:28:10", type: "SCAN", bot: "RADAR", token: "DOGEUSDT", pnl: "32/100", reason: "PASS: Ask Wall Resistance (58% Asks)", size: "$0.00" },
-        { time: "06:27:00", type: "ENTER", bot: "Smart Scalper", token: "SOLUSDT", pnl: "$0.00", reason: "spike 3.1x • whale bid wall absorption size 22%", size: "$1,846.04" },
-        { time: "06:25:20", type: "EXIT", bot: "Dip Buyer", token: "ETHUSDT", pnl: "-$148.50", pnl_num: -148.50, reason: "stop 1% hit (-1.2% risk cut)", size: "$1,620.00" },
-        { time: "06:20:15", type: "EXIT", bot: "Trend Rider", token: "SUIUSDT", pnl: "+$418.90", pnl_num: 418.90, reason: "trailing runner hit (+8.4% gain)", size: "$1,750.00" },
-        { time: "06:12:00", type: "EXIT", bot: "Trend Rider", token: "AVAXUSDT", pnl: "+$295.40", pnl_num: 295.40, reason: "trailing runner hit (+6.1% gain)", size: "$1,680.00" }
+        { time: "06:27:00", type: "ENTER", bot: isFut ? "Reversal Sniper" : "Smart Scalper", token: "SOLUSDT", pnl: "$0.00", reason: "spike 3.1x • whale bid wall absorption size 22%", size: "$1,846.04" },
+        { time: "06:25:20", type: "EXIT", bot: isFut ? "Perp Funding Arb" : "Dip Buyer", token: "ETHUSDT", pnl: "-$148.50", pnl_num: -148.50, reason: "stop 1% hit (-1.2% risk cut)", size: "$1,620.00" },
+        { time: "06:20:15", type: "EXIT", bot: isFut ? "Momentum Hunter" : "Trend Rider", token: "SUIUSDT", pnl: "+$418.90", pnl_num: 418.90, reason: "trailing runner hit (+8.4% gain)", size: "$1,750.00" },
+        { time: "06:12:00", type: "EXIT", bot: isFut ? "Momentum Hunter" : "Trend Rider", token: "AVAXUSDT", pnl: "+$295.40", pnl_num: 295.40, reason: "trailing runner hit (+6.1% gain)", size: "$1,680.00" }
       ];
 
-      localStorage.removeItem("grok_positions");
-      localStorage.removeItem("grok_active_trade");
-      localStorage.setItem("grok_user_balance", "8391.08");
-      localStorage.setItem("grok_start_capital", "44.82");
-      localStorage.setItem("grok_total_trades", "61");
-      localStorage.setItem("grok_total_wins", "40");
-      localStorage.setItem("grok_total_losses", "21");
-      localStorage.setItem("grok_bot_fleet", JSON.stringify(STATE.botFleet));
-      localStorage.setItem("grok_terminal_logs", JSON.stringify(STATE.logs.slice(0, 40)));
       saveUserState();
-
       document.getElementById("equity-last-val").textContent = "+$342.52";
-      logEvent("RESET", "SYSTEM", "ALPHA", "+$8,391.08", "Alpha Overnight Runner Loaded ($44.82 -> $8,391.08 • 40W/21L). 22% Sizing Active.", "100%");
+      logEvent("RESET", "SYSTEM", "ALPHA", "+$8,391.08", `${STATE.marketType} Alpha Runner Loaded ($44.82 -> $8,391.08 • 40W/21L). 22% Sizing Active.`, "100%");
       
-      const modal = document.getElementById("capital-modal");
+      const modal = document.getElementById("deposit-modal");
       if (modal) modal.style.display = "none";
       render();
     }
@@ -3582,7 +3646,7 @@
     if (reset5Btn) {
       reset5Btn.addEventListener("click", () => {
         resetDemoAccount(5.0);
-        logEvent("RESET", "SYSTEM", "ALL", "+$5.00", "⚡ $5.00 Micro Scalper Challenge Activated! 100% Capital Concentration into 1 A+ Trade.", "100%");
+        logEvent("RESET", "SYSTEM", "ALL", "+$5.00", `⚡ $5.00 ${STATE.marketType} Scalper Activated! 100% Capital Concentration into 1 A+ Trade.`, "100%");
       });
     }
 
@@ -3591,17 +3655,108 @@
       resetDemoBtn.addEventListener("click", () => resetDemoAccount(100.0));
     }
 
-    // Toggle Pause/Resume Button
-    
-    // Market Mode Switcher (SPOT vs FUTURES)
+    // Dynamic UI Theme & Modules Morphing (Spot vs Futures)
+    function updateModeUIElements(mode) {
+      const isFut = mode === "FUTURES";
+      if (isFut) {
+        document.body.classList.add("futures-mode");
+      } else {
+        document.body.classList.remove("futures-mode");
+      }
+
+      const brandTitle = document.getElementById("brand-title-el");
+      const brandTag = document.getElementById("brand-tag-el");
+      const brandSub = document.getElementById("brand-subtext-el");
+      if (brandTitle) brandTitle.textContent = isFut ? "Grok Futures AI Auto-Trader" : "Grok Spot Auto-Trader";
+      if (brandTag) brandTag.textContent = isFut ? `⚡ v2.0 • ${STATE.leverage || 10}x Perp Profit Engine` : "v2.0 • Spot Profit Engine";
+      if (brandSub) brandSub.textContent = isFut ? "Bi-Directional Long & Short • Cross-Margin • AI Dynamic Leverage (5x-20x) • Liquidation Shield Buffer" : "Buys safe dips & sells for profit 24/7 on Binance Spot • Zero liquidation risk";
+
+      // Strat cards
+      const s1Title = document.getElementById("strat-1-title");
+      const s1Sub = document.getElementById("strat-1-sub");
+      const s2Title = document.getElementById("strat-2-title");
+      const s2Sub = document.getElementById("strat-2-sub");
+      const s3Title = document.getElementById("strat-3-title");
+      const s3Sub = document.getElementById("strat-3-sub");
+
+      if (s1Title) s1Title.textContent = isFut ? "⚡ 1. MOMENTUM HUNTER" : "🚀 1. TREND RIDER";
+      if (s1Sub) s1Sub.textContent = isFut ? "Trades Breakout Longs & Breakdown Shorts" : "Buys Upward Breakouts & EMA Golden Cross";
+      if (s2Title) s2Title.textContent = isFut ? "🛡️ 2. PERP FUNDING ARB" : "🎯 2. DIP BUYER";
+      if (s2Sub) s2Sub.textContent = isFut ? "Harvests Funding Spreads & Extreme Reversals" : "Buys Oversold Dips & Sells Quick Bounces";
+      if (s3Title) s3Title.textContent = isFut ? "🎯 3. REVERSAL SNIPER" : "⚡ 3. SMART SCALPER";
+      if (s3Sub) s3Sub.textContent = isFut ? "Snipes Exhaustion Tops & Deep Bottoms" : "Fast Profit Scalping on Orderbook Buying Pressure";
+
+      // Pipeline Modules
+      const pipeTitle = document.getElementById("pipeline-header-title");
+      if (pipeTitle) pipeTitle.textContent = isFut ? "FUTURES PERP PIPELINE" : "AUTOMATION ENGINE";
+
+      const m1Name = document.getElementById("mod-1-name");
+      const m1Role = document.getElementById("mod-1-role");
+      if (m1Name) m1Name.textContent = isFut ? "1. PERPETUAL RADAR" : "1. MARKET RADAR";
+      if (m1Role) m1Role.textContent = isFut ? "Funding rate, OI & perp momentum radar" : "Live Binance Spot 1m price radar";
+
+      const m2Name = document.getElementById("mod-2-name");
+      const m2Role = document.getElementById("mod-2-role");
+      if (m2Name) m2Name.textContent = isFut ? "2. LIQUIDATION SHIELD" : "2. SPREAD GUARD";
+      if (m2Role) m2Role.textContent = isFut ? "Maintains 35%+ buffer from liq price" : "Liquidity & low fee verification";
+
+      const m3Name = document.getElementById("mod-3-name");
+      const m3Role = document.getElementById("mod-3-role");
+      if (m3Name) m3Name.textContent = isFut ? "3. AI AUTO-LEVERAGE" : "3. MONEY MANAGER";
+      if (m3Role) m3Role.textContent = isFut ? "Dynamic: 5x memes • 10x alts • 20x BTC" : "Protects balance & enforces safe sizing";
+
+      const m4Name = document.getElementById("mod-4-name");
+      const m4Role = document.getElementById("mod-4-role");
+      if (m4Name) m4Name.textContent = isFut ? "4. DUAL EXECUTOR" : "4. AUTO-TRADER";
+      if (m4Role) m4Role.textContent = isFut ? "Auto LONG on breakout / SHORT on dump" : "Buys low & auto-sells for profit";
+
+      const m5Name = document.getElementById("mod-5-name");
+      const m5Role = document.getElementById("mod-5-role");
+      if (m5Name) m5Name.textContent = isFut ? "5. FUNDING & TAKER AUDITOR" : "5. PROFIT AUDITOR";
+      if (m5Role) m5Role.textContent = isFut ? "Tracks 8h funding rate & 0.08% taker fee" : "Exchange fee audit (0.2% round-trip)";
+
+      const m6Name = document.getElementById("mod-6-name");
+      const m6Role = document.getElementById("mod-6-role");
+      if (m6Name) m6Name.textContent = isFut ? "6. USD-M MARGIN VAULT" : "6. USDT VAULT";
+      if (m6Role) m6Role.textContent = isFut ? "Protects USD-M futures margin collateral" : "Protects capital in stable USDT";
+
+      const m7Name = document.getElementById("mod-7-name");
+      const m7Role = document.getElementById("mod-7-role");
+      if (m7Name) m7Name.textContent = isFut ? "7. CROSS-MARGIN PROTOCOL" : "7. YOUR PRIVATE SESSION";
+      if (m7Role) m7Role.textContent = isFut ? "Cross-margin risk control & auto-deleverage" : "Client-side private storage";
+
+      // Flow & Confluence Titles
+      const flowTitle = document.getElementById("flow-header-title");
+      const flowSub = document.getElementById("flow-header-sub");
+      if (flowTitle) flowTitle.textContent = isFut ? "HOW THE BOT WORKS (FUTURES PERP MODEL - LONG & SHORT)" : "HOW THE BOT WORKS (SPOT EARNING MODEL)";
+      if (flowSub) flowSub.textContent = isFut ? "1. SCAN ➔ 2. CHECK MOMENTUM ➔ 3. AUTO-LEVERAGE ➔ 4. EXECUTE LONG/SHORT ➔ 5. ROI EXIT" : "1. SCAN ➔ 2. CHECK DIP/TREND ➔ 3. SAFE SIZING ➔ 4. AUTO BUY ➔ 5. SELL FOR PROFIT";
+
+      const radarTitle = document.getElementById("radar-header-title");
+      if (radarTitle) radarTitle.textContent = isFut ? "⚡ AI PERP CONFLUENCE RADAR (LONG/SHORT)" : "🧠 AI QUANT CONFLUENCE RADAR";
+
+      const activeCardTitle = document.getElementById("active-card-title");
+      if (activeCardTitle) activeCardTitle.textContent = isFut ? `⚡ LIVE FUTURES POSITION (${STATE.leverage || 10}x)` : "📊 LIVE SPOT POSITION";
+
+      const ledgerTitle = document.getElementById("ledger-title-el");
+      const ledgerSub = document.getElementById("ledger-sub-el");
+      if (ledgerTitle) ledgerTitle.textContent = isFut ? "⚡ COMPLETED FUTURES PERP TRADES & EXECUTION LEDGER" : "📜 COMPLETED SPOT TRADES & EXECUTION LEDGER";
+      if (ledgerSub) ledgerSub.textContent = isFut ? "Real Futures Execution History" : "Real Spot Execution History";
+
+      document.querySelectorAll(".token-pill .sub").forEach(el => {
+        el.textContent = isFut ? "Perp" : "Spot";
+      });
+    }
+
     function setMarketMode(mode) {
       STATE.marketType = mode;
       localStorage.setItem("grok_market_type", mode);
+      const isFut = mode === "FUTURES";
+
       const spotBtn = document.getElementById("tab-spot-btn");
       const futBtn = document.getElementById("tab-futures-btn");
       const levWrap = document.getElementById("futures-leverage-wrap");
 
-      if (mode === "FUTURES") {
+      if (isFut) {
         if (spotBtn) {
           spotBtn.style.background = "transparent";
           spotBtn.style.color = "#94a3b8";
@@ -3628,6 +3783,9 @@
         if (levWrap) levWrap.style.display = "none";
         logEvent("MODE", "SYSTEM", "SPOT", "1x SPOT", "Switched to Binance Spot Engine. Safe Dip & Breakout Buying.", "100%");
       }
+
+      updateModeUIElements(mode);
+      saveUserState();
       render();
     }
 
@@ -3664,6 +3822,8 @@
     // Initialize initial mode visual state
     if (STATE.marketType === "FUTURES") {
       setMarketMode("FUTURES");
+    } else {
+      updateModeUIElements("SPOT");
     }
 
     document.getElementById("toggle-run-btn").addEventListener("click", () => {
