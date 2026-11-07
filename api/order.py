@@ -7,6 +7,8 @@ import time
 import hmac
 import hashlib
 
+import math
+
 # Binance Global multi-cluster endpoints
 BINANCE_ENDPOINTS = [
     "https://api1.binance.com",
@@ -15,12 +17,12 @@ BINANCE_ENDPOINTS = [
     "https://api.binance.com"
 ]
 
-# Precision map for Binance Spot base assets
-SYMBOL_PRECISION = {
-    "BTCUSDT": 5,
-    "ETHUSDT": 4,
-    "SOLUSDT": 2,
-    "BNBUSDT": 3
+# Exact stepSize and precision for Binance Spot target pairs
+SYMBOL_CONFIG = {
+    "BTCUSDT": {"stepSize": 0.00001, "decimals": 5, "baseAsset": "BTC", "minNotional": 5.0},
+    "ETHUSDT": {"stepSize": 0.0001,  "decimals": 4, "baseAsset": "ETH", "minNotional": 5.0},
+    "SOLUSDT": {"stepSize": 0.001,   "decimals": 3, "baseAsset": "SOL", "minNotional": 5.0},
+    "BNBUSDT": {"stepSize": 0.001,   "decimals": 3, "baseAsset": "BNB", "minNotional": 5.0}
 }
 
 class handler(BaseHTTPRequestHandler):
@@ -151,12 +153,43 @@ class handler(BaseHTTPRequestHandler):
             "error": f"Binance rejected: {err_msg}"
         })
 
+    def _get_base_free_balance(self, api_key, api_secret, base_asset):
+        timestamp = int(time.time() * 1000)
+        query_string = f"timestamp={timestamp}&recvWindow=5000"
+        signature = hmac.new(api_secret.encode('utf-8'), query_string.encode('utf-8'), hashlib.sha256).hexdigest()
+
+        for base_url in BINANCE_ENDPOINTS:
+            full_url = f"{base_url}/api/v3/account?{query_string}&signature={signature}"
+            req = urllib.request.Request(full_url, headers={
+                'X-MBX-APIKEY': api_key,
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            })
+            try:
+                with urllib.request.urlopen(req, timeout=5) as response:
+                    res_data = json.loads(response.read().decode('utf-8'))
+                    for b in res_data.get("balances", []):
+                        if b.get("asset") == base_asset:
+                            return float(b.get("free", 0.0))
+                    return 0.0
+            except Exception:
+                continue
+        return 0.0
+
     def handle_create_order(self, api_key, api_secret, data):
         symbol = data.get("symbol", "BTCUSDT").upper()
         side = data.get("side", "BUY").upper()
         order_type = data.get("type", "MARKET").upper()
         quote_order_qty = data.get("quoteOrderQty")
         quantity = data.get("quantity")
+
+        cfg = SYMBOL_CONFIG.get(symbol, {
+            "stepSize": 0.0001,
+            "decimals": 4,
+            "baseAsset": symbol.replace("USDT", ""),
+            "minNotional": 5.0
+        })
+        decimals = cfg["decimals"]
+        step_size = cfg["stepSize"]
 
         params = {
             "symbol": symbol,
@@ -166,8 +199,6 @@ class handler(BaseHTTPRequestHandler):
             "recvWindow": 5000
         }
 
-        decimals = SYMBOL_PRECISION.get(symbol, 4)
-
         if side == "BUY":
             if quote_order_qty:
                 params["quoteOrderQty"] = f"{float(quote_order_qty):.2f}"
@@ -176,13 +207,29 @@ class handler(BaseHTTPRequestHandler):
             else:
                 params["quoteOrderQty"] = "10.00"
         else: # SELL
-            if quantity:
-                params["quantity"] = f"{float(quantity):.{decimals}f}"
-            elif quote_order_qty:
-                params["quoteOrderQty"] = f"{float(quote_order_qty):.2f}"
-            else:
-                self._respond_json(400, {"success": False, "error": "Must specify quantity or quoteOrderQty for SELL"})
+            # Binance Spot MARKET SELL orders REQUIRE quantity (not quoteOrderQty)
+            sell_qty = None
+            if quantity and str(quantity).upper() != "ALL":
+                try:
+                    sell_qty = float(quantity)
+                except ValueError:
+                    sell_qty = None
+
+            # If quantity not provided or "ALL", lookup free asset balance directly from Binance
+            if sell_qty is None or sell_qty <= 0:
+                sell_qty = self._get_base_free_balance(api_key, api_secret, cfg["baseAsset"])
+
+            # Round down with math.floor to stepSize to guarantee ZERO LOT_SIZE filter rejections
+            floored_qty = math.floor((sell_qty or 0.0) / step_size) * step_size
+
+            if floored_qty <= 0:
+                self._respond_json(200, {
+                    "success": False,
+                    "error": f"Insufficient {cfg['baseAsset']} balance on Binance to sell. (Available: {sell_qty or 0.0})"
+                })
                 return
+
+            params["quantity"] = f"{floored_qty:.{decimals}f}"
 
         query_string = urllib.parse.urlencode(params)
         signature = hmac.new(api_secret.encode('utf-8'), query_string.encode('utf-8'), hashlib.sha256).hexdigest()
