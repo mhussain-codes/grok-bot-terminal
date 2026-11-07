@@ -2172,7 +2172,12 @@
         STATE.apiErrorCooldown--;
       }
 
-      const MAX_OPEN_POSITIONS = 4;
+      // Scale max positions based on account size (concentrate capital for small accounts)
+      let MAX_OPEN_POSITIONS = 1;
+      if (STATE.balance >= 250) MAX_OPEN_POSITIONS = 4;
+      else if (STATE.balance >= 100) MAX_OPEN_POSITIONS = 3;
+      else if (STATE.balance >= 25) MAX_OPEN_POSITIONS = 2;
+      else MAX_OPEN_POSITIONS = 1; // Small accounts: ONE concentrated position
       STATE.positions = STATE.positions || [];
 
       // =========================================================
@@ -2228,11 +2233,11 @@
         // 2. High-Profit Trailing Lock: Peak >= +0.90% Net reach kiya aur peak se 0.25% pullback kiya
         const hitTrailingProfit = pos.peakNetPct >= 0.90 && netPct <= (pos.peakNetPct - 0.25);
         // 3. Breakeven Profit Defense: Agar +0.55% Net reach kiya aur price retrace ho rahi hai, lock at +0.20% Net (Zero Loss Guarantee!)
-        const hitBreakevenLock = pos.peakNetPct >= 0.55 && netPct <= 0.20;
+        const hitBreakevenLock = pos.peakNetPct >= 0.70 && netPct <= 0.15;
         // 4. Time-Based Scalp Win: Held >= 25 mins and in solid profit (>= +0.35% Net)
         const hitTimeScalpWin = heldMinutes >= MAX_HOLD_MINUTES && netPct >= 0.35;
         // 5. Stale Chop Exit: Held >= 40 mins and price is negative (prevent dead bags)
-        const hitStaleExit = heldMinutes >= 40 && netPct < 0;
+        const hitStaleExit = heldMinutes >= 40 && netPct <= -0.30;
         // 6. Professional Risk Stop-Loss (-0.85% Net)
         const hitStopLoss = netPct <= STOP_LOSS_NET;
 
@@ -2300,8 +2305,10 @@
 
         // Professional Confluence Gate:
         // Must have Score >= 76 AND volRatio >= 1.15 AND bidRatio >= 0.48 AND (Bullish Ribbon OR Oversold Bounce) AND NOT Disqualified
+        // ALSO: Last completed candle must be GREEN (buy volume, not sell dump)
         const trendOrDipValid = isBullishRibbon || isDeepOversoldDip;
-        const entryDisqualified = STATE.confluenceDisqualified || score < 76 || volRatio < 1.15 || bidRatio < 0.48 || !trendOrDipValid || STATE.market.rsi > 67.0;
+        const lastCandleGreen = candleData.length >= 2 && candleData[candleData.length - 2].close >= candleData[candleData.length - 2].open;
+        const entryDisqualified = STATE.confluenceDisqualified || score < 76 || volRatio < 1.15 || bidRatio < 0.48 || !trendOrDipValid || STATE.market.rsi > 67.0 || !lastCandleGreen;
 
         if (alreadyHoldingCoin || entryDisqualified) {
           // Increment SKIPPED DUMPS on each evaluation cycle
@@ -2326,6 +2333,8 @@
                 skipReason = `Low Momentum Vol (${volRatio}x < 1.15x)`;
               } else if (score < 76) {
                 skipReason = `Score ${score}/100 (Below 76 Grade A Threshold)`;
+              } else if (!lastCandleGreen) {
+                skipReason = `Red Candle (Sell Pressure Active)`;
               } else {
                 skipReason = `Score ${score}/100 (Filtering for High-Probability Setup)`;
               }
@@ -2372,17 +2381,32 @@
           reason = `A+ High-Confluence Setup (${score}/100 pts • Momentum)`;
         }
 
-        // Dynamic Position Sizing (20% equity for up to 4 parallel positions)
-        let sizeUsd = 10.0;
-        if (STATE.balance >= 50.0) {
-          sizeUsd = +(STATE.balance * 0.20).toFixed(2);
-        } else if (STATE.balance >= 10.0) {
-          sizeUsd = 10.0;
-        } else {
-          sizeUsd = +(STATE.balance).toFixed(2);
+        // Dynamic Position Sizing (Risk-Aware: subtracts committed capital)
+        const committedCapital = (STATE.positions || []).reduce((sum, p) => sum + (p.sizeUsd || 0), 0);
+        const availableBalance = +(STATE.balance - committedCapital).toFixed(2);
+
+        // Hard block: Need at least $10 AVAILABLE (uncommitted) capital to open ANY new position
+        if (availableBalance < 10.0) {
+          if (STATE.positions.length === 0 && STATE.balance >= 10.0) {
+            // Edge case: no positions but balance shows committed (stale data) - allow
+          } else {
+            return; // Not enough free capital
+          }
         }
 
-        if (sizeUsd < 5.0 || STATE.balance < 5.0) return;
+        let sizeUsd = 10.0;
+        if (availableBalance >= 50.0) {
+          sizeUsd = +(availableBalance * 0.25).toFixed(2); // 25% of AVAILABLE (not total)
+        } else if (availableBalance >= 25.0) {
+          sizeUsd = +(availableBalance * 0.40).toFixed(2); // 40% of available for mid accounts
+        } else if (availableBalance >= 10.0) {
+          sizeUsd = +(availableBalance * 0.80).toFixed(2); // 80% for small accounts (concentrate capital)
+        } else {
+          return; // Below minimum
+        }
+
+        // Binance minimum notional: $5 USDT for most pairs
+        if (sizeUsd < 5.0) return;
 
         const sizePct = Math.round((sizeUsd / STATE.balance) * 100);
         const livePrice = STATE.market.price > 0 ? STATE.market.price : currentPair.price;
@@ -2534,25 +2558,30 @@
         STATE.activeTrade = null;
       }
 
-      // Dynamic 20% equity sizing calculation
+      // Dynamic Risk-Aware Sizing (mirrors actual tradingTick logic)
+      const renderCommitted = (STATE.positions || []).reduce((sum, p) => sum + (p.sizeUsd || 0), 0);
+      const renderAvailable = +(STATE.balance - renderCommitted).toFixed(2);
       let dynOrderSize = 10.0;
-      let dynOrderPct = 20;
-      if (STATE.balance >= 50.0) {
-        dynOrderSize = +(STATE.balance * 0.20).toFixed(2);
-        dynOrderPct = 20;
-      } else if (STATE.balance >= 10.0) {
-        dynOrderSize = 10.0;
-        dynOrderPct = Math.round((10.0 / STATE.balance) * 100);
+      let dynOrderPct = 25;
+      if (renderAvailable >= 50.0) {
+        dynOrderSize = +(renderAvailable * 0.25).toFixed(2);
+        dynOrderPct = Math.round((dynOrderSize / STATE.balance) * 100);
+      } else if (renderAvailable >= 25.0) {
+        dynOrderSize = +(renderAvailable * 0.40).toFixed(2);
+        dynOrderPct = Math.round((dynOrderSize / STATE.balance) * 100);
+      } else if (renderAvailable >= 10.0) {
+        dynOrderSize = +(renderAvailable * 0.80).toFixed(2);
+        dynOrderPct = Math.round((dynOrderSize / STATE.balance) * 100);
       } else {
-        dynOrderSize = +(STATE.balance).toFixed(2);
-        dynOrderPct = 100;
+        dynOrderSize = 0;
+        dynOrderPct = 0;
       }
       const estFee = +(dynOrderSize * 0.002).toFixed(2);
 
       const sizerEqVal = document.getElementById("sizer-eq-val");
       const sizerEqSub = document.getElementById("sizer-eq-sub");
       if (sizerEqVal && sizerEqSub) {
-        sizerEqVal.textContent = `${dynOrderPct}% eq`;
+        sizerEqVal.textContent = openCount > 0 ? `${dynOrderPct}% free` : `${dynOrderPct}% eq`;
         sizerEqSub.textContent = `$${dynOrderSize.toFixed(2)}`;
       }
 
@@ -2588,7 +2617,11 @@
       // Update Money Manager & USDT Vault Dynamic Subtext
       const sizerSub = document.getElementById("sizer-subtext");
       if (sizerSub) {
-        sizerSub.textContent = `$${dynOrderSize.toFixed(2)} order size`;
+        if (renderAvailable < 10.0 && openCount > 0) {
+          sizerSub.textContent = `$${renderAvailable.toFixed(2)} free (waiting)`;
+        } else {
+          sizerSub.textContent = `$${dynOrderSize.toFixed(2)} order size`;
+        }
       }
       const vaultSub = document.getElementById("equity-subtext");
       if (vaultSub) {
