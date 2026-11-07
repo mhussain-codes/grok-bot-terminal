@@ -950,9 +950,9 @@
       <div style="margin-top:10px; padding:8px 10px; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.25); border-radius:5px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
         <span style="font-size:11px; color:#93c5fd;">⚡ Need Sandbox Practice Funds?</span>
         <div style="display:flex; gap:6px; flex-wrap:wrap;">
-          <button type="button" id="alpha-preset-btn" style="background:linear-gradient(135deg, #059669, #0284c7); color:#fff; border:1px solid #38bdf8; padding:7px 14px; border-radius:5px; font-size:11px; font-weight:800; cursor:pointer; box-shadow:0 0 10px rgba(56,189,248,0.3);">🔥 Load Alpha Overnight Runner ($8,391.08 • 40W/21L)</button>
-          <button type="button" id="quick-reset-5-btn" style="background:#1d4ed8; color:#fff; border:1px solid #3b82f6; padding:7px 12px; border-radius:5px; font-size:11px; font-weight:700; cursor:pointer;">⚡ $1,000 Growth Account</button>
-          <button type="button" id="quick-reset-demo-btn" style="background:#0f172a; color:#94a3b8; border:1px solid #334155; padding:7px 12px; border-radius:5px; font-size:11px; font-weight:700; cursor:pointer;">Reset $100 Demo</button>
+          <button type="button" id="quick-reset-5-btn" style="background:#059669; color:#fff; border:1px solid #10b981; padding:7px 14px; border-radius:5px; font-size:11px; font-weight:800; cursor:pointer; box-shadow:0 0 10px rgba(16,185,129,0.3);">⚡ $5.00 Micro Scalper (Challenge: $5 ➔ $10+)</button>
+          <button type="button" id="quick-reset-demo-btn" style="background:#1d4ed8; color:#fff; border:1px solid #3b82f6; padding:7px 12px; border-radius:5px; font-size:11px; font-weight:700; cursor:pointer;">Reset $100 Demo</button>
+          <button type="button" id="alpha-preset-btn" style="background:linear-gradient(135deg, #0f172a, #1e293b); color:#38bdf8; border:1px solid #38bdf8; padding:7px 14px; border-radius:5px; font-size:11px; font-weight:700; cursor:pointer;">🔥 $8,391 Alpha Runner</button>
         </div>
       </div>
 
@@ -2565,12 +2565,17 @@
       const renderAvailable = +(STATE.balance - renderCommitted).toFixed(2);
       let dynOrderSize = +(STATE.balance * 0.22).toFixed(2);
       let dynOrderPct = 22;
+      if (STATE.balance < 25.0) {
+        // Micro Challenge accounts ($5 - $24): 100% concentrated capital into 1 high-conviction trade
+        dynOrderSize = +(STATE.balance).toFixed(2);
+        dynOrderPct = 100;
+      }
       const estFee = +(dynOrderSize * 0.002).toFixed(2);
 
       const sizerEqVal = document.getElementById("sizer-eq-val");
       const sizerEqSub = document.getElementById("sizer-eq-sub");
       if (sizerEqVal && sizerEqSub) {
-        sizerEqVal.textContent = "22% eq";
+        sizerEqVal.textContent = `${dynOrderPct}% eq`;
         sizerEqSub.textContent = `$${dynOrderSize.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
       }
 
@@ -3496,7 +3501,10 @@
 
     const reset5Btn = document.getElementById("quick-reset-5-btn");
     if (reset5Btn) {
-      reset5Btn.addEventListener("click", () => resetDemoAccount(1000.0));
+      reset5Btn.addEventListener("click", () => {
+        resetDemoAccount(5.0);
+        logEvent("RESET", "SYSTEM", "ALL", "+$5.00", "⚡ $5.00 Micro Scalper Challenge Activated! 100% Capital Concentration into 1 A+ Trade.", "100%");
+      });
     }
 
     const resetDemoBtn = document.getElementById("quick-reset-demo-btn");
