@@ -415,22 +415,21 @@
       color: #64748b;
       font-weight: normal;
     }
+    /* Global dark styled scrollbars across entire terminal */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #0b1120; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    * { scrollbar-width: thin; scrollbar-color: #1e293b #0b1120; }
+
     .flow-tokens-track {
       display: flex;
       align-items: center;
-      gap: 6px;
-      overflow-x: auto;
-      max-width: 560px;
-      padding: 3px 2px 4px 2px;
-      scrollbar-width: thin;
+      flex-wrap: wrap;
+      gap: 5px;
+      max-width: 580px;
+      padding: 2px 0;
       flex-shrink: 0;
-    }
-    .flow-tokens-track::-webkit-scrollbar {
-      height: 4px;
-    }
-    .flow-tokens-track::-webkit-scrollbar-thumb {
-      background: #1e2c45;
-      border-radius: 2px;
     }
     .flow-node.token-pill {
       cursor: pointer;
@@ -1294,9 +1293,9 @@
               <div class="detail-label">Position Size:</div>
               <div class="detail-val" id="active-size">$100.00 (20% eq)</div>
               <div class="detail-label">Target Profit:</div>
-              <div class="detail-val green-txt" id="active-target">🎯 +0.75% Net Scalp</div>
+              <div class="detail-val green-txt" id="active-target">🎯 +0.30% Net Scalp</div>
               <div class="detail-label">Safety Stop-Loss:</div>
-              <div class="detail-val red-txt" id="active-stop">🛑 -0.50% Stop-Loss</div>
+              <div class="detail-val red-txt" id="active-stop">🛑 -0.40% Net (Trail Lock @ +0.18%)</div>
               <div class="detail-label">Entry Reason:</div>
               <div class="detail-val blue-txt" id="active-reason" style="grid-column: span 1;">Waiting for A+ Confluence trigger...</div>
             </div>
@@ -1380,23 +1379,31 @@
       localStorage.setItem("grok_user_balance", "100.00");
     }
 
-    // Restore active trade if page was refreshed during an open position
+    // Restore active positions if page was refreshed during open trade(s)
+    let savedPositions = [];
     let savedTrade = null;
     let savedDuration = 0;
     try {
+      const rawPos = localStorage.getItem("grok_positions");
+      if (rawPos) {
+        savedPositions = JSON.parse(rawPos);
+        savedPositions = savedPositions.filter(p => p && p.symbol && p.entryPrice && p.symbol !== "BNBUSDT");
+      }
       const rawTrade = localStorage.getItem("grok_active_trade");
       if (rawTrade) {
         savedTrade = JSON.parse(rawTrade);
-        // Clean old corrupt / legacy mock positions or stale stuck trades (e.g. BNBUSDT @ 697.13, ETHUSDT stuck @ 2248)
-        if (savedTrade && (savedTrade.symbol === "BNBUSDT" || (savedTrade.symbol === "ETHUSDT" && savedTrade.entryPrice >= 2245) || (savedTrade.entryPrice && savedTrade.entryPrice >= 695) || (savedTrade.reason && (savedTrade.reason.includes("0.97x") || savedTrade.reason.includes("0.19x"))))) {
+        if (savedTrade && (savedTrade.symbol === "BNBUSDT" || (savedTrade.reason && (savedTrade.reason.includes("0.97x") || savedTrade.reason.includes("0.19x"))))) {
           savedTrade = null;
-          localStorage.removeItem("grok_active_trade");
-          localStorage.removeItem("grok_positions");
-        } else {
-          savedDuration = savedTrade.tradeDuration || 0;
         }
       }
     } catch (e) {}
+    if (!savedPositions.length && savedTrade) {
+      savedPositions = [savedTrade];
+    }
+    if (savedPositions.length) {
+      savedTrade = savedPositions[0];
+      savedDuration = savedTrade.tradeDuration || 0;
+    }
 
     let savedLogs = [];
     try {
@@ -1418,17 +1425,19 @@
       });
     }
 
-    // Dynamic token pills update and initialization (12 scanned coins)
-    function updateTokenPills(activeSym, holdingSym) {
+    // Dynamic token pills update and initialization (12 scanned coins, multiple open positions support)
+    function updateTokenPills(activeSym) {
       const track = document.getElementById("flow-tokens-track");
       if (!track) return;
       const pills = track.querySelectorAll(".token-pill");
       pills.forEach(pill => {
         const sym = pill.getAttribute("data-sym");
         const sub = pill.querySelector(".sub");
-        if (holdingSym && sym === holdingSym) {
+        const holdingPos = STATE.positions ? STATE.positions.find(p => p.symbol === sym) : null;
+        if (holdingPos) {
           pill.className = "flow-node token-pill active-holding";
-          if (sub) sub.textContent = "⚡ HOLDING";
+          const pSign = (holdingPos.pnlPct || 0) >= 0 ? "+" : "";
+          if (sub) sub.textContent = `⚡ ${(holdingPos.pnlPct !== undefined ? `${pSign}${holdingPos.pnlPct}%` : 'HOLD')}`;
         } else if (sym === activeSym) {
           pill.className = "flow-node token-pill active-scan";
           if (sub) sub.textContent = "SCANNING";
@@ -1445,13 +1454,19 @@
       const pills = track.querySelectorAll(".token-pill");
       pills.forEach(pill => {
         pill.addEventListener("click", () => {
-          if (STATE.activeTrade) return;
           const sym = pill.getAttribute("data-sym");
+          const holding = STATE.positions.find(p => p.symbol === sym);
+          if (holding) {
+            STATE.activeTrade = holding;
+            render();
+            return;
+          }
+          if (STATE.positions.length >= 4) return;
           const idx = STATE.pairs.findIndex(p => p.symbol === sym);
           if (idx !== -1) {
             STATE.pairIdx = idx;
             fetchRealBinanceData(sym);
-            updateTokenPills(sym, null);
+            updateTokenPills(sym);
           }
         });
       });
@@ -1491,8 +1506,8 @@
       confluenceDisqualifyReason: "",
       confluenceBreakdown: { rsiPts: 0, emaPts: 0, volPts: 0, depthPts: 0 },
       logs: savedLogs,
-      positions: savedTrade ? [savedTrade] : [],
-      maxPositions: 1,
+      positions: savedPositions || [],
+      maxPositions: 4,
       pairs: [
         { symbol: "BTCUSDT",  name: "Bitcoin",  price: 77000.0 },
         { symbol: "ETHUSDT",  name: "Ethereum", price: 2450.0 },
@@ -1967,6 +1982,86 @@
     // -------------------------------------------------------------
     let isTradeActionInProgress = false;
 
+    // Global Close Position function (supports parallel positions in LIVE and DEMO modes)
+    async function closePosition(pos, exitReason, netUsd, netPct) {
+      if (currentTradingMode === "LIVE" && userApiKey && userApiSecret) {
+        isTradeActionInProgress = true;
+        document.getElementById("exec-pill").textContent = `SELLING ${pos.symbol} ON BINANCE SPOT...`;
+
+        try {
+          const sellRes = await fetch("/api/order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "create_order",
+              apiKey: userApiKey,
+              apiSecret: userApiSecret,
+              symbol: pos.symbol,
+              side: "SELL",
+              type: "MARKET",
+              quantity: pos.quantity || "ALL"
+            })
+          });
+          const sellData = await sellRes.json();
+
+          if (!sellData.success) {
+            logEvent("SELL_ERROR", pos.bot, pos.symbol, "RETRY", sellData.error || "Sell order failed", `$${pos.sizeUsd.toFixed(2)}`);
+            isTradeActionInProgress = false;
+            render();
+            return false;
+          }
+
+          logEvent("BINANCE_SELL", pos.bot, pos.symbol, "FILLED", `Sold on Binance (${exitReason})`, `$${pos.sizeUsd.toFixed(2)}`);
+        } catch (err) {
+          logEvent("NET_ERR", pos.bot, pos.symbol, "FAIL", "Sell proxy error: " + err.message, `$${pos.sizeUsd.toFixed(2)}`);
+          isTradeActionInProgress = false;
+          return false;
+        }
+      }
+
+      // Remove from STATE.positions
+      STATE.positions = (STATE.positions || []).filter(p => p !== pos && p.symbol !== pos.symbol);
+      STATE.activeTrade = STATE.positions.length ? STATE.positions[0] : null;
+
+      const isWin = netUsd > 0;
+      STATE.balance = +(STATE.balance + netUsd).toFixed(2);
+
+      const botKey = pos.botKey || "house";
+      if (STATE.botFleet[botKey]) {
+        STATE.botFleet[botKey].trades++;
+        STATE.botFleet[botKey].pnl = +(STATE.botFleet[botKey].pnl + netUsd).toFixed(2);
+        if (isWin) STATE.botFleet[botKey].wins++;
+      }
+
+      if (isWin) STATE.wins++; else STATE.losses++;
+      STATE.trades++;
+
+      const pnlSign = netUsd >= 0 ? "+$" : "-$";
+      const pnlStr = `${pnlSign}${Math.abs(netUsd).toFixed(2)}`;
+
+      logEvent("SOLD", pos.bot, pos.symbol, pnlStr, exitReason, `$${pos.sizeUsd.toFixed(2)}`);
+      document.getElementById("equity-last-val").textContent = pnlStr;
+
+      isTradeActionInProgress = false;
+      saveUserState();
+
+      // Sync real wallet balance from Binance
+      if (currentTradingMode === "LIVE" && userApiKey && userApiSecret) {
+        fetch("/api/order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "test_connection", apiKey: userApiKey, apiSecret: userApiSecret })
+        }).then(r => r.json()).then(d => {
+          if (d.success && d.usdtBalance !== undefined) {
+            STATE.balance = parseFloat(d.usdtBalance);
+            saveUserState();
+            render();
+          }
+        }).catch(() => {});
+      }
+      return true;
+    }
+
     async function tradingTick() {
       if (!STATE.running || isTradeActionInProgress) return;
       STATE.seconds++;
@@ -1975,22 +2070,99 @@
         STATE.apiErrorCooldown--;
       }
 
+      const MAX_OPEN_POSITIONS = 4;
+      STATE.positions = STATE.positions || [];
+
       // =========================================================
-      // 1. ACTIVE POSITION ISOLATION (FIX ISSUE #1)
+      // 1. REAL-TIME MULTI-POSITION PRICE SYNC (BINANCE TICKER API)
       // =========================================================
-      // When in a trade, NEVER rotate pairs! Strictly monitor activeTrade.symbol
-      if (STATE.activeTrade) {
-        await fetchRealBinanceData(STATE.activeTrade.symbol);
-      } else {
-        // Flat market: cycle scanner through target pairs
+      if (STATE.positions.length > 0) {
+        const symsParam = JSON.stringify(STATE.positions.map(p => p.symbol));
+        try {
+          const pRes = await fetch(`https://api.binance.com/api/v3/ticker/price?symbols=${encodeURIComponent(symsParam)}`);
+          if (pRes.ok) {
+            const pricesData = await pRes.json();
+            pricesData.forEach(item => {
+              const pos = STATE.positions.find(p => p.symbol === item.symbol);
+              if (pos) {
+                pos.currentPrice = parseFloat(item.price);
+              }
+            });
+          }
+        } catch (e) {}
+      }
+
+      // =========================================================
+      // 2. FAST SCALPING TARGETS & TRAILING PROFIT LOCK MONITOR
+      // =========================================================
+      const FEE_PCT = 0.20; // 0.1% Buy + 0.1% Sell
+      const TARGET_NET_PROFIT = 0.30; // +0.30% Net (+0.50% Gross move) -> Quick Scalp Win
+      const STOP_LOSS_NET = -0.40; // -0.40% Net Stop-Loss
+      const MAX_HOLD_MINUTES = 12; // Time-Stop: 12 min baad green ho toh close kar de
+
+      for (let i = STATE.positions.length - 1; i >= 0; i--) {
+        const pos = STATE.positions[i];
+        pos.tradeDuration = (pos.tradeDuration || 0) + 1;
+        const livePrice = pos.currentPrice || pos.entryPrice;
+        const priceDiff = livePrice - pos.entryPrice;
+        const grossPct = +((priceDiff / pos.entryPrice) * 100).toFixed(2);
+        const netPct = +(grossPct - FEE_PCT).toFixed(2);
+        const netUsd = +(pos.sizeUsd * (netPct / 100)).toFixed(2);
+        const heldMinutes = (Date.now() - (pos.entryTime || (Date.now() - (pos.tradeDuration * 1000)))) / 60000;
+
+        pos.pnlPct = netPct;
+        pos.pnlDollars = netUsd;
+        pos.peakNetPct = Math.max(pos.peakNetPct !== undefined ? pos.peakNetPct : -1, netPct);
+
+        // Periodic Live Monitoring Log every 60 seconds while holding
+        if (pos.tradeDuration % 60 === 0) {
+          const mins = Math.floor(pos.tradeDuration / 60);
+          const pSign = netPct >= 0 ? "+" : "";
+          logEvent("HOLD", pos.bot, pos.symbol, `${pSign}${netPct}%`, `Monitoring @ $${fmtPrice(livePrice)} • TP +0.30% / Trail / SL -0.40% (${mins}m held)`, `$${pos.sizeUsd.toFixed(2)}`);
+        }
+
+        // 1. Direct Take-Profit Hit (+0.30% Net)
+        const hitTakeProfit = netPct >= TARGET_NET_PROFIT;
+        // 2. Trailing Profit Lock: Agar +0.18% Net tak gaya aur wapas +0.08% par aaya, profit book kar lo
+        const hitTrailingProfit = pos.peakNetPct >= 0.18 && netPct <= 0.08;
+        // 3. Time-Based Scalp Win: Held >= 12 mins and in profit (> +0.05% Net)
+        const hitTimeScalpWin = heldMinutes >= MAX_HOLD_MINUTES && netPct >= 0.05;
+        // 4. Strict Stop-Loss Hit (-0.40% Net)
+        const hitStopLoss = netPct <= STOP_LOSS_NET;
+
+        if (hitTakeProfit || hitTrailingProfit || hitTimeScalpWin || hitStopLoss) {
+          let exitReason = "";
+          if (hitTakeProfit) {
+            exitReason = `🎯 SCALP TAKE PROFIT (+${netPct}% Net)`;
+          } else if (hitTrailingProfit) {
+            exitReason = `🛡️ TRAILING PROFIT LOCK (+${netPct}% Net locked from peak +${pos.peakNetPct}%)`;
+          } else if (hitTimeScalpWin) {
+            exitReason = `⏱️ TIME SCALP WIN (+${netPct}% Net - 12m profit release)`;
+          } else if (hitStopLoss) {
+            exitReason = `🛑 SCALP STOP LOSS (${netPct}% Net risk control)`;
+          }
+
+          await closePosition(pos, exitReason, netUsd, netPct);
+        }
+      }
+
+      // =========================================================
+      // 3. CONTINUOUS RADAR SCANNER LOOP (NEVER STALLS ON 1 TRADE)
+      // =========================================================
+      // Scanner continues rotating across 12 liquid pairs unless 4 positions full
+      if (STATE.positions.length < MAX_OPEN_POSITIONS) {
         if (STATE.seconds % 2 === 0) {
           STATE.pairIdx = (STATE.pairIdx + 1) % STATE.pairs.length;
         }
         await fetchRealBinanceData(STATE.pairs[STATE.pairIdx].symbol);
+      } else {
+        // If 4 positions are full, cycle among open positions to monitor klines
+        const activeIdx = Math.floor((STATE.seconds / 2) % STATE.positions.length);
+        await fetchRealBinanceData(STATE.positions[activeIdx].symbol);
       }
 
-      // If zero balance and no trade active, notify user
-      if (STATE.balance <= 0 && !STATE.activeTrade) {
+      // Check balance conditions
+      if (STATE.balance <= 0 && STATE.positions.length === 0) {
         document.getElementById("active-symbol").textContent = "WAITING CAPITAL";
         document.getElementById("active-side").textContent = "$0.00 BALANCE";
         document.getElementById("active-pnl").textContent = "Add capital to start";
@@ -2003,165 +2175,27 @@
       }
 
       // =========================================================
-      // 2. MANAGE ACTIVE POSITION WITH REAL PRICE MATH (FIX ISSUE #3)
+      // 4. SCAN & ENTER SPOT TRADES (UP TO 4 POSITIONS, SCORE >= 72)
       // =========================================================
-      if (STATE.activeTrade) {
-        STATE.tradeDuration++;
-
-        // Periodic Live Monitoring Log every 60 seconds while holding
-        if (STATE.tradeDuration % 60 === 0) {
-          const livePrice = (STATE.market && STATE.market.price > 0) ? STATE.market.price : STATE.activeTrade.currentPrice;
-          const mins = Math.floor(STATE.tradeDuration / 60);
-          const pSign = STATE.activeTrade.pnlPct >= 0 ? "+" : "";
-          logEvent("HOLD", STATE.activeTrade.bot, STATE.activeTrade.symbol, `${pSign}${STATE.activeTrade.pnlPct}%`, `Monitoring @ $${livePrice} • TP +0.75% / SL -0.50% (${mins}m held)`, `$${STATE.activeTrade.sizeUsd.toFixed(2)}`);
-        }
-
-        // REAL Binance market price for the EXACT active trade symbol
-        const livePrice = (STATE.market && STATE.market.price > 0) ? STATE.market.price : STATE.activeTrade.currentPrice;
-        STATE.activeTrade.currentPrice = livePrice;
-
-        // REAL Price Math: Gross PnL% = (Live Price - Fill Price) / Fill Price * 100
-        const priceDiff = livePrice - STATE.activeTrade.entryPrice;
-        const grossPct = +((priceDiff / STATE.activeTrade.entryPrice) * 100).toFixed(2);
-        
-        // Binance Spot Fee: 0.10% buy + 0.10% sell = 0.20% round-trip
-        const feesPaid = +(STATE.activeTrade.sizeUsd * 0.002).toFixed(3);
-        const netPct = +(grossPct - 0.20).toFixed(2);
-        const netUsd = +(STATE.activeTrade.sizeUsd * (netPct / 100)).toFixed(3);
-
-        STATE.activeTrade.pnlPct = netPct;
-        STATE.activeTrade.pnlDollars = netUsd;
-        STATE.activeTrade.fees = feesPaid;
-
-        if (netPct > STATE.maxObservedPnl) {
-          STATE.maxObservedPnl = netPct;
-        }
-
-        // Real candlestick tick update
-        if (candleData.length) {
-          const lastCandle = candleData[candleData.length - 1];
-          lastCandle.close = livePrice;
-          lastCandle.high = Math.max(lastCandle.high, livePrice);
-          lastCandle.low = Math.min(lastCandle.low, livePrice);
-          renderCandlesticks();
-        }
-
-        // 1-MINUTE SCALPER REAL EXIT CRITERIA:
-        // 1. Scalp Take Profit: +0.75% Net (Fast micro-move exit)
-        // 2. Breakeven Trailing: Lock in +0.05% Net profit once trade reaches +0.35% Net
-        // 3. Strict Stop Loss: -0.50% Net (tight capital protection)
-        // 4. Stale Trade Killer: Dead sideways exit if held > 20 mins between -0.30% and +0.20%
-        const hitTakeProfit = netPct >= 0.75;
-        const hitBreakeven = STATE.maxObservedPnl >= 0.35 && netPct <= 0.05;
-        const hitStopLoss = netPct <= -0.50;
-        const hitStaleKiller = STATE.tradeDuration >= (20 * 60) && netPct >= -0.30 && netPct <= 0.20;
-
-        if (hitTakeProfit || hitBreakeven || hitStopLoss || hitStaleKiller) {
-          let exitReason = "";
-          if (hitTakeProfit) {
-            exitReason = `🎯 SCALP TAKE PROFIT (+${netPct}% Net)`;
-          } else if (hitBreakeven) {
-            exitReason = `🛡️ BREAKEVEN PROTECT (+${netPct}% Net locked)`;
-          } else if (hitStopLoss) {
-            exitReason = `🛑 SCALP STOP LOSS (${netPct}% Net risk control)`;
-          } else if (hitStaleKiller) {
-            exitReason = `⏱️ STALE TRADE KILLER (${netPct}% Net - 20m sideways release)`;
-          }
-
-          // If LIVE mode, send real SELL order to Binance and verify execution
-          if (currentTradingMode === "LIVE" && userApiKey && userApiSecret) {
-            isTradeActionInProgress = true;
-            document.getElementById("exec-pill").textContent = `SELLING ${STATE.activeTrade.symbol} ON BINANCE SPOT...`;
-
-            try {
-              const sellRes = await fetch("/api/order", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  action: "create_order",
-                  apiKey: userApiKey,
-                  apiSecret: userApiSecret,
-                  symbol: STATE.activeTrade.symbol,
-                  side: "SELL",
-                  type: "MARKET",
-                  quantity: STATE.activeTrade.quantity || "ALL"
-                })
-              });
-              const sellData = await sellRes.json();
-
-              if (!sellData.success) {
-                logEvent("SELL_ERROR", STATE.activeTrade.bot, STATE.activeTrade.symbol, "RETRY", sellData.error || "Sell order failed", `$${STATE.activeTrade.sizeUsd.toFixed(2)}`);
-                isTradeActionInProgress = false;
-                render();
-                return; // Do NOT close state prematurely if Binance rejected sell!
-              }
-
-              logEvent("BINANCE_SELL", STATE.activeTrade.bot, STATE.activeTrade.symbol, "FILLED", `Sold on Binance (${exitReason})`, `$${STATE.activeTrade.sizeUsd.toFixed(2)}`);
-            } catch (err) {
-              logEvent("NET_ERR", STATE.activeTrade.bot, STATE.activeTrade.symbol, "FAIL", "Sell proxy error: " + err.message, `$${STATE.activeTrade.sizeUsd.toFixed(2)}`);
-              isTradeActionInProgress = false;
-              return;
-            }
-          }
-
-          // Close position in state
-          const isWin = netUsd > 0;
-          STATE.balance = +(STATE.balance + netUsd).toFixed(2);
-
-          const botKey = STATE.activeTrade.botKey || "house";
-          if (STATE.botFleet[botKey]) {
-            STATE.botFleet[botKey].trades++;
-            STATE.botFleet[botKey].pnl = +(STATE.botFleet[botKey].pnl + netUsd).toFixed(2);
-            if (isWin) STATE.botFleet[botKey].wins++;
-          }
-
-          if (isWin) STATE.wins++; else STATE.losses++;
-          STATE.trades++;
-
-          const pnlSign = netUsd >= 0 ? "+$" : "-$";
-          const pnlStr = `${pnlSign}${Math.abs(netUsd).toFixed(2)}`;
-
-          logEvent("SOLD", STATE.activeTrade.bot, STATE.activeTrade.symbol, pnlStr, exitReason, `$${STATE.activeTrade.sizeUsd.toFixed(2)}`);
-          document.getElementById("equity-last-val").textContent = pnlStr;
-
-          STATE.activeTrade = null;
-          STATE.tradeDuration = 0;
-          STATE.maxObservedPnl = 0.0;
-          isTradeActionInProgress = false;
-          saveUserState();
-
-          // Sync real wallet balance from Binance
-          if (currentTradingMode === "LIVE" && userApiKey && userApiSecret) {
-            fetch("/api/order", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ action: "test_connection", apiKey: userApiKey, apiSecret: userApiSecret })
-            }).then(r => r.json()).then(d => {
-              if (d.success && d.usdtBalance !== undefined) {
-                STATE.balance = parseFloat(d.usdtBalance);
-                saveUserState();
-                render();
-              }
-            }).catch(() => {});
-          }
-        }
-      }
-      // =========================================================
-      // 3. SCAN & ENTER SPOT TRADE WITH STRICT VERIFICATION (FIX #2 & #5)
-      // =========================================================
-      else if (STATE.balance >= 5.0) {
+      if (STATE.balance >= 5.0) {
         const currentPair = STATE.pairs[STATE.pairIdx];
         const score = STATE.confluenceScore || 0;
         const volRatio = STATE.market.volRatio || 1.0;
+        const alreadyHoldingCoin = STATE.positions.some(pos => pos.symbol === currentPair.symbol);
+        const isMaxPositions = STATE.positions.length >= MAX_OPEN_POSITIONS;
 
-        // Strict Confluence Gate: Require score >= 75 AND volRatio >= 1.05 AND NOT Disqualified
-        if (STATE.confluenceDisqualified || score < 75 || volRatio < 1.05 || STATE.market.rsi > 70.0) {
+        // Confluence Gate: Require score >= 72 AND volRatio >= 1.05 AND NOT Disqualified AND < 4 positions
+        if (isMaxPositions || alreadyHoldingCoin || STATE.confluenceDisqualified || score < 72 || volRatio < 1.05 || STATE.market.rsi > 70.0) {
           // Increment SKIPPED DUMPS on each evaluation cycle
           if (STATE.seconds % 2 === 0) {
             STATE.filtered++;
             
             let skipReason = STATE.confluenceDisqualifyReason || `Score ${score}/100`;
-            if (!STATE.confluenceDisqualifyReason) {
+            if (isMaxPositions) {
+              skipReason = `Max ${MAX_OPEN_POSITIONS} Positions Active`;
+            } else if (alreadyHoldingCoin) {
+              skipReason = `Holding ${currentPair.symbol} Position`;
+            } else if (!STATE.confluenceDisqualifyReason) {
               if (volRatio >= 1.35 && STATE.market.rsi < 50) {
                 skipReason = `Heavy Sell Dump (${volRatio}x Vol)`;
               } else if (volRatio < 0.60) {
@@ -2171,29 +2205,31 @@
               } else if (score < 50) {
                 skipReason = `Weak Edge (Score ${score}/100)`;
               } else {
-                skipReason = `Score ${score}/100 (Below 75 Threshold)`;
+                skipReason = `Score ${score}/100 (Below 72 Threshold)`;
               }
             }
 
-            // Populate Live Trading Stream every 4 seconds so terminal is actively alive during scanning
+            // Populate Live Trading Stream every 4 seconds
             if (STATE.seconds % 4 === 0) {
               logEvent("SCAN", "RADAR", currentPair.symbol, `${score}/100`, `PASS: ${skipReason}`, `$${fmtPrice(STATE.market.price)}`);
             }
           }
 
-          document.getElementById("active-symbol").textContent = currentPair.symbol;
-          document.getElementById("active-side").textContent = `RADAR: ${score}/100`;
-          document.getElementById("active-pnl").textContent = STATE.confluenceDisqualified ? `DISQUALIFIED: ${STATE.confluenceDisqualifyReason}` : (volRatio < 1.05 ? `low volume (${volRatio}x < 1.05x)` : "analyzing setup (min 75 required)");
-          document.getElementById("active-pnl").className = "live-pnl blue-txt";
-          document.getElementById("active-current").textContent = `$${fmtPrice(STATE.market.price)}`;
-          document.getElementById("exec-node-sub").textContent = "SCANNING";
-          document.getElementById("exec-pill").textContent = STATE.confluenceDisqualified ? `RADAR • PASS: ${STATE.confluenceDisqualifyReason}` : `RADAR • ANALYZING ${currentPair.symbol} (${score}/100 • ${volRatio}x Vol)`;
-          document.getElementById("trade-open-badge").style.display = "none";
+          if (STATE.positions.length === 0) {
+            document.getElementById("active-symbol").textContent = currentPair.symbol;
+            document.getElementById("active-side").textContent = `RADAR: ${score}/100`;
+            document.getElementById("active-pnl").textContent = STATE.confluenceDisqualified ? `DISQUALIFIED: ${STATE.confluenceDisqualifyReason}` : (volRatio < 1.05 ? `low volume (${volRatio}x < 1.05x)` : "analyzing setup (min 72 required)");
+            document.getElementById("active-pnl").className = "live-pnl blue-txt";
+            document.getElementById("active-current").textContent = `$${fmtPrice(STATE.market.price)}`;
+            document.getElementById("exec-node-sub").textContent = "SCANNING";
+            document.getElementById("exec-pill").textContent = STATE.confluenceDisqualified ? `RADAR • PASS: ${STATE.confluenceDisqualifyReason}` : `RADAR • ANALYZING ${currentPair.symbol} (${score}/100 • ${volRatio}x Vol)`;
+            document.getElementById("trade-open-badge").style.display = "none";
+          }
           render();
           return;
         }
 
-        // Dynamic Bot Selection with TRUE reasons
+        // Setup Approved! Dynamic Strategy Selection
         let chosenBot = "Dip Buyer";
         let botKey = "house";
         let reason = "";
@@ -2216,7 +2252,7 @@
           reason = `A+ Confluence Setup (${score}/100 pts) + Momentum`;
         }
 
-        // Safe Sizing: $10.00 recommended safe size, or full balance if $5-$10 starter
+        // Dynamic Position Sizing (20% equity for up to 4 parallel positions)
         let sizeUsd = 10.0;
         if (STATE.balance >= 50.0) {
           sizeUsd = +(STATE.balance * 0.20).toFixed(2);
@@ -2231,7 +2267,7 @@
         const sizePct = Math.round((sizeUsd / STATE.balance) * 100);
         const livePrice = STATE.market.price > 0 ? STATE.market.price : currentPair.price;
 
-        // IN LIVE MODE: STRICT BINANCE API EXECUTION (NO DEMO FALLBACK, 30S COOLDOWN ON ERROR)
+        // IN LIVE MODE: STRICT BINANCE API EXECUTION
         if (currentTradingMode === "LIVE") {
           if (!userApiKey || !userApiSecret) {
             document.getElementById("exec-pill").textContent = "LIVE MODE • PLEASE CONNECT BINANCE API KEYS";
@@ -2239,7 +2275,6 @@
             return;
           }
 
-          // If in API error cooldown, pause live orders to prevent spamming
           if (STATE.apiErrorCooldown > 0) {
             document.getElementById("exec-pill").textContent = `LIVE PAUSED • ${STATE.lastApiError || 'API Error'} (${STATE.apiErrorCooldown}s cooldown)`;
             render();
@@ -2266,17 +2301,15 @@
             const data = await res.json();
             isTradeActionInProgress = false;
 
-            // ABORT IMMEDIATELY IF BINANCE DID NOT FILL ORDER (NO OPTIMISTIC FAKES!)
             if (!data.success || !data.order || (data.order.status !== "FILLED" && data.order.status !== "NEW")) {
-              STATE.apiErrorCooldown = 30; // 30 seconds pause on error
+              STATE.apiErrorCooldown = 30;
               STATE.lastApiError = data.error || "Order rejected by Binance";
               logEvent("API_ERROR", chosenBot, currentPair.symbol, "PAUSED", `${data.error || 'Order rejected by Binance'} (Live trading paused 30s)`, `$${sizeUsd.toFixed(2)}`);
               document.getElementById("exec-pill").textContent = `LIVE PAUSED • ${data.error || 'Check API Key'} (30s cooldown)`;
               render();
-              return; // NEVER open trade, NEVER fall back to paper demo!
+              return;
             }
 
-            // Real fill price and executed quantity calculation
             let actualFillPrice = livePrice;
             let actualExecutedQty = 0;
             if (data.order.cummulativeQuoteQty && data.order.executedQty) {
@@ -2289,7 +2322,7 @@
             }
 
             const bDown = STATE.confluenceBreakdown || { rsiPts: 0, emaPts: 0, volPts: 0, depthPts: 0 };
-            STATE.activeTrade = {
+            const newTrade = {
               symbol: currentPair.symbol,
               coinName: currentPair.name,
               bot: chosenBot,
@@ -2297,9 +2330,12 @@
               side: "SPOT BUY (LONG)",
               entryPrice: actualFillPrice,
               currentPrice: actualFillPrice,
+              entryTime: Date.now(),
               quantity: actualExecutedQty,
               pnlPct: 0.0,
               pnlDollars: 0.0,
+              peakNetPct: 0.0,
+              tradeDuration: 0,
               fees: +(sizeUsd * 0.002).toFixed(3),
               sizeUsd: sizeUsd,
               sizePct: sizePct,
@@ -2307,7 +2343,8 @@
               score: score,
               orderId: data.order.orderId
             };
-            STATE.maxObservedPnl = 0.0;
+            STATE.positions.push(newTrade);
+            STATE.activeTrade = newTrade;
             saveUserState();
 
             logEvent("BINANCE_LIVE", chosenBot, currentPair.symbol, "FILLED", `Order #${data.order.orderId} at $${actualFillPrice} [Score ${score}/100: RSI ${bDown.rsiPts}+EMA ${bDown.emaPts}+Vol ${bDown.volPts}+Depth ${bDown.depthPts}]`, `$${sizeUsd.toFixed(2)}`);
@@ -2320,9 +2357,9 @@
             return;
           }
         } else {
-          // Practice / Paper Demo Execution (Strictly active only when user chooses DEMO mode)
+          // Practice / Paper Demo Execution
           const bDown = STATE.confluenceBreakdown || { rsiPts: 0, emaPts: 0, volPts: 0, depthPts: 0 };
-          STATE.activeTrade = {
+          const newTrade = {
             symbol: currentPair.symbol,
             coinName: currentPair.name,
             bot: chosenBot,
@@ -2330,21 +2367,25 @@
             side: "SPOT BUY (LONG)",
             entryPrice: livePrice,
             currentPrice: livePrice,
+            entryTime: Date.now(),
             quantity: +(sizeUsd / livePrice).toFixed(6),
             pnlPct: 0.0,
             pnlDollars: 0.0,
+            peakNetPct: 0.0,
+            tradeDuration: 0,
             fees: +(sizeUsd * 0.002).toFixed(3),
             sizeUsd: sizeUsd,
             sizePct: sizePct,
             reason: reason,
             score: score
           };
-          STATE.maxObservedPnl = 0.0;
+          STATE.positions.push(newTrade);
+          STATE.activeTrade = newTrade;
           saveUserState();
 
           logEvent("BOUGHT", chosenBot, currentPair.symbol, `FEE: $${(sizeUsd * 0.002).toFixed(2)}`, `[SCORE ${score}/100: RSI ${bDown.rsiPts}+EMA ${bDown.emaPts}+Vol ${bDown.volPts}+Depth ${bDown.depthPts}] ${reason}`, `$${sizeUsd.toFixed(2)}`);
         }
-      } else if (STATE.balance > 0 && STATE.balance < 5.0 && !STATE.activeTrade) {
+      } else if (STATE.balance > 0 && STATE.balance < 5.0 && STATE.positions.length === 0) {
         document.getElementById("active-symbol").textContent = "BALANCE < $5";
         document.getElementById("active-side").textContent = "MIN NOTIONAL";
         document.getElementById("active-pnl").textContent = "min $10 recommended for Binance orders";
@@ -2380,10 +2421,12 @@
       document.getElementById("balance-val").textContent = `$${STATE.balance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
       document.getElementById("now-bal-val").textContent = `$${STATE.balance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
       document.getElementById("start-bal-val").textContent = `$${STATE.startBalance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-      document.getElementById("trades-count").textContent = `${STATE.trades} trades`;
+      const openCount = (STATE.positions || []).length;
+      const openBadge = openCount > 0 ? ` • <span style="color:#38bdf8;font-weight:700;">⚡ ${openCount} OPEN</span>` : "";
+      document.getElementById("trades-count").innerHTML = `${STATE.trades} closed${openBadge}`;
       document.getElementById("wins-count").textContent = `${STATE.wins} wins`;
       document.getElementById("losses-count").textContent = `${STATE.losses} losses`;
-      document.getElementById("record-stat-val").textContent = `${STATE.wins} WINS / ${STATE.losses} LOSSES`;
+      document.getElementById("record-stat-val").innerHTML = `${STATE.wins}W / ${STATE.losses}L${openBadge}`;
       document.getElementById("filtered-val").textContent = STATE.filtered;
 
       // Update Money Manager & USDT Vault Dynamic Subtext
@@ -2393,7 +2436,7 @@
       }
       const vaultSub = document.getElementById("equity-subtext");
       if (vaultSub) {
-        vaultSub.textContent = `${STATE.trades} completed trades • ${STATE.wins}W / ${STATE.losses}L`;
+        vaultSub.innerHTML = `${STATE.trades} closed (${STATE.wins}W / ${STATE.losses}L)${openBadge}`;
       }
 
       // Update Mode Badge
@@ -2415,19 +2458,31 @@
       // Sync Scanned & Holding Token Pills
       const activeScannedSym = STATE.pairs && STATE.pairs[STATE.pairIdx] ? STATE.pairs[STATE.pairIdx].symbol : STATE.market.symbol;
       const holdingSym = STATE.activeTrade ? STATE.activeTrade.symbol : null;
-      updateTokenPills(activeScannedSym, holdingSym);
+      updateTokenPills(activeScannedSym);
 
-      // Bot fleet stats (Accurate PnL Sync)
+      // Bot fleet stats (Accurate PnL Sync with Live Open Count)
+      const gamblerOpen = (STATE.positions || []).filter(p => p.botKey === 'gambler').length;
+      const houseOpen = (STATE.positions || []).filter(p => p.botKey === 'house').length;
+      const spyOpen = (STATE.positions || []).filter(p => p.botKey === 'spy').length;
+
       document.getElementById("gambler-pnl").textContent = `${STATE.botFleet.gambler.pnl >= 0 ? '+$' : '-$'}${Math.abs(STATE.botFleet.gambler.pnl).toFixed(2)}`;
-      document.getElementById("gambler-trades").textContent = `${STATE.botFleet.gambler.trades} trades (${STATE.botFleet.gambler.wins}W/${STATE.botFleet.gambler.trades - STATE.botFleet.gambler.wins}L)`;
+      document.getElementById("gambler-trades").innerHTML = `${STATE.botFleet.gambler.trades} closed (${STATE.botFleet.gambler.wins}W/${STATE.botFleet.gambler.trades - STATE.botFleet.gambler.wins}L)${gamblerOpen > 0 ? ` • <span style="color:#38bdf8;font-weight:700;">⚡ ${gamblerOpen} OPEN</span>` : ''}`;
 
       document.getElementById("house-pnl").textContent = `${STATE.botFleet.house.pnl >= 0 ? '+$' : '-$'}${Math.abs(STATE.botFleet.house.pnl).toFixed(2)}`;
-      document.getElementById("house-trades").textContent = `${STATE.botFleet.house.trades} trades (${STATE.botFleet.house.wins}W/${STATE.botFleet.house.trades - STATE.botFleet.house.wins}L)`;
+      document.getElementById("house-trades").innerHTML = `${STATE.botFleet.house.trades} closed (${STATE.botFleet.house.wins}W/${STATE.botFleet.house.trades - STATE.botFleet.house.wins}L)${houseOpen > 0 ? ` • <span style="color:#38bdf8;font-weight:700;">⚡ ${houseOpen} OPEN</span>` : ''}`;
 
       document.getElementById("spy-pnl").textContent = `${STATE.botFleet.spy.pnl >= 0 ? '+$' : '-$'}${Math.abs(STATE.botFleet.spy.pnl).toFixed(2)}`;
-      document.getElementById("spy-trades").textContent = `${STATE.botFleet.spy.trades} trades (${STATE.botFleet.spy.wins}W/${STATE.botFleet.spy.trades - STATE.botFleet.spy.wins}L)`;
+      document.getElementById("spy-trades").innerHTML = `${STATE.botFleet.spy.trades} closed (${STATE.botFleet.spy.wins}W/${STATE.botFleet.spy.trades - STATE.botFleet.spy.wins}L)${spyOpen > 0 ? ` • <span style="color:#38bdf8;font-weight:700;">⚡ ${spyOpen} OPEN</span>` : ''}`;
 
-      // Active trade render (Fix Issue #1: strictly reflect STATE.activeTrade)
+      // Active trade render (supports viewing focused position from STATE.positions)
+      if (STATE.positions && STATE.positions.length) {
+        if (!STATE.activeTrade || !STATE.positions.includes(STATE.activeTrade)) {
+          STATE.activeTrade = STATE.positions[0];
+        }
+      } else {
+        STATE.activeTrade = null;
+      }
+
       if (STATE.activeTrade) {
         document.getElementById("active-symbol").textContent = STATE.activeTrade.symbol;
         document.getElementById("active-bot").textContent = STATE.activeTrade.bot.toUpperCase();
@@ -2449,9 +2504,11 @@
         if (slipEl) {
           slipEl.textContent = `-$${(STATE.activeTrade.fees || 0.02).toFixed(2)} (0.1% Buy + 0.1% Sell)`;
         }
-        document.getElementById("exec-node-sub").textContent = `HOLDING ${STATE.activeTrade.symbol}`;
-        document.getElementById("exec-pill").textContent = `AUTO-TRADER • HOLDING ${STATE.activeTrade.symbol} ($${STATE.activeTrade.sizeUsd.toFixed(2)})`;
+        const openPCount = (STATE.positions || []).length;
+        document.getElementById("exec-node-sub").textContent = `HOLDING (${openPCount}/4)`;
+        document.getElementById("exec-pill").textContent = `AUTO-TRADER • ${openPCount} ACTIVE SPOT POSITION(S)`;
         document.getElementById("trade-open-badge").style.display = "inline-block";
+        document.getElementById("trade-open-badge").textContent = `${openPCount} ACTIVE (${(STATE.positions || []).map(p => p.symbol.replace("USDT","")).join(", ")})`;
 
         const emergencyBtn = document.getElementById("emergency-reset-btn");
         if (emergencyBtn) emergencyBtn.style.display = "inline-block";
@@ -2528,7 +2585,7 @@
       if (sizerDetail) {
         if (STATE.balance >= 50.0) {
           const orderSz = (STATE.balance * 0.20).toFixed(2);
-          sizerDetail.innerHTML = `Max 20% equity • 1 active position at a time<br><span id="sizer-subtext">$${orderSz} order size</span>`;
+          sizerDetail.innerHTML = `Max 20% equity • Up to 4 active positions<br><span id="sizer-subtext">$${orderSz} order size</span>`;
         } else if (STATE.balance >= 10.0) {
           sizerDetail.innerHTML = `Min safe size: $10.00 • Max 20% equity<br><span id="sizer-subtext">$10.00 safe order</span>`;
         } else if (STATE.balance >= 5.0) {
@@ -2998,12 +3055,14 @@
     const emergencyResetBtn = document.getElementById("emergency-reset-btn");
     if (emergencyResetBtn) {
       emergencyResetBtn.addEventListener("click", () => {
-        const prevSymbol = STATE.activeTrade ? STATE.activeTrade.symbol : "COIN";
+        const count = (STATE.positions || []).length;
+        STATE.positions = [];
         STATE.activeTrade = null;
         STATE.tradeDuration = 0;
         STATE.maxObservedPnl = 0.0;
         localStorage.removeItem("grok_active_trade");
-        logEvent("RESET", "SYSTEM", prevSymbol, "$0.00", "Position manually cleared by user. Resumed scanning.", "0%");
+        localStorage.removeItem("grok_positions");
+        logEvent("RESET", "SYSTEM", "ALL", "$0.00", `${count} open position(s) manually cleared by user. Resumed scanning.`, "0%");
         saveUserState();
         render();
       });
