@@ -1056,7 +1056,7 @@
             <span class="agent-state-tag tag-blue">SAFE SIZE</span>
           </div>
           <div class="agent-role">Protects balance & enforces safe sizing</div>
-          <div class="agent-detail">Min safe size: $10.00 • Max 20% equity<br><span id="sizer-subtext">$10.00 safe order</span></div>
+          <div class="agent-detail" id="sizer-detail">Min safe size: $10.00 • Max 20% equity<br><span id="sizer-subtext">$10.00 safe order</span></div>
         </div>
 
         <!-- 4: AUTO-TRADER -->
@@ -1106,7 +1106,7 @@
         <section class="live-flow-panel">
           <div class="flow-header">
             <span style="font-weight:700; color:#fff;">HOW THE BOT WORKS (SPOT EARNING MODEL)</span>
-            <span>1. SCAN ➔ 2. CHECK DIP/TREND ➔ 3. SAFE $10 ➔ 4. AUTO BUY ➔ 5. SELL FOR PROFIT</span>
+            <span>1. SCAN ➔ 2. CHECK DIP/TREND ➔ 3. SAFE SIZING ➔ 4. AUTO BUY ➔ 5. SELL FOR PROFIT</span>
             <span id="speed-indicator">live tick</span>
           </div>
           <div class="flow-pipeline-viz">
@@ -1234,13 +1234,13 @@
               <div class="detail-label">Binance Fee (0.2%):</div>
               <div class="detail-val red-txt" id="active-slip">-$0.02 (0.1% Buy + 0.1% Sell)</div>
               <div class="detail-label">Position Size:</div>
-              <div class="detail-val" id="active-size">$5.00 (Binance Min)</div>
+              <div class="detail-val" id="active-size">$5.29 (100% eq)</div>
               <div class="detail-label">Target Profit:</div>
               <div class="detail-val green-txt" id="active-target">🎯 +1.50% Net (Auto-Sell)</div>
               <div class="detail-label">Safety Stop-Loss:</div>
               <div class="detail-val red-txt" id="active-stop">🛑 -1.00% Max Risk</div>
               <div class="detail-label">Entry Reason:</div>
-              <div class="detail-val blue-txt" id="active-reason" style="grid-column: span 1;">Oversold dip bounce detected</div>
+              <div class="detail-val blue-txt" id="active-reason" style="grid-column: span 1;">Waiting for A+ Confluence trigger...</div>
             </div>
           </div>
 
@@ -1461,9 +1461,13 @@
 
     async function fetchRealBinanceData(symbol) {
       try {
-        // 1. Fetch 1m historical klines (30 bars for smooth EMA and RSI calculation)
-        const klineRes = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1m&limit=30`);
-        if (klineRes.ok) {
+        const [klineRes, tickerRes, depthRes] = await Promise.all([
+          fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1m&limit=30`).catch(() => null),
+          fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`).catch(() => null),
+          fetch(`https://api.binance.com/api/v3/depth?symbol=${symbol}&limit=10`).catch(() => null)
+        ]);
+
+        if (klineRes && klineRes.ok) {
           const kData = await klineRes.json();
           candleData = kData.map(k => ({
             open: parseFloat(k[1]),
@@ -1472,14 +1476,9 @@
             close: parseFloat(k[4]),
             vol: parseFloat(k[5])
           }));
-          computeRealIndicators();
-          evaluateConfluenceSignal(symbol);
-          renderCandlesticks();
         }
 
-        // 2. Fetch 24h ticker & live price
-        const tickerRes = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
-        if (tickerRes.ok) {
+        if (tickerRes && tickerRes.ok) {
           const td = await tickerRes.json();
           STATE.market.price = parseFloat(td.lastPrice);
           STATE.market.high24h = parseFloat(td.highPrice);
@@ -1490,11 +1489,9 @@
           if (scanEl) scanEl.textContent = `${symbol} • $${STATE.market.price.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
 
-        // 3. Fetch Orderbook Depth (top 10 bids & asks for whale liquidity wall calculation)
-        const depthRes = await fetch(`https://api.binance.com/api/v3/depth?symbol=${symbol}&limit=10`);
-        if (depthRes.ok) {
+        if (depthRes && depthRes.ok) {
           const dd = await depthRes.json();
-          if (dd.bids.length && dd.asks.length) {
+          if (dd.bids && dd.asks && dd.bids.length && dd.asks.length) {
             const bestBid = parseFloat(dd.bids[0][0]);
             const bestAsk = parseFloat(dd.asks[0][0]);
             STATE.market.spread = +(bestAsk - bestBid).toFixed(2);
@@ -1507,6 +1504,11 @@
             if (rugEl) rugEl.textContent = `Spread $${STATE.market.spread.toFixed(2)} • Bids ${Math.round(STATE.market.bidRatio * 100)}%`;
           }
         }
+
+        // Evaluate Confluence and Candlesticks ONLY after depth and all indicators are fully synchronized
+        computeRealIndicators();
+        evaluateConfluenceSignal(symbol);
+        renderCandlesticks();
       } catch (err) {
         // Quiet fallback
       }
@@ -1565,24 +1567,40 @@
       const volRatio = STATE.market.volRatio;
       const bidRatio = STATE.market.bidRatio;
 
-      let rsiPts = 10;
-      let rsiDesc = "Neutral RSI";
-      // Pillar 1: RSI Dynamics (25 pts max)
-      if (rsi <= 38 && deltaRsi >= 0) {
-        rsiPts = 25;
-        rsiDesc = "🟢 Oversold Bounce (Strong Buy)";
-      } else if (rsi <= 44 && deltaRsi >= 0) {
-        rsiPts = 20;
-        rsiDesc = "🟢 Dip Recovery Curvature";
+      // Pillar 1: RSI Dynamics (25 pts max) - Quant Dip & Trend Alignment
+      let rsiPts = 12;
+      let rsiDesc = `Neutral Range (${rsi.toFixed(1)})`;
+
+      if (rsi < 30) {
+        // Deep Oversold Zone (High-priority Dip Buyer edge)
+        if (deltaRsi >= 0) {
+          rsiPts = 25;
+          rsiDesc = `🟢 Oversold Bounce (Strong Dip Reversal)`;
+        } else {
+          rsiPts = 22;
+          rsiDesc = `🟢 Oversold Dip Zone (RSI ${rsi.toFixed(1)})`;
+        }
+      } else if (rsi <= 40) {
+        // Lower Dip Transition Zone
+        if (deltaRsi >= 0) {
+          rsiPts = 20;
+          rsiDesc = `🟢 Dip Recovery Curvature (RSI ${rsi.toFixed(1)})`;
+        } else {
+          rsiPts = 16;
+          rsiDesc = `🟡 Approaching Oversold (${rsi.toFixed(1)})`;
+        }
       } else if (rsi >= 48 && rsi <= 64 && ema7 > ema21) {
-        rsiPts = 18;
-        rsiDesc = "🟢 Healthy Trend Momentum";
+        // Healthy Trend Momentum
+        rsiPts = 19;
+        rsiDesc = `🟢 Healthy Bullish Trend Momentum`;
       } else if (rsi > 68) {
-        rsiPts = 4;
-        rsiDesc = "⚠️ Overbought (Do Not Buy Peak)";
+        // Overbought Danger Zone
+        rsiPts = 3;
+        rsiDesc = `🔴 Overbought Risk (RSI ${rsi.toFixed(1)})`;
       } else {
+        // Middle Neutral Range (40 - 48 or 64 - 68)
         rsiPts = 12;
-        rsiDesc = "Neutral Consolidation";
+        rsiDesc = `Neutral Consolidation (${rsi.toFixed(1)})`;
       }
 
       // Pillar 2: EMA Trend Ribbon (25 pts max)
@@ -1944,6 +1962,29 @@
 
         // Strict Confluence Gate: Require score >= 75 AND volRatio >= 1.05 (Never enter on 0.19x dead volume!)
         if (score < 75 || volRatio < 1.05) {
+          // Increment SKIPPED DUMPS on each evaluation cycle
+          if (STATE.seconds % 2 === 0) {
+            STATE.filtered++;
+            
+            let skipReason = `Score ${score}/100`;
+            if (volRatio >= 1.35 && STATE.market.rsi < 50) {
+              skipReason = `Heavy Sell Dump (${volRatio}x Vol)`;
+            } else if (volRatio < 0.60) {
+              skipReason = `Dead Volume (${volRatio}x)`;
+            } else if (STATE.market.rsi > 68) {
+              skipReason = `Overbought Risk (RSI ${STATE.market.rsi.toFixed(1)})`;
+            } else if (score < 50) {
+              skipReason = `Weak Edge (Score ${score}/100)`;
+            } else {
+              skipReason = `Score ${score}/100 (Below 75 Threshold)`;
+            }
+
+            // Populate Live Trading Stream every 4 seconds so terminal is actively alive during scanning
+            if (STATE.seconds % 4 === 0) {
+              logEvent("SCAN", "RADAR", currentPair.symbol, `${score}/100`, `PASS: ${skipReason}`, `$${STATE.market.price.toFixed(2)}`);
+            }
+          }
+
           document.getElementById("active-symbol").textContent = currentPair.symbol;
           document.getElementById("active-side").textContent = `RADAR: ${score}/100`;
           document.getElementById("active-pnl").textContent = volRatio < 1.05 ? `low volume (${volRatio}x < 1.05x)` : "analyzing setup (min 75 required)";
@@ -2230,6 +2271,35 @@
         if (execSubEl) {
           execSubEl.textContent = "HUNTING ENTRY";
           execSubEl.style.color = "#38bdf8";
+        }
+
+        // In scanning mode: ensure Entry Reason and Position Size are never premature
+        const reasonEl = document.getElementById("active-reason");
+        if (reasonEl) {
+          reasonEl.textContent = "Waiting for A+ Confluence trigger...";
+          reasonEl.className = "detail-val blue-txt";
+        }
+        const activeSizeEl = document.getElementById("active-size");
+        if (activeSizeEl) {
+          if (STATE.balance >= 10.0) {
+            activeSizeEl.textContent = "$10.00 (Safe Size)";
+          } else if (STATE.balance >= 5.0) {
+            activeSizeEl.textContent = `$${STATE.balance.toFixed(2)} (100% eq)`;
+          } else {
+            activeSizeEl.textContent = "$0.00";
+          }
+        }
+      }
+
+      // Dynamic Money Manager description in Left Sidebar
+      const sizerDetail = document.getElementById("sizer-detail");
+      if (sizerDetail) {
+        if (STATE.balance >= 10.0) {
+          sizerDetail.innerHTML = `Min safe size: $10.00 • Max 20% equity<br><span id="sizer-subtext">$10.00 safe order</span>`;
+        } else if (STATE.balance >= 5.0) {
+          sizerDetail.innerHTML = `Starter Micro-Size: $${STATE.balance.toFixed(2)} (100% eq)<br><span id="sizer-subtext">Covers $5.00 min with safe buffer</span>`;
+        } else {
+          sizerDetail.innerHTML = `Min safe size: $10.00 • Max 20% equity<br><span id="sizer-subtext">Awaiting capital</span>`;
         }
       }
 
