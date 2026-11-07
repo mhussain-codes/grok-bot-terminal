@@ -415,6 +415,54 @@
       color: #64748b;
       font-weight: normal;
     }
+    .flow-tokens-track {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      max-width: 560px;
+      padding: 3px 2px 4px 2px;
+      scrollbar-width: thin;
+      flex-shrink: 0;
+    }
+    .flow-tokens-track::-webkit-scrollbar {
+      height: 4px;
+    }
+    .flow-tokens-track::-webkit-scrollbar-thumb {
+      background: #1e2c45;
+      border-radius: 2px;
+    }
+    .flow-node.token-pill {
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .flow-node.token-pill:hover {
+      border-color: #3b82f6;
+      background: #182238;
+    }
+    .flow-node.token-pill.active-scan {
+      background: rgba(59, 130, 246, 0.22) !important;
+      border-color: #38bdf8 !important;
+      color: #38bdf8 !important;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.45);
+      transform: translateY(-1px);
+    }
+    .flow-node.token-pill.active-scan .sub {
+      color: #7dd3fc !important;
+      font-weight: 700;
+    }
+    .flow-node.token-pill.active-holding {
+      background: rgba(16, 185, 129, 0.25) !important;
+      border-color: #10b981 !important;
+      color: #34d399 !important;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.45);
+      transform: translateY(-1px);
+    }
+    .flow-node.token-pill.active-holding .sub {
+      color: #6ee7b7 !important;
+      font-weight: 700;
+    }
     .flow-circle {
       width: 54px;
       height: 54px;
@@ -1110,10 +1158,20 @@
             <span id="speed-indicator">live tick</span>
           </div>
           <div class="flow-pipeline-viz">
-            <div class="flow-node token-pill" id="flow-tok-1">BTCUSDT <span class="sub">Spot</span></div>
-            <div class="flow-node token-pill" id="flow-tok-2">ETHUSDT <span class="sub">Spot</span></div>
-            <div class="flow-node token-pill" id="flow-tok-3">SOLUSDT <span class="sub">Spot</span></div>
-            <div class="flow-node token-pill" id="flow-tok-4">BNBUSDT <span class="sub">Spot</span></div>
+            <div class="flow-tokens-track" id="flow-tokens-track">
+              <div class="flow-node token-pill" data-sym="BTCUSDT">BTCUSDT <span class="sub">Spot</span></div>
+              <div class="flow-node token-pill" data-sym="ETHUSDT">ETHUSDT <span class="sub">Spot</span></div>
+              <div class="flow-node token-pill" data-sym="SOLUSDT">SOLUSDT <span class="sub">Spot</span></div>
+              <div class="flow-node token-pill" data-sym="BNBUSDT">BNBUSDT <span class="sub">Spot</span></div>
+              <div class="flow-node token-pill" data-sym="XRPUSDT">XRPUSDT <span class="sub">Spot</span></div>
+              <div class="flow-node token-pill" data-sym="DOGEUSDT">DOGEUSDT <span class="sub">Spot</span></div>
+              <div class="flow-node token-pill" data-sym="SUIUSDT">SUIUSDT <span class="sub">Spot</span></div>
+              <div class="flow-node token-pill" data-sym="ADAUSDT">ADAUSDT <span class="sub">Spot</span></div>
+              <div class="flow-node token-pill" data-sym="AVAXUSDT">AVAXUSDT <span class="sub">Spot</span></div>
+              <div class="flow-node token-pill" data-sym="LINKUSDT">LINKUSDT <span class="sub">Spot</span></div>
+              <div class="flow-node token-pill" data-sym="PEPEUSDT">PEPEUSDT <span class="sub">Spot</span></div>
+              <div class="flow-node token-pill" data-sym="WIFUSDT">WIFUSDT <span class="sub">Spot</span></div>
+            </div>
             <div class="flow-circle rug-check-circle">
               <div style="font-size:11px;">🛡️</div>
               <div>SAFETY</div>
@@ -1360,6 +1418,45 @@
       });
     }
 
+    // Dynamic token pills update and initialization (12 scanned coins)
+    function updateTokenPills(activeSym, holdingSym) {
+      const track = document.getElementById("flow-tokens-track");
+      if (!track) return;
+      const pills = track.querySelectorAll(".token-pill");
+      pills.forEach(pill => {
+        const sym = pill.getAttribute("data-sym");
+        const sub = pill.querySelector(".sub");
+        if (holdingSym && sym === holdingSym) {
+          pill.className = "flow-node token-pill active-holding";
+          if (sub) sub.textContent = "⚡ HOLDING";
+        } else if (sym === activeSym) {
+          pill.className = "flow-node token-pill active-scan";
+          if (sub) sub.textContent = "SCANNING";
+        } else {
+          pill.className = "flow-node token-pill";
+          if (sub) sub.textContent = "Spot";
+        }
+      });
+    }
+
+    function initTokenPills() {
+      const track = document.getElementById("flow-tokens-track");
+      if (!track) return;
+      const pills = track.querySelectorAll(".token-pill");
+      pills.forEach(pill => {
+        pill.addEventListener("click", () => {
+          if (STATE.activeTrade) return;
+          const sym = pill.getAttribute("data-sym");
+          const idx = STATE.pairs.findIndex(p => p.symbol === sym);
+          if (idx !== -1) {
+            STATE.pairIdx = idx;
+            fetchRealBinanceData(sym);
+            updateTokenPills(sym, null);
+          }
+        });
+      });
+    }
+
     // Dynamic price formatting for high-value and sub-dollar coins (DOGE, XRP, ADA, PEPE, BTC)
     function fmtPrice(p) {
       if (typeof p !== 'number' || isNaN(p)) return '0.00';
@@ -1513,6 +1610,7 @@
 
           const scanEl = document.getElementById("scanner-detail");
           if (scanEl) scanEl.textContent = `${symbol} • $${fmtPrice(STATE.market.price)}`;
+          updateTokenPills(symbol, STATE.activeTrade ? STATE.activeTrade.symbol : null);
         }
 
         if (depthRes && depthRes.ok) {
@@ -1638,18 +1736,24 @@
         rsiDesc = `Neutral Consolidation (${rsi.toFixed(1)})`;
       }
 
-      // Pillar 2: EMA Trend Ribbon (25 pts max) - Requires Genuine Positive Slope (>= 0.05%)
+      // Pillar 2: EMA Trend Ribbon (25 pts max) - Bullish Alignment & Healthy Pullback Support
       let emaPts = 10;
       let emaDesc = "Flat Trend";
       const emaSpread = ema21 > 0 ? (ema7 - ema21) / ema21 : 0;
 
-      if (ema7 > ema21 && price >= ema7 && emaSpread >= 0.0005) {
+      if (ema7 > ema21 && price >= ema7) {
         emaPts = 25;
-        emaDesc = `🟢 Bullish Golden Trend (+${(emaSpread * 100).toFixed(2)}% spread)`;
-      } else if (ema7 > ema21 && emaSpread >= 0.0002) {
-        emaPts = 19;
-        emaDesc = `🟢 EMA 7/21 Bullish Cross (+${(emaSpread * 100).toFixed(2)}%)`;
-      } else if (price > ema21) {
+        emaDesc = `🟢 Bullish Golden Alignment (+${(emaSpread * 100).toFixed(2)}%)`;
+      } else if (ema7 > ema21 && price >= (ema21 * 0.999)) {
+        // Bullish ribbon intact: healthy dip / pullback holding EMA 21 support zone
+        emaPts = 21;
+        emaDesc = `🟢 Bullish Trend Pullback (EMA 21 Support)`;
+      } else if (ema7 > ema21 && price < (ema21 * 0.999)) {
+        // Deep pullback under EMA 21 within macro uptrend
+        emaPts = 12;
+        emaDesc = `🟡 Deep Pullback Below EMA 21`;
+      } else if (price >= ema21) {
+        // Bottom reversal bounce holding above EMA 21
         emaPts = 14;
         emaDesc = "Supported Above EMA 21";
       } else {
@@ -2307,6 +2411,11 @@
           modeBadge.style.background = "rgba(59, 130, 246, 0.15)";
         }
       }
+
+      // Sync Scanned & Holding Token Pills
+      const activeScannedSym = STATE.pairs && STATE.pairs[STATE.pairIdx] ? STATE.pairs[STATE.pairIdx].symbol : STATE.market.symbol;
+      const holdingSym = STATE.activeTrade ? STATE.activeTrade.symbol : null;
+      updateTokenPills(activeScannedSym, holdingSym);
 
       // Bot fleet stats (Accurate PnL Sync)
       document.getElementById("gambler-pnl").textContent = `${STATE.botFleet.gambler.pnl >= 0 ? '+$' : '-$'}${Math.abs(STATE.botFleet.gambler.pnl).toFixed(2)}`;
@@ -3091,7 +3200,8 @@
       }
     });
 
-    // Initial load: Fetch real Binance data and start engine
+    // Initial load: Initialize token pills & fetch real Binance data
+    initTokenPills();
     fetchRealBinanceData("BTCUSDT");
     setTimeout(renderCandlesticks, 150);
     render();
