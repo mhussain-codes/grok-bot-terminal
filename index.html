@@ -1754,18 +1754,22 @@
         rsiDesc = `Neutral Consolidation (${rsi.toFixed(1)})`;
       }
 
-      // Pillar 2: EMA Trend Ribbon (25 pts max) - Bullish Alignment & Healthy Pullback Support
+      // Pillar 2: EMA Trend Ribbon (25 pts max) - Bullish Alignment (Requires >= +0.03% spread for Golden Trend)
       let emaPts = 10;
       let emaDesc = "Flat Trend";
       const emaSpread = ema21 > 0 ? (ema7 - ema21) / ema21 : 0;
 
-      if (ema7 > ema21 && price >= ema7) {
+      if (ema7 > ema21 && price >= ema7 && emaSpread >= 0.0003) {
         emaPts = 25;
         emaDesc = `🟢 Bullish Golden Alignment (+${(emaSpread * 100).toFixed(2)}%)`;
-      } else if (ema7 > ema21 && price >= (ema21 * 0.999)) {
+      } else if (ema7 > ema21 && price >= (ema21 * 0.999) && emaSpread >= 0.0003) {
         // Bullish ribbon intact: healthy dip / pullback holding EMA 21 support zone
         emaPts = 21;
         emaDesc = `🟢 Bullish Trend Pullback (EMA 21 Support)`;
+      } else if (ema7 > ema21 && emaSpread < 0.0003) {
+        // Spread is flat (+0.00% to +0.02%): Sideways consolidation
+        emaPts = 14;
+        emaDesc = `🟡 Flat EMA Consolidation (+${(emaSpread * 100).toFixed(2)}%)`;
       } else if (ema7 > ema21 && price < (ema21 * 0.999)) {
         // Deep pullback under EMA 21 within macro uptrend
         emaPts = 12;
@@ -2156,17 +2160,22 @@
       }
 
       // =========================================================
-      // 3. SYNCHRONIZED RADAR SCANNER (SCANS ALL 12 COINS IN ORDER)
+      // 3. SYNCHRONIZED RADAR SCANNER (NO SPAM WHEN 4/4 POSITIONS FULL)
       // =========================================================
-      if (STATE.positions.length < MAX_OPEN_POSITIONS) {
-        // Advance to next coin in sequence on each scan step
-        STATE.pairIdx = (STATE.pairIdx + 1) % STATE.pairs.length;
-        await fetchRealBinanceData(STATE.pairs[STATE.pairIdx].symbol);
-      } else {
-        // When 4 positions full, cycle among the open positions to monitor klines
+      if (STATE.positions.length >= MAX_OPEN_POSITIONS) {
+        // When max 4 positions are full: strictly monitor open positions klines & ticker prices
+        // DO NOT spam stream with PASS: Max 4 Positions Active logs!
         const activeIdx = Math.floor(STATE.seconds % STATE.positions.length);
-        await fetchRealBinanceData(STATE.positions[activeIdx].symbol);
+        const monSymbol = STATE.positions[activeIdx].symbol;
+        await fetchRealBinanceData(monSymbol);
+        render();
+        return; // Early return: Keeps stream clean for HOLD & TP/SL logs
       }
+
+      // Positions < 4: Advance scanner sequentially through all 12 target coins
+      STATE.pairIdx = (STATE.pairIdx + 1) % STATE.pairs.length;
+      const currentPair = STATE.pairs[STATE.pairIdx];
+      await fetchRealBinanceData(currentPair.symbol);
 
       // Check balance conditions
       if (STATE.balance <= 0 && STATE.positions.length === 0) {
@@ -2185,22 +2194,18 @@
       // 4. SCAN & ENTER SPOT TRADES (UP TO 4 POSITIONS, SCORE >= 72)
       // =========================================================
       if (STATE.balance >= 5.0) {
-        const currentPair = STATE.pairs[STATE.pairIdx];
         const score = STATE.confluenceScore || 0;
         const volRatio = STATE.market.volRatio || 1.0;
         const alreadyHoldingCoin = STATE.positions.some(pos => pos.symbol === currentPair.symbol);
-        const isMaxPositions = STATE.positions.length >= MAX_OPEN_POSITIONS;
 
-        // Confluence Gate: Require score >= 72 AND volRatio >= 1.05 AND NOT Disqualified AND < 4 positions
-        if (isMaxPositions || alreadyHoldingCoin || STATE.confluenceDisqualified || score < 72 || volRatio < 1.05 || STATE.market.rsi > 70.0) {
+        // Confluence Gate: Require score >= 72 AND volRatio >= 1.05 AND NOT Disqualified AND not holding this coin
+        if (alreadyHoldingCoin || STATE.confluenceDisqualified || score < 72 || volRatio < 1.05 || STATE.market.rsi > 70.0) {
           // Increment SKIPPED DUMPS on each evaluation cycle
           if (STATE.seconds % 2 === 0) {
             STATE.filtered++;
             
             let skipReason = STATE.confluenceDisqualifyReason || `Score ${score}/100`;
-            if (isMaxPositions) {
-              skipReason = `Max ${MAX_OPEN_POSITIONS} Positions Active`;
-            } else if (alreadyHoldingCoin) {
+            if (alreadyHoldingCoin) {
               skipReason = `Holding ${currentPair.symbol} Position`;
             } else if (!STATE.confluenceDisqualifyReason) {
               if (volRatio >= 1.35 && STATE.market.rsi < 50) {
@@ -2216,7 +2221,7 @@
               }
             }
 
-            // Populate Live Trading Stream on every evaluated coin (all 12 coins logged in order)
+            // Populate Live Trading Stream with the exact coin and matching price
             logEvent("SCAN", "RADAR", currentPair.symbol, `${score}/100`, `PASS: ${skipReason}`, `$${fmtPrice(STATE.market.price)}`);
           }
 
