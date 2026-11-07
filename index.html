@@ -1113,7 +1113,7 @@
             <span class="agent-state-tag tag-cyan">ACTIVE</span>
           </div>
           <div class="agent-role">Buys low & auto-sells for profit</div>
-          <div class="agent-detail"><span class="cyan-txt">Target: +0.75% Net Scalp</span><br><span id="exec-subtext">HUNTING ENTRY</span></div>
+          <div class="agent-detail"><span class="cyan-txt">Target: +0.30% Net Scalp</span><br><span id="exec-subtext">HUNTING ENTRY</span></div>
         </div>
 
         <!-- 5: PROFIT AUDITOR -->
@@ -1265,12 +1265,14 @@
         <div class="middle-row">
           <div class="trade-card">
             <div class="card-bar">
-              <span style="font-weight:700; color:#fff;">📊 LIVE SPOT POSITION</span>
+              <span style="font-weight:700; color:#fff;" id="active-card-title">📊 LIVE SPOT POSITION</span>
               <div style="display:flex; align-items:center; gap:8px;">
-                <button type="button" id="emergency-reset-btn" style="display:none; background:rgba(239,68,68,0.2); border:1px solid #ef4444; color:#f87171; font-size:10px; font-weight:700; padding:3px 8px; border-radius:4px; cursor:pointer;" title="Reset or clear stuck position from local storage / cache">⚡ CLOSE / RESET POSITION</button>
+                <button type="button" id="emergency-reset-btn" style="display:none; background:rgba(239,68,68,0.2); border:1px solid #ef4444; color:#f87171; font-size:10px; font-weight:700; padding:3px 8px; border-radius:4px; cursor:pointer;" title="Reset or clear stuck position from local storage / cache">⚡ CLOSE / RESET ALL</button>
                 <span class="badge-open" id="trade-open-badge">HOLDING COIN</span>
               </div>
             </div>
+            <!-- Interactive Multi-Position Switcher Tabs -->
+            <div id="multi-pos-tabs" style="display:none; gap:6px; flex-wrap:wrap; padding:8px 10px; background:#080d16; border-bottom:1px solid #182234;"></div>
             <div class="trade-symbol-row">
               <span class="token-name" id="active-symbol">BTCUSDT</span>
               <span class="badge-side" id="active-side">SPOT BUY (LONG)</span>
@@ -1690,9 +1692,10 @@
       const lastClosedVol = vols[vols.length - 2] || avgVol;
       const formingVol = vols[vols.length - 1] || 0;
       
-      // Project the current forming candle's volume based on elapsed seconds in current minute
-      const elapsedSecs = Math.max(5, new Date().getSeconds());
-      const projectedCurVol = formingVol * (60 / elapsedSecs);
+      // Project the current forming candle's volume (Capped at max 4.0x to avoid false meme spikes)
+      const elapsedSecs = Math.max(10, new Date().getSeconds());
+      const projFactor = Math.min(60 / elapsedSecs, 4.0);
+      const projectedCurVol = formingVol * projFactor;
 
       // Effective volume: Max of last fully completed bar or the live projected volume
       const effectiveVol = Math.max(lastClosedVol, projectedCurVol);
@@ -1777,23 +1780,28 @@
       }
 
       // Pillar 3: Volume Surge (25 pts max) - Strict Real Volume Logic
-      let volPts = 6;
+      let volPts = 10;
       let volDesc = "Average Volume";
       const isGreenCandle = lastCandle.close >= lastCandle.open;
+      const candleDropPct = lastCandle.open > 0 ? ((lastCandle.open - lastCandle.close) / lastCandle.open) * 100 : 0;
+
       if (volRatio >= 1.50 && isGreenCandle) {
         volPts = 25;
         volDesc = `🟢 ${volRatio}x Whale Accumulation Surge`;
       } else if (volRatio >= 1.15 && isGreenCandle) {
         volPts = 18;
         volDesc = `🟢 ${volRatio}x Moderate Buying Inflow`;
-      } else if (volRatio >= 1.35 && !isGreenCandle) {
+      } else if (!isGreenCandle && candleDropPct >= 0.25 && volRatio >= 2.50) {
         volPts = 2;
-        volDesc = `🔴 ${volRatio}x Heavy Sell Dump Volume`;
-      } else if (volRatio < 0.60) {
+        volDesc = `🔴 Panic Dump (-${candleDropPct.toFixed(2)}% • ${volRatio}x Vol)`;
+      } else if (!isGreenCandle && volRatio >= 1.15) {
+        volPts = 16;
+        volDesc = `🟢 ${volRatio}x Dip Absorption Inflow`;
+      } else if (volRatio < 0.40) {
         volPts = 2;
         volDesc = `🔴 ${volRatio}x Dead Volume (Low Liquidity)`;
       } else {
-        volPts = 10;
+        volPts = 12;
         volDesc = `${volRatio}x Normal Market Flow`;
       }
 
@@ -1832,10 +1840,10 @@
         disqualifyReason = `Heavy Sell Wall Above (${Math.round((1 - bidRatio) * 100)}% Asks)`;
         depthPts = 0;
       }
-      // Rule 3: Heavy Sell Volume Dump (Red candle with high volume)
-      else if (volRatio >= 1.30 && !isGreenCandle) {
+      // Rule 3: Genuine Panic Dump (Steep drop > 0.25% with massive volume > 2.50x)
+      else if (!isGreenCandle && candleDropPct >= 0.25 && volRatio >= 2.50) {
         isHardDisqualified = true;
-        disqualifyReason = `Dump Volume (${volRatio}x Sell Volume)`;
+        disqualifyReason = `Panic Dump (-${candleDropPct.toFixed(2)}% • ${volRatio}x Vol)`;
         volPts = 0;
       }
 
@@ -2147,17 +2155,15 @@
       }
 
       // =========================================================
-      // 3. CONTINUOUS RADAR SCANNER LOOP (NEVER STALLS ON 1 TRADE)
+      // 3. SYNCHRONIZED RADAR SCANNER (SCANS ALL 12 COINS IN ORDER)
       // =========================================================
-      // Scanner continues rotating across 12 liquid pairs unless 4 positions full
       if (STATE.positions.length < MAX_OPEN_POSITIONS) {
-        if (STATE.seconds % 2 === 0) {
-          STATE.pairIdx = (STATE.pairIdx + 1) % STATE.pairs.length;
-        }
+        // Advance to next coin in sequence on each scan step
+        STATE.pairIdx = (STATE.pairIdx + 1) % STATE.pairs.length;
         await fetchRealBinanceData(STATE.pairs[STATE.pairIdx].symbol);
       } else {
-        // If 4 positions are full, cycle among open positions to monitor klines
-        const activeIdx = Math.floor((STATE.seconds / 2) % STATE.positions.length);
+        // When 4 positions full, cycle among the open positions to monitor klines
+        const activeIdx = Math.floor(STATE.seconds % STATE.positions.length);
         await fetchRealBinanceData(STATE.positions[activeIdx].symbol);
       }
 
@@ -2209,10 +2215,8 @@
               }
             }
 
-            // Populate Live Trading Stream every 4 seconds
-            if (STATE.seconds % 4 === 0) {
-              logEvent("SCAN", "RADAR", currentPair.symbol, `${score}/100`, `PASS: ${skipReason}`, `$${fmtPrice(STATE.market.price)}`);
-            }
+            // Populate Live Trading Stream on every evaluated coin (all 12 coins logged in order)
+            logEvent("SCAN", "RADAR", currentPair.symbol, `${score}/100`, `PASS: ${skipReason}`, `$${fmtPrice(STATE.market.price)}`);
           }
 
           if (STATE.positions.length === 0) {
@@ -2418,8 +2422,28 @@
           sizerEqSub.textContent = "$0.00";
         }
       }
-      document.getElementById("balance-val").textContent = `$${STATE.balance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-      document.getElementById("now-bal-val").textContent = `$${STATE.balance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+      // Compute total unrealized PnL and Live Equity across all open positions
+      const totalUnrealizedNetPnL = (STATE.positions || []).reduce((acc, p) => acc + (p.pnlDollars || 0), 0);
+      const liveEquity = +(STATE.balance + totalUnrealizedNetPnL).toFixed(2);
+      const eqSign = totalUnrealizedNetPnL >= 0 ? "+$" : "-$";
+
+      const balValEl = document.getElementById("balance-val");
+      if (balValEl) {
+        if (openCount > 0) {
+          balValEl.innerHTML = `$${liveEquity.toFixed(2)} <span style="font-size:11px; font-weight:normal; color:${totalUnrealizedNetPnL >= 0 ? '#34d399' : '#f87171'};">(${eqSign}${Math.abs(totalUnrealizedNetPnL).toFixed(2)})</span>`;
+        } else {
+          balValEl.textContent = `$${STATE.balance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        }
+      }
+
+      const nowBalVal = document.getElementById("now-bal-val");
+      if (nowBalVal) {
+        if (openCount > 0) {
+          nowBalVal.innerHTML = `$${STATE.balance.toFixed(2)} <span style="font-size:11px; color:#38bdf8; font-weight:700;">(Equity: $${liveEquity.toFixed(2)})</span>`;
+        } else {
+          nowBalVal.textContent = `$${STATE.balance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        }
+      }
       document.getElementById("start-bal-val").textContent = `$${STATE.startBalance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
       const openCount = (STATE.positions || []).length;
       const openBadge = openCount > 0 ? ` • <span style="color:#38bdf8;font-weight:700;">⚡ ${openCount} OPEN</span>` : "";
@@ -2514,8 +2538,54 @@
         if (emergencyBtn) emergencyBtn.style.display = "inline-block";
         const execSubEl = document.getElementById("exec-subtext");
         if (execSubEl) {
-          execSubEl.textContent = `HOLDING ${STATE.activeTrade.symbol} (MONITORING TP/SL)`;
+          execSubEl.textContent = `HOLDING (${(STATE.positions || []).length}/4) • TP +0.30%`;
           execSubEl.style.color = "#34d399";
+        }
+
+        // Render interactive tabs for all open positions
+        const tabsEl = document.getElementById("multi-pos-tabs");
+        if (tabsEl) {
+          if ((STATE.positions || []).length > 1) {
+            tabsEl.style.display = "flex";
+            tabsEl.innerHTML = STATE.positions.map((pos, idx) => {
+              const isSelected = STATE.activeTrade && STATE.activeTrade.symbol === pos.symbol;
+              const pSign = (pos.pnlPct || 0) >= 0 ? "+" : "";
+              const color = (pos.pnlPct || 0) >= 0 ? "#34d399" : "#f87171";
+              return `
+                <div class="pos-tab" data-sym="${pos.symbol}" style="cursor:pointer; display:flex; align-items:center; gap:6px; background:${isSelected ? 'rgba(59,130,246,0.25)' : '#0c1220'}; border:1px solid ${isSelected ? '#3b82f6' : '#1e293b'}; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">
+                  <span>${pos.symbol}</span>
+                  <span style="color:${color}; font-size:10px;">${pSign}${(pos.pnlPct || 0).toFixed(2)}%</span>
+                  <button type="button" class="close-single-pos-btn" data-sym="${pos.symbol}" style="background:rgba(239,68,68,0.25); border:1px solid #ef4444; color:#f87171; font-size:9px; padding:1px 5px; border-radius:3px; cursor:pointer;" title="Close this position">✕</button>
+                </div>
+              `;
+            }).join("");
+
+            tabsEl.querySelectorAll(".pos-tab").forEach(tab => {
+              tab.addEventListener("click", (e) => {
+                if (e.target.classList.contains("close-single-pos-btn")) return;
+                const sym = tab.getAttribute("data-sym");
+                const p = STATE.positions.find(pos => pos.symbol === sym);
+                if (p) {
+                  STATE.activeTrade = p;
+                  render();
+                }
+              });
+            });
+
+            tabsEl.querySelectorAll(".close-single-pos-btn").forEach(btn => {
+              btn.addEventListener("click", async (e) => {
+                e.stopPropagation();
+                const sym = btn.getAttribute("data-sym");
+                const posToClose = STATE.positions.find(p => p.symbol === sym);
+                if (posToClose) {
+                  await closePosition(posToClose, "⚡ MANUAL CLOSE", posToClose.pnlDollars || 0, posToClose.pnlPct || 0);
+                  render();
+                }
+              });
+            });
+          } else {
+            tabsEl.style.display = "none";
+          }
         }
       } else if (STATE.balance <= 0) {
         document.getElementById("active-symbol").textContent = "WAITING CAPITAL";
