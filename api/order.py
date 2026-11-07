@@ -94,10 +94,17 @@ class handler(BaseHTTPRequestHandler):
             })
             return
 
+        market_type = data.get("marketType", "SPOT").upper()
         if action == "test_connection" or action == "get_balance":
-            self.handle_test_connection(api_key, api_secret)
+            if market_type == "FUTURES":
+                self.handle_futures_connection(api_key, api_secret)
+            else:
+                self.handle_test_connection(api_key, api_secret)
         elif action == "create_order":
-            self.handle_create_order(api_key, api_secret, data)
+            if market_type == "FUTURES":
+                self.handle_create_futures_order(api_key, api_secret, data)
+            else:
+                self.handle_create_order(api_key, api_secret, data)
         else:
             self._respond_json(400, {"success": False, "error": f"Unknown action: {action}"})
 
@@ -310,3 +317,124 @@ class handler(BaseHTTPRequestHandler):
         self._send_cors_headers()
         self.end_headers()
         self.wfile.write(json.dumps(data).encode('utf-8'))
+
+    def handle_futures_connection(self, api_key, api_secret):
+        timestamp = get_binance_server_time()
+        query_string = f"timestamp={timestamp}&recvWindow=60000"
+        signature = hmac.new(api_secret.encode('utf-8'), query_string.encode('utf-8'), hashlib.sha256).hexdigest()
+
+        for base_url in ["https://fapi.binance.com", "https://fapi1.binance.com"]:
+            full_url = f"{base_url}/fapi/v2/balance?{query_string}&signature={signature}"
+            req = urllib.request.Request(full_url, headers={
+                'X-MBX-APIKEY': api_key,
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            })
+            try:
+                with urllib.request.urlopen(req, timeout=6) as response:
+                    res_data = json.loads(response.read().decode('utf-8'))
+                    usdt_balance = 0.0
+                    for item in res_data:
+                        if item.get("asset") == "USDT":
+                            usdt_balance = float(item.get("availableBalance", item.get("balance", 0.0)))
+                            break
+                    self._respond_json(200, {
+                        "success": True,
+                        "marketType": "FUTURES",
+                        "usdtBalance": round(usdt_balance, 2),
+                        "message": f"Binance USD-M Futures connected! Available USDT: ${usdt_balance:.2f}"
+                    })
+                    return
+            except urllib.error.HTTPError as e:
+                try:
+                    err_data = json.loads(e.read().decode('utf-8'))
+                    err_msg = err_data.get("msg", str(e))
+                except Exception:
+                    err_msg = str(e)
+                self._respond_json(200, {
+                    "success": False,
+                    "error": f"Binance Futures error: {err_msg} (Ensure 'Enable Futures' is checked in your API Key settings)"
+                })
+                return
+            except Exception as e:
+                continue
+
+        self._respond_json(200, {
+            "success": False,
+            "error": "Failed to connect to Binance Futures endpoint."
+        })
+
+    def handle_create_futures_order(self, api_key, api_secret, data):
+        symbol = data.get("symbol", "BTCUSDT").upper()
+        side = data.get("side", "BUY").upper()
+        order_type = data.get("type", "MARKET").upper()
+        quantity = data.get("quantity")
+        leverage = int(data.get("leverage", 10))
+
+        # 1. Set leverage on Binance USD-M
+        ts = get_binance_server_time()
+        lev_query = f"symbol={symbol}&leverage={leverage}&timestamp={ts}&recvWindow=60000"
+        lev_sig = hmac.new(api_secret.encode('utf-8'), lev_query.encode('utf-8'), hashlib.sha256).hexdigest()
+        try:
+            lev_req = urllib.request.Request(f"https://fapi.binance.com/fapi/v1/leverage?{lev_query}&signature={lev_sig}", data=b"", headers={
+                'X-MBX-APIKEY': api_key, 'User-Agent': 'Mozilla/5.0'
+            }, method="POST")
+            urllib.request.urlopen(lev_req, timeout=4)
+        except Exception:
+            pass
+
+        # 2. Place Market Order
+        ts2 = get_binance_server_time()
+        cfg = SYMBOL_CONFIG.get(symbol, {"stepSize": 0.001, "decimals": 3, "baseAsset": symbol.replace("USDT","")})
+        decimals = cfg["decimals"]
+        step_size = cfg["stepSize"]
+
+        # If quantity is not explicitly set, calculate minimal safe lot
+        order_qty = None
+        if quantity and str(quantity).upper() != "ALL":
+            try:
+                order_qty = float(quantity)
+            except ValueError:
+                order_qty = None
+
+        if order_qty is None or order_qty <= 0:
+            order_qty = step_size * 5
+
+        floored_qty = math.floor(order_qty / step_size) * step_size
+        params = {
+            "symbol": symbol,
+            "side": side,
+            "type": order_type,
+            "quantity": f"{floored_qty:.{decimals}f}",
+            "timestamp": ts2,
+            "recvWindow": 60000
+        }
+        q_str = urllib.parse.urlencode(params)
+        sig = hmac.new(api_secret.encode('utf-8'), q_str.encode('utf-8'), hashlib.sha256).hexdigest()
+        full_url = f"https://fapi.binance.com/fapi/v1/order?{q_str}&signature={sig}"
+
+        try:
+            req = urllib.request.Request(full_url, data=b"", headers={
+                'X-MBX-APIKEY': api_key, 'User-Agent': 'Mozilla/5.0'
+            }, method="POST")
+            with urllib.request.urlopen(req, timeout=6) as response:
+                res_data = json.loads(response.read().decode('utf-8'))
+                self._respond_json(200, {
+                    "success": True,
+                    "order": res_data,
+                    "message": f"Binance Futures order executed: {side} {symbol} ({leverage}x)"
+                })
+        except urllib.error.HTTPError as e:
+            try:
+                err_data = json.loads(e.read().decode('utf-8'))
+                err_msg = err_data.get("msg", str(e))
+            except Exception:
+                err_msg = str(e)
+            self._respond_json(200, {
+                "success": False,
+                "error": f"Futures order rejected: {err_msg}"
+            })
+        except Exception as e:
+            self._respond_json(200, {
+                "success": False,
+                "error": f"Futures execution error: {str(e)}"
+            })

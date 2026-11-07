@@ -973,8 +973,8 @@
         </div>
         <div class="title-meta">
           <div class="brand-row" style="display:flex; align-items:center; flex-wrap:wrap; gap:6px;">
-            <span class="brand-name">Grok Spot Auto-Trader</span>
-            <span class="tag-version">v2.0 • Spot Profit Engine</span>
+            <span class="brand-name" id="brand-title-el">Grok Spot Auto-Trader</span>
+            <span class="tag-version" id="brand-tag-el">v2.0 • Spot Profit Engine</span>
             <div class="cute-mascot-chip" title="Active Spot AI Trading Companion">
               <svg class="cute-bot-svg" width="24" height="24" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <!-- Antenna with glowing red beacon -->
@@ -1008,11 +1008,27 @@
             <span id="timer-val" style="color:#60a5fa; font-family:monospace; font-weight:700;">00:00:00</span>
             <span class="status-pill" id="exec-pill">AUTO-TRADER • ACTIVE</span>
           </div>
-          <div class="subtext">Buys safe dips & sells for profit 24/7 on Binance Spot • Zero shorting risk</div>
+          <div class="subtext" id="brand-subtext-el">Buys safe dips & sells for profit 24/7 on Binance Spot • Zero shorting risk</div>
         </div>
       </div>
 
       <div class="header-center-controls">
+        <div class="market-view-switcher" style="display:flex; align-items:center; background:#080d16; border:1px solid #1e293b; border-radius:6px; padding:3px; gap:4px;">
+          <button type="button" id="tab-spot-btn" class="view-tab-btn" style="padding:6px 13px; border-radius:5px; font-size:11px; font-weight:800; cursor:pointer; border:1px solid #10b981; background:rgba(16,185,129,0.2); color:#34d399; display:flex; align-items:center; gap:5px;">
+            <span style="display:inline-block; width:7px; height:7px; background:#10b981; border-radius:50%; box-shadow:0 0 6px #10b981;"></span>
+            SPOT TRADER
+          </button>
+          <button type="button" id="tab-futures-btn" class="view-tab-btn" style="padding:6px 13px; border-radius:5px; font-size:11px; font-weight:800; cursor:pointer; border:1px solid transparent; background:transparent; color:#94a3b8; display:flex; align-items:center; gap:5px;">
+            <span style="display:inline-block; width:7px; height:7px; background:#a855f7; border-radius:50%; box-shadow:0 0 6px #a855f7;"></span>
+            ⚡ FUTURES AI (10x LONG/SHORT)
+          </button>
+        </div>
+        <div id="futures-leverage-wrap" style="display:none; align-items:center; gap:4px;">
+          <span style="font-size:10px; color:#c084fc; font-weight:700;">LEV:</span>
+          <button type="button" class="lev-btn" data-lev="5" style="background:#1e1b4b; border:1px solid #4338ca; color:#a5b4fc; font-size:10px; padding:4px 7px; border-radius:3px; cursor:pointer;">5x</button>
+          <button type="button" class="lev-btn active-lev" data-lev="10" style="background:#7c3aed; border:1px solid #a855f7; color:#fff; font-size:10px; font-weight:800; padding:4px 7px; border-radius:3px; cursor:pointer;">10x</button>
+          <button type="button" class="lev-btn" data-lev="20" style="background:#1e1b4b; border:1px solid #4338ca; color:#a5b4fc; font-size:10px; padding:4px 7px; border-radius:3px; cursor:pointer;">20x</button>
+        </div>
         <button class="action-btn" id="auth-modal-btn" style="background:rgba(16,185,129,0.18); border:1px solid #10b981; color:#34d399; font-weight:700;" title="User Login or Sign Up"><span id="auth-btn-icon">👤</span> <span id="auth-btn-label">SIGN IN / UP</span></button>
         <button class="action-btn" id="api-modal-btn" style="background:rgba(59,130,246,0.18); border:1px solid #3b82f6; color:#93c5fd;" title="Setup your own Binance API keys or toggle Practice mode">🔑 CONNECT BINANCE</button>
         <button class="action-btn" id="deposit-btn">💳 CAPITAL / WALLET</button>
@@ -1036,8 +1052,8 @@
     <div class="bot-fleet-bar">
       <div class="bot-card-fleet bot-blue-card">
         <div>
-          <div class="bot-name-tag cyan-txt">🚀 1. TREND RIDER</div>
-          <div style="color:#8292ab; font-size:10px;">Buys Upward Breakouts & EMA Golden Cross</div>
+          <div class="bot-name-tag cyan-txt" id="strat-1-title">🚀 1. TREND RIDER</div>
+          <div style="color:#8292ab; font-size:10px;" id="strat-1-sub">Buys Upward Breakouts & EMA Golden Cross</div>
         </div>
         <div style="text-align:right;">
           <div class="green-txt bold" id="gambler-pnl">+$0.00</div>
@@ -1047,8 +1063,8 @@
 
       <div class="bot-card-fleet bot-red-card">
         <div>
-          <div class="bot-name-tag red-txt">🎯 2. DIP BUYER</div>
-          <div style="color:#8292ab; font-size:10px;">Buys Oversold Dips & Sells Quick Bounces</div>
+          <div class="bot-name-tag red-txt" id="strat-2-title">🎯 2. DIP BUYER</div>
+          <div style="color:#8292ab; font-size:10px;" id="strat-2-sub">Buys Oversold Dips & Sells Quick Bounces</div>
         </div>
         <div style="text-align:right;">
           <div class="green-txt bold" id="house-pnl">+$0.00</div>
@@ -1058,8 +1074,8 @@
 
       <div class="bot-card-fleet bot-hybrid-card">
         <div>
-          <div class="bot-name-tag purple-txt">⚡ 3. SMART SCALPER</div>
-          <div style="color:#8292ab; font-size:10px;">Fast Profit Scalping on Orderbook Buying Pressure</div>
+          <div class="bot-name-tag purple-txt" id="strat-3-title">⚡ 3. SMART SCALPER</div>
+          <div style="color:#8292ab; font-size:10px;" id="strat-3-sub">Fast Profit Scalping on Orderbook Buying Pressure</div>
         </div>
         <div style="text-align:right;">
           <div class="green-txt bold" id="spy-pnl">+$0.00</div>
@@ -1552,6 +1568,8 @@
       logs: savedLogs,
       positions: savedPositions || [],
       maxPositions: 4,
+      marketType: localStorage.getItem("grok_market_type") || "SPOT",
+      leverage: parseInt(localStorage.getItem("grok_futures_leverage") || "10", 10),
       pairs: [
         { symbol: "BTCUSDT",  name: "Bitcoin",  price: 77000.0 },
         { symbol: "ETHUSDT",  name: "Ethereum", price: 2450.0 },
@@ -1581,6 +1599,8 @@
     };
 
     function saveUserState() {
+      localStorage.setItem("grok_market_type", STATE.marketType || "SPOT");
+      localStorage.setItem("grok_futures_leverage", (STATE.leverage || 10).toString());
       localStorage.setItem("grok_user_balance", STATE.balance.toFixed(2));
       localStorage.setItem("grok_start_capital", STATE.startBalance.toFixed(2));
       localStorage.setItem("grok_trading_mode", currentTradingMode);
@@ -2095,7 +2115,8 @@
               apiKey: userApiKey,
               apiSecret: userApiSecret,
               symbol: pos.symbol,
-              side: "SELL",
+              side: (pos.side === "SHORT" ? "BUY" : "SELL"),
+              marketType: pos.marketType || STATE.marketType || "SPOT",
               type: "MARKET",
               quantity: pos.quantity || "ALL"
             })
@@ -2198,18 +2219,21 @@
       }
 
       // =========================================================
-      // 2. DYNAMIC ALPHA TRAILING STOP RUNNER ENGINE (LET WINNERS RUN)
+      // 2. DYNAMIC ALPHA TRAILING STOP RUNNER ENGINE (SPOT & FUTURES)
       // =========================================================
-      const FEE_PCT = 0.20; // 0.1% Buy + 0.1% Sell
-      const STOP_LOSS_NET = -1.50; // -1.50% Net Stop-Loss (gives spot trades room to breathe without getting stopped on 1m wicks)
+      const isFuturesActive = STATE.marketType === "FUTURES";
 
       for (let i = STATE.positions.length - 1; i >= 0; i--) {
         const pos = STATE.positions[i];
         pos.tradeDuration = (pos.tradeDuration || 0) + 1;
         const livePrice = pos.currentPrice || pos.entryPrice;
-        const priceDiff = livePrice - pos.entryPrice;
-        const grossPct = +((priceDiff / pos.entryPrice) * 100).toFixed(2);
-        const netPct = +(grossPct - FEE_PCT).toFixed(2);
+        const lev = pos.leverage || (isFuturesActive ? (STATE.leverage || 10) : 1);
+        
+        // Directional PnL: LONG profits when price rises; SHORT profits when price falls!
+        const priceDiff = pos.side === "SHORT" ? (pos.entryPrice - livePrice) : (livePrice - pos.entryPrice);
+        const grossPct = +(((priceDiff / pos.entryPrice) * 100) * lev).toFixed(2);
+        const feePct = isFuturesActive ? +(0.08 * lev).toFixed(2) : 0.20;
+        const netPct = +(grossPct - feePct).toFixed(2);
         const netUsd = +(pos.sizeUsd * (netPct / 100)).toFixed(2);
         const heldMinutes = (Date.now() - (pos.entryTime || (Date.now() - (pos.tradeDuration * 1000)))) / 60000;
 
@@ -2221,49 +2245,53 @@
         if (pos.tradeDuration % 60 === 0) {
           const mins = Math.floor(pos.tradeDuration / 60);
           const pSign = netPct >= 0 ? "+" : "";
-          logEvent("HOLD", pos.bot, pos.symbol, `${pSign}${netPct}%`, `Holding @ $${fmtPrice(livePrice)} • Peak +${pos.peakNetPct}% (${mins}m held)`, `$${pos.sizeUsd.toFixed(2)}`);
+          logEvent("HOLD", pos.bot, pos.symbol, `${pSign}${netPct}%`, `Holding ${pos.side} @ $${fmtPrice(livePrice)} • Peak +${pos.peakNetPct}% (${mins}m held)`, `$${pos.sizeUsd.toFixed(2)}`);
         }
 
-        // 1. Dynamic Trailing Runner Exit (Locks in peak profit as coin trends up):
         let hitTrailingProfit = false;
-        if (pos.peakNetPct >= 3.0) {
-          hitTrailingProfit = netPct <= (pos.peakNetPct - 0.70);
-        } else if (pos.peakNetPct >= 1.20) {
-          hitTrailingProfit = netPct <= (pos.peakNetPct - 0.35);
-        } else if (pos.peakNetPct >= 0.75) {
-          hitTrailingProfit = netPct <= (pos.peakNetPct - 0.20);
+        let hitBreakevenLock = false;
+        let hitTargetProfit = false;
+        let hitTimeScalpWin = false;
+        let hitStaleExit = false;
+        let hitStopLoss = false;
+
+        if (isFuturesActive) {
+          // Futures High-ROI Rules (10x dynamic leverage)
+          if (pos.peakNetPct >= 8.0) hitTrailingProfit = netPct <= (pos.peakNetPct - 1.80);
+          else if (pos.peakNetPct >= 4.0) hitTrailingProfit = netPct <= (pos.peakNetPct - 1.00);
+
+          hitBreakevenLock = pos.peakNetPct >= 1.80 && netPct <= 0.40;
+          hitTargetProfit = netPct >= 6.00; // +6.00% Net ROI
+          hitTimeScalpWin = heldMinutes >= 20 && netPct >= 1.50;
+          hitStaleExit = heldMinutes >= 35 && netPct <= -1.50;
+          hitStopLoss = netPct <= -4.00; // -4.00% Net ROI Stop (only 0.4% move on 10x, zero liquidation risk)
+        } else {
+          // Spot 1x Scalper Rules
+          if (pos.peakNetPct >= 3.0) hitTrailingProfit = netPct <= (pos.peakNetPct - 0.70);
+          else if (pos.peakNetPct >= 1.20) hitTrailingProfit = netPct <= (pos.peakNetPct - 0.35);
+          else if (pos.peakNetPct >= 0.75) hitTrailingProfit = netPct <= (pos.peakNetPct - 0.20);
+
+          hitBreakevenLock = pos.peakNetPct >= 0.35 && netPct <= 0.05;
+          hitTargetProfit = netPct >= 1.20;
+          hitTimeScalpWin = heldMinutes >= 25 && netPct >= 0.25;
+          hitStaleExit = heldMinutes >= 40 && netPct <= -0.50;
+          hitStopLoss = netPct <= -1.50;
         }
-
-        // 2. Early Breakeven Armor (Zero Loss Guarantee):
-        // Once peak hits +0.35%, protect trade from ever turning into a loss
-        const hitBreakevenLock = pos.peakNetPct >= 0.35 && netPct <= 0.05;
-
-        // 3. High-Probability Target Scalp (+1.20% Net):
-        const hitTargetProfit = netPct >= 1.20;
-
-        // 4. Time-Stop Capital Release:
-        const hitTimeScalpWin = heldMinutes >= 25 && netPct >= 0.25;
-
-        // 5. Stale Chop Exit:
-        const hitStaleExit = heldMinutes >= 40 && netPct <= -0.50;
-
-        // 6. Safety Stop Loss (-1.50% Net)
-        const hitStopLoss = netPct <= STOP_LOSS_NET;
 
         if (hitTrailingProfit || hitBreakevenLock || hitTargetProfit || hitTimeScalpWin || hitStaleExit || hitStopLoss) {
           let exitReason = "";
           if (hitTargetProfit) {
-            exitReason = `🎯 TARGET PROFIT HIT (+${netPct}% Net locked • Clean Spot Win)`;
+            exitReason = `🎯 TARGET PROFIT HIT (+${netPct}% Net • Clean ${pos.side} Win)`;
           } else if (hitTrailingProfit) {
             exitReason = `🚀 TRAILING STOP HIT (+${netPct}% Net locked • Peak +${pos.peakNetPct}%)`;
           } else if (hitBreakevenLock) {
             exitReason = `🛡️ BREAKEVEN DEFENSE (+${netPct}% Net locked • Zero Loss)`;
           } else if (hitTimeScalpWin) {
-            exitReason = `⏱️ TIME SCALP WIN (+${netPct}% Net • 25m profit release)`;
+            exitReason = `⏱️ TIME SCALP WIN (+${netPct}% Net • 20m profit release)`;
           } else if (hitStaleExit) {
-            exitReason = `⏳ STALE CHOP TIMEOUT (${netPct}% Net • 40m capital release)`;
+            exitReason = `⏳ STALE CHOP TIMEOUT (${netPct}% Net • capital release)`;
           } else if (hitStopLoss) {
-            exitReason = `🛑 STOP 1.5% HIT (${netPct}% Net risk cut)`;
+            exitReason = `🛑 STOP LOSS HIT (${netPct}% Net risk cut)`;
           }
 
           await closePosition(pos, exitReason, netUsd, netPct);
@@ -2271,19 +2299,9 @@
       }
 
       // =========================================================
-      // 3. SYNCHRONIZED RADAR SCANNER (NO SPAM WHEN 4/4 POSITIONS FULL)
+      // 3. CONTINUOUS RADAR SCANNER (NEVER STOPS • SCANS ALL 12 COINS 24/7)
       // =========================================================
-      if (STATE.positions.length >= MAX_OPEN_POSITIONS) {
-        // When max 4 positions are full: strictly monitor open positions klines & ticker prices
-        // DO NOT spam stream with PASS: Max 4 Positions Active logs!
-        const activeIdx = Math.floor(STATE.seconds % STATE.positions.length);
-        const monSymbol = STATE.positions[activeIdx].symbol;
-        await fetchRealBinanceData(monSymbol);
-        render();
-        return; // Early return: Keeps stream clean for HOLD & TP/SL logs
-      }
-
-      // Positions < 4: Advance scanner sequentially through all 12 target coins
+      // Always advance sequentially through all 12 target coins every tick!
       STATE.pairIdx = (STATE.pairIdx + 1) % STATE.pairs.length;
       const currentPair = STATE.pairs[STATE.pairIdx];
       await fetchRealBinanceData(currentPair.symbol);
@@ -2366,30 +2384,62 @@
           return;
         }
 
-        // Setup Approved! Strict Strategy Gate (Eliminated unconfirmed catch-all buys)
+        // Setup Approved! Directional Strategy Gate (Spot: Buy Only | Futures: Long & Short)
+        let side = "BUY";
         let chosenBot = "Trend Rider";
         let botKey = "gambler";
         let reason = "";
+        const lev = STATE.marketType === "FUTURES" ? (STATE.leverage || 10) : 1;
 
-        if (STATE.market.rsi <= 38 && bidRatio >= 0.50) {
-          chosenBot = "Dip Buyer";
-          botKey = "house";
-          reason = `A+ Oversold Reversal (RSI ${STATE.market.rsi.toFixed(1)} + ${Math.round(bidRatio * 100)}% Whale Bids)`;
-        } else if (isBullishRibbon && volRatio >= 1.25) {
-          chosenBot = "Trend Rider";
-          botKey = "gambler";
-          reason = `A+ Bullish Breakout (EMA Golden Ribbon + ${volRatio}x Surge)`;
-        } else if (isBullishRibbon && bidRatio >= 0.56) {
-          chosenBot = "Smart Scalper";
-          botKey = "spy";
-          reason = `A+ Whale Orderbook Imbalance (${Math.round(bidRatio * 100)}% Bids + Golden Ribbon)`;
-        } else if (isBullishRibbon) {
-          chosenBot = "Trend Rider";
-          botKey = "gambler";
-          reason = `A+ Bullish Momentum Follower (${score}/100 pts)`;
+        if (STATE.marketType === "FUTURES") {
+          const isBearishRibbon = STATE.market.ema7 < STATE.market.ema21;
+          const isOverboughtTop = STATE.market.rsi >= 65;
+
+          if (isBearishRibbon && bidRatio < 0.49) {
+            side = "SHORT";
+            chosenBot = "Short Hunter";
+            botKey = "house";
+            reason = `⚡ Bearish Breakdown SHORT (${lev}x Lev • EMA 7 < 21 Death Cross)`;
+          } else if (isOverboughtTop) {
+            side = "SHORT";
+            chosenBot = "Short Hunter";
+            botKey = "house";
+            reason = `⚡ Overbought Top SHORT (${lev}x Lev • RSI ${STATE.market.rsi.toFixed(1)} Resistance)`;
+          } else if (STATE.market.rsi <= 38 && bidRatio >= 0.49) {
+            side = "LONG";
+            chosenBot = "Long Runner";
+            botKey = "gambler";
+            reason = `⚡ Oversold Dip LONG (${lev}x Lev • RSI ${STATE.market.rsi.toFixed(1)} Whale Bids)`;
+          } else if (isBullishRibbon) {
+            side = "LONG";
+            chosenBot = "Long Runner";
+            botKey = "gambler";
+            reason = `⚡ Bullish Ribbon LONG (${lev}x Lev • Golden Ribbon Momentum)`;
+          } else {
+            return;
+          }
         } else {
-          // If neither Bullish Ribbon nor Oversold Dip, REJECT! Zero low-edge trades.
-          return;
+          // Spot Mode: Long / Buy Only
+          side = "BUY";
+          if (STATE.market.rsi <= 38 && bidRatio >= 0.50) {
+            chosenBot = "Dip Buyer";
+            botKey = "house";
+            reason = `A+ Oversold Reversal (RSI ${STATE.market.rsi.toFixed(1)} + ${Math.round(bidRatio * 100)}% Whale Bids)`;
+          } else if (isBullishRibbon && volRatio >= 1.25) {
+            chosenBot = "Trend Rider";
+            botKey = "gambler";
+            reason = `A+ Bullish Breakout (EMA Golden Ribbon + ${volRatio}x Surge)`;
+          } else if (isBullishRibbon && bidRatio >= 0.56) {
+            chosenBot = "Smart Scalper";
+            botKey = "spy";
+            reason = `A+ Whale Orderbook Imbalance (${Math.round(bidRatio * 100)}% Bids + Golden Ribbon)`;
+          } else if (isBullishRibbon) {
+            chosenBot = "Trend Rider";
+            botKey = "gambler";
+            reason = `A+ Bullish Momentum Follower (${score}/100 pts)`;
+          } else {
+            return;
+          }
         }
 
         // Dynamic Position Sizing (Risk-Aware: subtracts committed capital)
@@ -2469,7 +2519,9 @@
               coinName: currentPair.name,
               bot: chosenBot,
               botKey: botKey,
-              side: "SPOT BUY (LONG)",
+              side: side,
+              marketType: STATE.marketType || "SPOT",
+              leverage: lev,
               entryPrice: actualFillPrice,
               currentPrice: actualFillPrice,
               entryTime: Date.now(),
@@ -2506,7 +2558,9 @@
             coinName: currentPair.name,
             bot: chosenBot,
             botKey: botKey,
-            side: "SPOT BUY (LONG)",
+            side: side,
+            marketType: STATE.marketType || "SPOT",
+            leverage: lev,
             entryPrice: livePrice,
             currentPrice: livePrice,
             entryTime: Date.now(),
@@ -2630,19 +2684,51 @@
         vaultSub.innerHTML = `${STATE.trades} closed (${STATE.wins}W / ${STATE.losses}L)${openBadge}`;
       }
 
+      // Update Brand Title, Subtext, and Mode Badge dynamically
+      const isFut = STATE.marketType === "FUTURES";
+      const brandTitleEl = document.getElementById("brand-title-el");
+      const brandTagEl = document.getElementById("brand-tag-el");
+      const brandSubEl = document.getElementById("brand-subtext-el");
+      const s1Title = document.getElementById("strat-1-title");
+      const s1Sub = document.getElementById("strat-1-sub");
+      const s2Title = document.getElementById("strat-2-title");
+      const s2Sub = document.getElementById("strat-2-sub");
+      const s3Title = document.getElementById("strat-3-title");
+      const s3Sub = document.getElementById("strat-3-sub");
+
+      if (brandTitleEl) brandTitleEl.textContent = isFut ? "Grok Futures AI Auto-Trader" : "Grok Spot Auto-Trader";
+      if (brandTagEl) brandTagEl.textContent = isFut ? `v2.0 • ${STATE.leverage || 10}x High-ROI Engine` : "v2.0 • Spot Profit Engine";
+      if (brandSubEl) brandSubEl.textContent = isFut ? "AI Auto Long & Short 24/7 on Binance Futures • 5x-20x Dynamic Leverage • Massive Profit Potential" : "Buys safe dips & sells for profit 24/7 on Binance Spot • Zero shorting risk";
+
+      if (isFut) {
+        if (s1Title) s1Title.textContent = "🚀 1. LONG RUNNER";
+        if (s1Sub) s1Sub.textContent = `${STATE.leverage || 10}x Bullish Momentum & Golden Ribbon Breakouts`;
+        if (s2Title) s2Title.textContent = "⚡ 2. SHORT HUNTER";
+        if (s2Sub) s2Sub.textContent = `${STATE.leverage || 10}x Bearish Breakdown & Overbought Rejections`;
+        if (s3Title) s3Title.textContent = "🎯 3. VOLATILITY SCALPER";
+        if (s3Sub) s3Sub.textContent = "Rapid Bi-Directional Orderbook Liquidity Scalping";
+      } else {
+        if (s1Title) s1Title.textContent = "🚀 1. TREND RIDER";
+        if (s1Sub) s1Sub.textContent = "Buys Upward Breakouts & EMA Golden Cross";
+        if (s2Title) s2Title.textContent = "🎯 2. DIP BUYER";
+        if (s2Sub) s2Sub.textContent = "Buys Oversold Dips & Sells Quick Bounces";
+        if (s3Title) s3Title.textContent = "⚡ 3. SMART SCALPER";
+        if (s3Sub) s3Sub.textContent = "Fast Profit Scalping on Orderbook Buying Pressure";
+      }
+
       // Update Mode Badge
       const modeBadge = document.getElementById("mode-badge-el");
       if (modeBadge) {
         if (currentTradingMode === "LIVE") {
-          modeBadge.textContent = `🔴 LIVE • BINANCE SPOT ($${STATE.balance.toFixed(2)} USDT)`;
+          modeBadge.textContent = isFut ? `🔴 LIVE • BINANCE FUTURES (${STATE.leverage || 10}x)` : `🔴 LIVE • BINANCE SPOT ($${STATE.balance.toFixed(2)} USDT)`;
           modeBadge.style.color = "#f87171";
           modeBadge.style.borderColor = "rgba(239, 68, 68, 0.4)";
           modeBadge.style.background = "rgba(239, 68, 68, 0.15)";
         } else {
-          modeBadge.textContent = "PRACTICE • DEMO MODE";
-          modeBadge.style.color = "#60a5fa";
-          modeBadge.style.borderColor = "rgba(59, 130, 246, 0.35)";
-          modeBadge.style.background = "rgba(59, 130, 246, 0.15)";
+          modeBadge.textContent = isFut ? `⚡ FUTURES • DEMO (${STATE.leverage || 10}x LEV)` : "PRACTICE • SPOT DEMO";
+          modeBadge.style.color = isFut ? "#c084fc" : "#60a5fa";
+          modeBadge.style.borderColor = isFut ? "rgba(168, 85, 247, 0.4)" : "rgba(59, 130, 246, 0.35)";
+          modeBadge.style.background = isFut ? "rgba(168, 85, 247, 0.15)" : "rgba(59, 130, 246, 0.15)";
         }
       }
 
@@ -2667,16 +2753,22 @@
 
       // Active trade render (supports viewing focused position from STATE.positions)
       if (STATE.activeTrade) {
-        document.getElementById("active-symbol").textContent = STATE.activeTrade.symbol;
-        document.getElementById("active-bot").textContent = STATE.activeTrade.bot.toUpperCase();
-        document.getElementById("active-side").textContent = STATE.activeTrade.side;
+        const posSide = STATE.activeTrade.side || "BUY";
+        const isPosFut = STATE.activeTrade.marketType === "FUTURES";
+        const levBadge = isPosFut ? ` [${STATE.activeTrade.leverage || 10}x]` : "";
+        const sideColor = posSide.includes("SHORT") ? "#f87171" : "#34d399";
         
-        const netUsd = STATE.activeTrade.pnlDollars;
+        document.getElementById("active-symbol").textContent = STATE.activeTrade.symbol;
+        document.getElementById("active-bot").textContent = `${STATE.activeTrade.bot.toUpperCase()}${levBadge}`;
+        document.getElementById("active-side").innerHTML = `<span style="color:${sideColor}; font-weight:800;">${posSide}</span>${levBadge}`;
+        
+        const netUsd = STATE.activeTrade.pnlDollars || 0;
         const dollarSign = netUsd >= 0 ? "+$" : "-$";
-        const pctSign = STATE.activeTrade.pnlPct >= 0 ? "+" : "";
+        const pctSign = (STATE.activeTrade.pnlPct || 0) >= 0 ? "+" : "";
         const pnlEl = document.getElementById("active-pnl");
-        pnlEl.textContent = `${pctSign}${STATE.activeTrade.pnlPct}% (Net ${dollarSign}${Math.abs(netUsd).toFixed(2)})`;
-        pnlEl.className = STATE.activeTrade.pnlPct >= 0 ? "live-pnl green-txt" : "live-pnl red-txt";
+        const roiTag = isPosFut ? "ROI" : "Net";
+        pnlEl.textContent = `${pctSign}${STATE.activeTrade.pnlPct}% ${roiTag} (${dollarSign}${Math.abs(netUsd).toFixed(2)})`;
+        pnlEl.className = (STATE.activeTrade.pnlPct || 0) >= 0 ? "live-pnl green-txt" : "live-pnl red-txt";
         
         document.getElementById("active-entry").textContent = `$${fmtPrice(STATE.activeTrade.entryPrice)}`;
         document.getElementById("active-current").textContent = `$${fmtPrice(STATE.activeTrade.currentPrice)}`;
@@ -3500,6 +3592,80 @@
     }
 
     // Toggle Pause/Resume Button
+    
+    // Market Mode Switcher (SPOT vs FUTURES)
+    function setMarketMode(mode) {
+      STATE.marketType = mode;
+      localStorage.setItem("grok_market_type", mode);
+      const spotBtn = document.getElementById("tab-spot-btn");
+      const futBtn = document.getElementById("tab-futures-btn");
+      const levWrap = document.getElementById("futures-leverage-wrap");
+
+      if (mode === "FUTURES") {
+        if (spotBtn) {
+          spotBtn.style.background = "transparent";
+          spotBtn.style.color = "#94a3b8";
+          spotBtn.style.borderColor = "transparent";
+        }
+        if (futBtn) {
+          futBtn.style.background = "rgba(168,85,247,0.25)";
+          futBtn.style.color = "#c084fc";
+          futBtn.style.borderColor = "#a855f7";
+        }
+        if (levWrap) levWrap.style.display = "flex";
+        logEvent("MODE", "SYSTEM", "FUTURES", `${STATE.leverage || 10}x LEV`, "Switched to Binance Futures AI Engine. Long & Short Active.", "100%");
+      } else {
+        if (spotBtn) {
+          spotBtn.style.background = "rgba(16,185,129,0.2)";
+          spotBtn.style.color = "#34d399";
+          spotBtn.style.borderColor = "#10b981";
+        }
+        if (futBtn) {
+          futBtn.style.background = "transparent";
+          futBtn.style.color = "#94a3b8";
+          futBtn.style.borderColor = "transparent";
+        }
+        if (levWrap) levWrap.style.display = "none";
+        logEvent("MODE", "SYSTEM", "SPOT", "1x SPOT", "Switched to Binance Spot Engine. Safe Dip & Breakout Buying.", "100%");
+      }
+      render();
+    }
+
+    const spotTabBtn = document.getElementById("tab-spot-btn");
+    if (spotTabBtn) {
+      spotTabBtn.addEventListener("click", () => setMarketMode("SPOT"));
+    }
+    const futTabBtn = document.getElementById("tab-futures-btn");
+    if (futTabBtn) {
+      futTabBtn.addEventListener("click", () => setMarketMode("FUTURES"));
+    }
+
+    // Leverage selection buttons
+    document.querySelectorAll(".lev-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const lev = parseInt(btn.getAttribute("data-lev"), 10);
+        STATE.leverage = lev;
+        localStorage.setItem("grok_futures_leverage", lev.toString());
+        document.querySelectorAll(".lev-btn").forEach(b => {
+          b.style.background = "#1e1b4b";
+          b.style.color = "#a5b4fc";
+          b.style.borderColor = "#4338ca";
+          b.style.fontWeight = "normal";
+        });
+        btn.style.background = "#7c3aed";
+        btn.style.color = "#fff";
+        btn.style.borderColor = "#a855f7";
+        btn.style.fontWeight = "800";
+        logEvent("CONFIG", "FUTURES", "LEV", `${lev}x`, `AI Dynamic Leverage set to ${lev}x.`, "100%");
+        render();
+      });
+    });
+
+    // Initialize initial mode visual state
+    if (STATE.marketType === "FUTURES") {
+      setMarketMode("FUTURES");
+    }
+
     document.getElementById("toggle-run-btn").addEventListener("click", () => {
       STATE.running = !STATE.running;
       document.getElementById("toggle-run-btn").textContent = STATE.running ? "⏸️ PAUSE BOT" : "▶️ START BOT";
