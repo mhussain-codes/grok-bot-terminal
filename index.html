@@ -1415,6 +1415,55 @@
       }
     } catch (e) {}
 
+    // Calculate completed trades, wins, losses, fleet stats and total realized profit from saved logs
+    const completedTrades = savedLogs.filter(l => l.type === "SOLD" || l.type === "EXIT" || l.type === "BINANCE_SELL");
+    let initTrades = completedTrades.length;
+    let initWins = completedTrades.filter(l => {
+      const pVal = typeof l.pnl_num === 'number' ? l.pnl_num : (parseFloat(String(l.pnl || "").replace(/[^0-9.-]+/g, '')) || 0);
+      return pVal > 0 || (l.pnl && l.pnl.includes("+"));
+    }).length;
+    let initLosses = initTrades - initWins;
+
+    let initFleet = {
+      gambler: { name: "Trend Rider",  trades: 0, wins: 0, pnl: 0 },
+      house:   { name: "Dip Buyer",    trades: 0, wins: 0, pnl: 0 },
+      spy:     { name: "Smart Scalper", trades: 0, wins: 0, pnl: 0 }
+    };
+
+    let totalSoldNetProfit = 0;
+    completedTrades.forEach(l => {
+      const bName = (l.bot || "").toLowerCase();
+      const key = bName.includes("trend") ? "gambler" : (bName.includes("dip") ? "house" : "spy");
+      const pVal = typeof l.pnl_num === 'number' ? l.pnl_num : (parseFloat(String(l.pnl || "").replace(/[^0-9.-]+/g, '')) || 0);
+      totalSoldNetProfit += pVal;
+      if (initFleet[key]) {
+        initFleet[key].trades++;
+        initFleet[key].pnl = +(initFleet[key].pnl + pVal).toFixed(2);
+        if (pVal > 0) initFleet[key].wins++;
+      }
+    });
+
+    // Check if localStorage has explicit saved stats
+    const lsTrades = parseInt(localStorage.getItem("grok_total_trades") || "0");
+    if (lsTrades > initTrades) {
+      initTrades = lsTrades;
+      initWins = parseInt(localStorage.getItem("grok_total_wins") || "0");
+      initLosses = parseInt(localStorage.getItem("grok_total_losses") || "0");
+      try {
+        const lsFleet = JSON.parse(localStorage.getItem("grok_bot_fleet") || "null");
+        if (lsFleet) initFleet = lsFleet;
+      } catch(e) {}
+    }
+
+    // Determine Starting Capital accurately (Never overwrite with realized profit!)
+    const savedStartCap = localStorage.getItem("grok_start_capital");
+    let startBal = savedStartCap !== null ? parseFloat(savedStartCap) : null;
+    if (startBal === null || isNaN(startBal) || startBal <= 0) {
+      // If start capital not yet saved, derive it by subtracting realized profits from current wallet
+      startBal = Math.max(5.0, +(initialBal - totalSoldNetProfit).toFixed(2));
+      localStorage.setItem("grok_start_capital", startBal.toFixed(2));
+    }
+
     if (savedTrade) {
       savedLogs.unshift({
         time: new Date().toTimeString().split(' ')[0],
@@ -1489,16 +1538,12 @@
       running: true,
       seconds: 0,
       balance: initialBal,
-      startBalance: initialBal,
-      trades: 0,
-      wins: 0,
-      losses: 0,
+      startBalance: startBal,
+      trades: initTrades,
+      wins: initWins,
+      losses: initLosses,
       filtered: 0,
-      botFleet: {
-        gambler: { name: "Trend Rider",  trades: 0, wins: 0, pnl: 0 },
-        house:   { name: "Dip Buyer",    trades: 0, wins: 0, pnl: 0 },
-        spy:     { name: "Smart Scalper", trades: 0, wins: 0, pnl: 0 }
-      },
+      botFleet: initFleet,
       activeTrade: savedTrade,
       tradeDuration: savedDuration,
       maxObservedPnl: 0.0,
@@ -1540,9 +1585,14 @@
 
     function saveUserState() {
       localStorage.setItem("grok_user_balance", STATE.balance.toFixed(2));
+      localStorage.setItem("grok_start_capital", STATE.startBalance.toFixed(2));
       localStorage.setItem("grok_trading_mode", currentTradingMode);
+      localStorage.setItem("grok_total_trades", STATE.trades.toString());
+      localStorage.setItem("grok_total_wins", STATE.wins.toString());
+      localStorage.setItem("grok_total_losses", STATE.losses.toString());
+      localStorage.setItem("grok_bot_fleet", JSON.stringify(STATE.botFleet));
       if (STATE.logs && STATE.logs.length) {
-        localStorage.setItem("grok_terminal_logs", JSON.stringify(STATE.logs.slice(0, 30)));
+        localStorage.setItem("grok_terminal_logs", JSON.stringify(STATE.logs.slice(0, 40)));
       }
       if (STATE.positions && STATE.positions.length) {
         localStorage.setItem("grok_positions", JSON.stringify(STATE.positions));
