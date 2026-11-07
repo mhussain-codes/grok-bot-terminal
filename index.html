@@ -1376,6 +1376,11 @@
       activeTrade: savedTrade,
       tradeDuration: savedDuration,
       maxObservedPnl: 0.0,
+      apiErrorCooldown: 0,
+      lastApiError: "",
+      confluenceDisqualified: false,
+      confluenceDisqualifyReason: "",
+      confluenceBreakdown: { rsiPts: 0, emaPts: 0, volPts: 0, depthPts: 0 },
       logs: savedLogs,
       pairs: [
         { symbol: "BTCUSDT", name: "Bitcoin", price: 77000.0 },
@@ -1658,8 +1663,38 @@
         depthDesc = `${Math.round(bidRatio * 100)}% Balanced Liquidity`;
       }
 
-      const totalScore = Math.min(100, rsiPts + emaPts + volPts + depthPts);
+      // ============================================================
+      // HARD DISQUALIFIER GATES (Strict Risk Protection - Zero Tops/Dumps)
+      // ============================================================
+      let isHardDisqualified = false;
+      let disqualifyReason = "";
+
+      // Rule 1: Overbought Peak Danger (Never buy into parabolic top)
+      if (rsi > 70.0) {
+        isHardDisqualified = true;
+        disqualifyReason = `Overbought Peak (RSI ${rsi.toFixed(1)} > 70)`;
+        rsiPts = 0;
+      }
+      // Rule 2: Heavy Ask Sell Wall (Orderbook dominated by sellers)
+      else if (bidRatio < 0.35) {
+        isHardDisqualified = true;
+        disqualifyReason = `Heavy Sell Wall Above (${Math.round((1 - bidRatio) * 100)}% Asks)`;
+        depthPts = 0;
+      }
+      // Rule 3: Heavy Sell Volume Dump (Red candle with high volume)
+      else if (volRatio >= 1.30 && !isGreenCandle) {
+        isHardDisqualified = true;
+        disqualifyReason = `Dump Volume (${volRatio}x Sell Volume)`;
+        volPts = 0;
+      }
+
+      // Exact mathematical sum of the 4 visible pillars
+      const rawScore = rsiPts + emaPts + volPts + depthPts;
+      const totalScore = isHardDisqualified ? Math.min(42, rawScore) : Math.min(100, rawScore);
       STATE.confluenceScore = totalScore;
+      STATE.confluenceDisqualified = isHardDisqualified;
+      STATE.confluenceDisqualifyReason = disqualifyReason;
+      STATE.confluenceBreakdown = { rsiPts, emaPts, volPts, depthPts };
 
       // Update UI Confluence Matrix Elements
       const scoreValEl = document.getElementById("signal-score-val");
@@ -1669,7 +1704,14 @@
       if (scoreValEl) scoreValEl.textContent = `${totalScore} / 100`;
       
       if (badgeEl && gradeValEl) {
-        if (totalScore >= 78) {
+        if (isHardDisqualified) {
+          badgeEl.textContent = `🛑 HARD PASS (${disqualifyReason})`;
+          badgeEl.style.background = "rgba(239, 68, 68, 0.25)";
+          badgeEl.style.color = "#f87171";
+          badgeEl.style.borderColor = "#ef4444";
+          gradeValEl.textContent = `Setup Disqualified • ${disqualifyReason}`;
+          gradeValEl.style.color = "#f87171";
+        } else if (totalScore >= 78) {
           badgeEl.textContent = "🎯 GRADE A+ CONFLUENCE (HIGH-WIN ENTRY)";
           badgeEl.style.background = "rgba(16, 185, 129, 0.25)";
           badgeEl.style.color = "#34d399";
@@ -1792,6 +1834,10 @@
     async function tradingTick() {
       if (!STATE.running || isTradeActionInProgress) return;
       STATE.seconds++;
+
+      if (STATE.apiErrorCooldown && STATE.apiErrorCooldown > 0) {
+        STATE.apiErrorCooldown--;
+      }
 
       // =========================================================
       // 1. ACTIVE POSITION ISOLATION (FIX ISSUE #1)
@@ -1960,23 +2006,25 @@
         const score = STATE.confluenceScore || 0;
         const volRatio = STATE.market.volRatio || 1.0;
 
-        // Strict Confluence Gate: Require score >= 75 AND volRatio >= 1.05 (Never enter on 0.19x dead volume!)
-        if (score < 75 || volRatio < 1.05) {
+        // Strict Confluence Gate: Require score >= 75 AND volRatio >= 1.05 AND NOT Disqualified
+        if (STATE.confluenceDisqualified || score < 75 || volRatio < 1.05 || STATE.market.rsi > 70.0) {
           // Increment SKIPPED DUMPS on each evaluation cycle
           if (STATE.seconds % 2 === 0) {
             STATE.filtered++;
             
-            let skipReason = `Score ${score}/100`;
-            if (volRatio >= 1.35 && STATE.market.rsi < 50) {
-              skipReason = `Heavy Sell Dump (${volRatio}x Vol)`;
-            } else if (volRatio < 0.60) {
-              skipReason = `Dead Volume (${volRatio}x)`;
-            } else if (STATE.market.rsi > 68) {
-              skipReason = `Overbought Risk (RSI ${STATE.market.rsi.toFixed(1)})`;
-            } else if (score < 50) {
-              skipReason = `Weak Edge (Score ${score}/100)`;
-            } else {
-              skipReason = `Score ${score}/100 (Below 75 Threshold)`;
+            let skipReason = STATE.confluenceDisqualifyReason || `Score ${score}/100`;
+            if (!STATE.confluenceDisqualifyReason) {
+              if (volRatio >= 1.35 && STATE.market.rsi < 50) {
+                skipReason = `Heavy Sell Dump (${volRatio}x Vol)`;
+              } else if (volRatio < 0.60) {
+                skipReason = `Dead Volume (${volRatio}x)`;
+              } else if (STATE.market.rsi > 70.0) {
+                skipReason = `Overbought Peak (RSI ${STATE.market.rsi.toFixed(1)} > 70)`;
+              } else if (score < 50) {
+                skipReason = `Weak Edge (Score ${score}/100)`;
+              } else {
+                skipReason = `Score ${score}/100 (Below 75 Threshold)`;
+              }
             }
 
             // Populate Live Trading Stream every 4 seconds so terminal is actively alive during scanning
@@ -1987,11 +2035,11 @@
 
           document.getElementById("active-symbol").textContent = currentPair.symbol;
           document.getElementById("active-side").textContent = `RADAR: ${score}/100`;
-          document.getElementById("active-pnl").textContent = volRatio < 1.05 ? `low volume (${volRatio}x < 1.05x)` : "analyzing setup (min 75 required)";
+          document.getElementById("active-pnl").textContent = STATE.confluenceDisqualified ? `DISQUALIFIED: ${STATE.confluenceDisqualifyReason}` : (volRatio < 1.05 ? `low volume (${volRatio}x < 1.05x)` : "analyzing setup (min 75 required)");
           document.getElementById("active-pnl").className = "live-pnl blue-txt";
           document.getElementById("active-current").textContent = `$${STATE.market.price.toLocaleString('en-US')}`;
           document.getElementById("exec-node-sub").textContent = "SCANNING";
-          document.getElementById("exec-pill").textContent = `RADAR • ANALYZING ${currentPair.symbol} (${score}/100 • ${volRatio}x Vol)`;
+          document.getElementById("exec-pill").textContent = STATE.confluenceDisqualified ? `RADAR • PASS: ${STATE.confluenceDisqualifyReason}` : `RADAR • ANALYZING ${currentPair.symbol} (${score}/100 • ${volRatio}x Vol)`;
           document.getElementById("trade-open-badge").style.display = "none";
           render();
           return;
@@ -2035,8 +2083,21 @@
         const sizePct = Math.round((sizeUsd / STATE.balance) * 100);
         const livePrice = STATE.market.price > 0 ? STATE.market.price : currentPair.price;
 
-        // IN LIVE MODE: AWAIT REAL BINANCE API EXECUTION FIRST (FIX ISSUE #2)
-        if (currentTradingMode === "LIVE" && userApiKey && userApiSecret) {
+        // IN LIVE MODE: STRICT BINANCE API EXECUTION (NO DEMO FALLBACK, 30S COOLDOWN ON ERROR)
+        if (currentTradingMode === "LIVE") {
+          if (!userApiKey || !userApiSecret) {
+            document.getElementById("exec-pill").textContent = "LIVE MODE • PLEASE CONNECT BINANCE API KEYS";
+            render();
+            return;
+          }
+
+          // If in API error cooldown, pause live orders to prevent spamming
+          if (STATE.apiErrorCooldown > 0) {
+            document.getElementById("exec-pill").textContent = `LIVE PAUSED • ${STATE.lastApiError || 'API Error'} (${STATE.apiErrorCooldown}s cooldown)`;
+            render();
+            return;
+          }
+
           isTradeActionInProgress = true;
           document.getElementById("exec-pill").textContent = `PLACING LIVE BUY FOR ${currentPair.symbol} ON BINANCE...`;
 
@@ -2059,10 +2120,12 @@
 
             // ABORT IMMEDIATELY IF BINANCE DID NOT FILL ORDER (NO OPTIMISTIC FAKES!)
             if (!data.success || !data.order || (data.order.status !== "FILLED" && data.order.status !== "NEW")) {
-              logEvent("API_ERROR", chosenBot, currentPair.symbol, "REJECTED", data.error || "Order rejected by Binance", `$${sizeUsd.toFixed(2)}`);
-              document.getElementById("exec-pill").textContent = `ORDER REJECTED • ${data.error || 'Check API Key'}`;
+              STATE.apiErrorCooldown = 30; // 30 seconds pause on error
+              STATE.lastApiError = data.error || "Order rejected by Binance";
+              logEvent("API_ERROR", chosenBot, currentPair.symbol, "PAUSED", `${data.error || 'Order rejected by Binance'} (Live trading paused 30s)`, `$${sizeUsd.toFixed(2)}`);
+              document.getElementById("exec-pill").textContent = `LIVE PAUSED • ${data.error || 'Check API Key'} (30s cooldown)`;
               render();
-              return; // Do NOT open active trade!
+              return; // NEVER open trade, NEVER fall back to paper demo!
             }
 
             // Real fill price and executed quantity calculation
@@ -2077,6 +2140,7 @@
               }
             }
 
+            const bDown = STATE.confluenceBreakdown || { rsiPts: 0, emaPts: 0, volPts: 0, depthPts: 0 };
             STATE.activeTrade = {
               symbol: currentPair.symbol,
               coinName: currentPair.name,
@@ -2098,15 +2162,18 @@
             STATE.maxObservedPnl = 0.0;
             saveUserState();
 
-            logEvent("BINANCE_LIVE", chosenBot, currentPair.symbol, "FILLED", `Order #${data.order.orderId} at $${actualFillPrice} [Score ${score}/100]`, `$${sizeUsd.toFixed(2)}`);
+            logEvent("BINANCE_LIVE", chosenBot, currentPair.symbol, "FILLED", `Order #${data.order.orderId} at $${actualFillPrice} [Score ${score}/100: RSI ${bDown.rsiPts}+EMA ${bDown.emaPts}+Vol ${bDown.volPts}+Depth ${bDown.depthPts}]`, `$${sizeUsd.toFixed(2)}`);
           } catch (err) {
             isTradeActionInProgress = false;
-            logEvent("NET_ERR", chosenBot, currentPair.symbol, "FAIL", "Proxy error: " + err.message, `$${sizeUsd.toFixed(2)}`);
+            STATE.apiErrorCooldown = 30;
+            STATE.lastApiError = err.message;
+            logEvent("NET_ERR", chosenBot, currentPair.symbol, "FAIL", "Proxy error: " + err.message + " (30s cooldown)", `$${sizeUsd.toFixed(2)}`);
             render();
             return;
           }
         } else {
-          // Practice / Paper Demo Execution
+          // Practice / Paper Demo Execution (Strictly active only when user chooses DEMO mode)
+          const bDown = STATE.confluenceBreakdown || { rsiPts: 0, emaPts: 0, volPts: 0, depthPts: 0 };
           STATE.activeTrade = {
             symbol: currentPair.symbol,
             coinName: currentPair.name,
@@ -2127,7 +2194,7 @@
           STATE.maxObservedPnl = 0.0;
           saveUserState();
 
-          logEvent("BOUGHT", chosenBot, currentPair.symbol, "FEE: $0.02", `[SCORE ${score}/100] ${reason}`, `$${sizeUsd.toFixed(2)}`);
+          logEvent("BOUGHT", chosenBot, currentPair.symbol, "FEE: $0.02", `[SCORE ${score}/100: RSI ${bDown.rsiPts}+EMA ${bDown.emaPts}+Vol ${bDown.volPts}+Depth ${bDown.depthPts}] ${reason}`, `$${sizeUsd.toFixed(2)}`);
         }
       } else if (STATE.balance > 0 && STATE.balance < 5.0 && !STATE.activeTrade) {
         document.getElementById("active-symbol").textContent = "BALANCE < $5";
