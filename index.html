@@ -950,8 +950,8 @@
       <div style="margin-top:10px; padding:8px 10px; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.25); border-radius:5px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
         <span style="font-size:11px; color:#93c5fd;">⚡ Need Sandbox Practice Funds?</span>
         <div style="display:flex; gap:6px;">
-          <button type="button" id="quick-reset-5-btn" style="background:#059669; color:#fff; border:1px solid #10b981; padding:5px 10px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;">⚡ $5 Demo (Starter)</button>
-          <button type="button" id="quick-reset-demo-btn" style="background:#1d4ed8; color:#fff; border:1px solid #3b82f6; padding:5px 10px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;">Reset $100 Demo</button>
+          <button type="button" id="quick-reset-5-btn" style="background:#1d4ed8; color:#fff; border:1px solid #3b82f6; padding:6px 12px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;">⚡ Reset $100 Demo (Recommended)</button>
+          <button type="button" id="quick-reset-demo-btn" style="background:#059669; color:#fff; border:1px solid #10b981; padding:6px 12px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;">🚀 Reset $500 Pro Demo</button>
         </div>
       </div>
 
@@ -1113,7 +1113,7 @@
             <span class="agent-state-tag tag-cyan">ACTIVE</span>
           </div>
           <div class="agent-role">Buys low & auto-sells for profit</div>
-          <div class="agent-detail"><span class="cyan-txt">Target: +1.25% Net Spot Scalp</span><br><span id="exec-subtext">HUNTING ENTRY</span></div>
+          <div class="agent-detail"><span class="cyan-txt">Target: +1.00% Net Spot Scalp</span><br><span id="exec-subtext">HUNTING ENTRY</span></div>
         </div>
 
         <!-- 5: PROFIT AUDITOR -->
@@ -1295,9 +1295,9 @@
               <div class="detail-label">Position Size:</div>
               <div class="detail-val" id="active-size">$20.00 (20% eq)</div>
               <div class="detail-label">Target Profit:</div>
-              <div class="detail-val green-txt" id="active-target">🎯 +1.25% Net Spot Scalp</div>
+              <div class="detail-val green-txt" id="active-target">🎯 +1.00% Net Spot Scalp</div>
               <div class="detail-label">Safety Stop-Loss:</div>
-              <div class="detail-val red-txt" id="active-stop">🛑 -0.85% Net (Breakeven @ +0.55% • Trail)</div>
+              <div class="detail-val red-txt" id="active-stop">🛑 -0.65% Net (Breakeven @ +0.35% • Trail)</div>
               <div class="detail-label">Entry Reason:</div>
               <div class="detail-val blue-txt" id="active-reason" style="grid-column: span 1;">Waiting for A+ Confluence trigger...</div>
             </div>
@@ -1389,7 +1389,7 @@
       const rawPos = localStorage.getItem("grok_positions");
       if (rawPos) {
         savedPositions = JSON.parse(rawPos);
-        savedPositions = savedPositions.filter(p => p && p.symbol && p.entryPrice && p.symbol !== "BNBUSDT");
+        savedPositions = savedPositions.filter(p => p && p.symbol && p.entryPrice && p.symbol !== "BNBUSDT" && (p.sizeUsd === undefined || p.sizeUsd >= 4.0));
       }
       const rawTrade = localStorage.getItem("grok_active_trade");
       if (rawTrade) {
@@ -2200,12 +2200,12 @@
       }
 
       // =========================================================
-      // 2. INSTITUTIONAL SPOT PROFIT RUNNER & RISK SYSTEM
+      // 2. INSTITUTIONAL MULTI-TIER PROFIT HARVESTER & RISK ENGINE
       // =========================================================
       const FEE_PCT = 0.20; // 0.1% Buy + 0.1% Sell
-      const TARGET_NET_PROFIT = 1.25; // +1.25% Net (+1.45% Gross) -> True Spot Scalp Win (+$1.25+ on $100 order)
-      const STOP_LOSS_NET = -0.85; // -0.85% Net Stop-Loss (gives 0.65% gross buffer to absorb 1m wicks & support retests)
-      const MAX_HOLD_MINUTES = 25; // Time-Stop: 25 min baad agar solid green ho toh book kar ke capital free kare
+      const TARGET_NET_PROFIT = 1.00; // +1.00% Net (+1.20% Gross) -> Fast, high-probability scalp win
+      const STOP_LOSS_NET = -0.65; // -0.65% Net Stop-Loss (clean risk cutoff)
+      const MAX_HOLD_MINUTES = 20; // Time-Stop: 20 min baad profit mein ho toh book kar le
 
       for (let i = STATE.positions.length - 1; i >= 0; i--) {
         const pos = STATE.positions[i];
@@ -2225,34 +2225,44 @@
         if (pos.tradeDuration % 60 === 0) {
           const mins = Math.floor(pos.tradeDuration / 60);
           const pSign = netPct >= 0 ? "+" : "";
-          logEvent("HOLD", pos.bot, pos.symbol, `${pSign}${netPct}%`, `Monitoring @ $${fmtPrice(livePrice)} • TP +1.25% / Trail / SL -0.85% (${mins}m held)`, `$${pos.sizeUsd.toFixed(2)}`);
+          logEvent("HOLD", pos.bot, pos.symbol, `${pSign}${netPct}%`, `Monitoring @ $${fmtPrice(livePrice)} • TP +1.00% / Trail / SL -0.65% (${mins}m held)`, `$${pos.sizeUsd.toFixed(2)}`);
         }
 
-        // 1. Direct Take-Profit Hit (+1.25% Net = +$1.25+ Real Profit)
+        // TIER 1: Direct Take-Profit Hit (+1.00% Net)
         const hitTakeProfit = netPct >= TARGET_NET_PROFIT;
-        // 2. High-Profit Trailing Lock: Peak >= +0.90% Net reach kiya aur peak se 0.25% pullback kiya
-        const hitTrailingProfit = pos.peakNetPct >= 0.90 && netPct <= (pos.peakNetPct - 0.25);
-        // 3. Breakeven Profit Defense: Agar +0.55% Net reach kiya aur price retrace ho rahi hai, lock at +0.20% Net (Zero Loss Guarantee!)
-        const hitBreakevenLock = pos.peakNetPct >= 0.70 && netPct <= 0.15;
-        // 4. Time-Based Scalp Win: Held >= 25 mins and in solid profit (>= +0.35% Net)
-        const hitTimeScalpWin = heldMinutes >= MAX_HOLD_MINUTES && netPct >= 0.35;
-        // 5. Stale Chop Exit: Held >= 40 mins and price is negative (prevent dead bags)
-        const hitStaleExit = heldMinutes >= 40 && netPct <= -0.30;
-        // 6. Professional Risk Stop-Loss (-0.85% Net)
+
+        // TIER 2: High Runner Trailing Lock (Peak reached >= +0.70%, lock if drops 0.15% from peak)
+        const hitTrailingProfit = pos.peakNetPct >= 0.70 && netPct <= (pos.peakNetPct - 0.15);
+
+        // TIER 3: Profit Lock (Peak reached >= +0.55%, lock at least +0.25% Net)
+        const hitMidProfitLock = pos.peakNetPct >= 0.55 && netPct <= 0.25;
+
+        // TIER 4: Early Breakeven Defense (Zero-Loss Guarantee: Peak >= +0.35%, lock at +0.08% Net)
+        const hitBreakevenLock = pos.peakNetPct >= 0.35 && netPct <= 0.08;
+
+        // TIER 5: Time-Based Scalp Win (Held >= 20 mins and in green >= +0.20% Net)
+        const hitTimeScalpWin = heldMinutes >= MAX_HOLD_MINUTES && netPct >= 0.20;
+
+        // TIER 6: Stale Chop Exit (Held >= 35 mins and dead/negative)
+        const hitStaleExit = heldMinutes >= 35 && netPct <= -0.20;
+
+        // TIER 7: Risk Stop-Loss (-0.65% Net)
         const hitStopLoss = netPct <= STOP_LOSS_NET;
 
-        if (hitTakeProfit || hitTrailingProfit || hitBreakevenLock || hitTimeScalpWin || hitStaleExit || hitStopLoss) {
+        if (hitTakeProfit || hitTrailingProfit || hitMidProfitLock || hitBreakevenLock || hitTimeScalpWin || hitStaleExit || hitStopLoss) {
           let exitReason = "";
           if (hitTakeProfit) {
             exitReason = `🎯 SPOT TAKE PROFIT (+${netPct}% Net • Target Hit)`;
           } else if (hitTrailingProfit) {
             exitReason = `🚀 TRAILING PROFIT LOCK (+${netPct}% Net locked from peak +${pos.peakNetPct}%)`;
+          } else if (hitMidProfitLock) {
+            exitReason = `💰 SOLID PROFIT LOCK (+${netPct}% Net secured)`;
           } else if (hitBreakevenLock) {
             exitReason = `🛡️ BREAKEVEN DEFENSE (+${netPct}% Net locked • Zero Loss)`;
           } else if (hitTimeScalpWin) {
-            exitReason = `⏱️ TIME SCALP WIN (+${netPct}% Net • 25m profit release)`;
+            exitReason = `⏱️ TIME SCALP WIN (+${netPct}% Net • 20m profit release)`;
           } else if (hitStaleExit) {
-            exitReason = `⏳ STALE CHOP TIMEOUT (${netPct}% Net • 40m capital release)`;
+            exitReason = `⏳ STALE CHOP TIMEOUT (${netPct}% Net • 35m capital release)`;
           } else if (hitStopLoss) {
             exitReason = `🛑 SAFETY STOP LOSS (${netPct}% Net risk control)`;
           }
@@ -2358,55 +2368,50 @@
           return;
         }
 
-        // Setup Approved! Dynamic Strategy Selection
-        let chosenBot = "Dip Buyer";
-        let botKey = "house";
+        // Setup Approved! Strict Strategy Gate (Eliminated unconfirmed catch-all buys)
+        let chosenBot = "Trend Rider";
+        let botKey = "gambler";
         let reason = "";
 
         if (STATE.market.rsi <= 38 && bidRatio >= 0.50) {
           chosenBot = "Dip Buyer";
           botKey = "house";
           reason = `A+ Oversold Reversal (RSI ${STATE.market.rsi.toFixed(1)} + ${Math.round(bidRatio * 100)}% Whale Bids)`;
-        } else if (isBullishRibbon && volRatio >= 1.30) {
+        } else if (isBullishRibbon && volRatio >= 1.25) {
           chosenBot = "Trend Rider";
           botKey = "gambler";
           reason = `A+ Bullish Breakout (EMA Golden Ribbon + ${volRatio}x Surge)`;
-        } else if (bidRatio >= 0.55) {
+        } else if (isBullishRibbon && bidRatio >= 0.56) {
           chosenBot = "Smart Scalper";
           botKey = "spy";
-          reason = `A+ Whale Depth Absorption (${Math.round(bidRatio * 100)}% Bids + ${volRatio}x Vol)`;
+          reason = `A+ Whale Orderbook Imbalance (${Math.round(bidRatio * 100)}% Bids + Golden Ribbon)`;
+        } else if (isBullishRibbon) {
+          chosenBot = "Trend Rider";
+          botKey = "gambler";
+          reason = `A+ Bullish Momentum Follower (${score}/100 pts)`;
         } else {
-          chosenBot = "Smart Scalper";
-          botKey = "spy";
-          reason = `A+ High-Confluence Setup (${score}/100 pts • Momentum)`;
+          // If neither Bullish Ribbon nor Oversold Dip, REJECT! Zero low-edge trades.
+          return;
         }
 
         // Dynamic Position Sizing (Risk-Aware: subtracts committed capital)
         const committedCapital = (STATE.positions || []).reduce((sum, p) => sum + (p.sizeUsd || 0), 0);
-        const availableBalance = +(STATE.balance - committedCapital).toFixed(2);
+        const availableBalance = Math.max(0, +(STATE.balance - committedCapital).toFixed(2));
 
-        // Hard block: Need at least $10 AVAILABLE (uncommitted) capital to open ANY new position
-        if (availableBalance < 10.0) {
-          if (STATE.positions.length === 0 && STATE.balance >= 10.0) {
-            // Edge case: no positions but balance shows committed (stale data) - allow
-          } else {
-            return; // Not enough free capital
-          }
-        }
+        if (availableBalance < 4.95) return; // Need at least $5 free capital
 
-        let sizeUsd = 10.0;
-        if (availableBalance >= 50.0) {
-          sizeUsd = +(availableBalance * 0.25).toFixed(2); // 25% of AVAILABLE (not total)
-        } else if (availableBalance >= 25.0) {
-          sizeUsd = +(availableBalance * 0.40).toFixed(2); // 40% of available for mid accounts
-        } else if (availableBalance >= 10.0) {
-          sizeUsd = +(availableBalance * 0.80).toFixed(2); // 80% for small accounts (concentrate capital)
+        let sizeUsd = 5.0;
+        if (availableBalance >= 200.0) {
+          sizeUsd = +(availableBalance * 0.25).toFixed(2); // 25% for large accounts ($50 - $250/pos)
+        } else if (availableBalance >= 100.0) {
+          sizeUsd = +(availableBalance * 0.33).toFixed(2); // 33% for $100 accounts ($33/pos)
+        } else if (availableBalance >= 30.0) {
+          sizeUsd = +(availableBalance * 0.50).toFixed(2); // 50% for mid accounts ($15 - $25/pos)
         } else {
-          return; // Below minimum
+          sizeUsd = availableBalance; // Concentrate small accounts into one full trade ($5 - $29)
         }
 
-        // Binance minimum notional: $5 USDT for most pairs
-        if (sizeUsd < 5.0) return;
+        if (sizeUsd < 4.95) return;
 
         const sizePct = Math.round((sizeUsd / STATE.balance) * 100);
         const livePrice = STATE.market.price > 0 ? STATE.market.price : currentPair.price;
@@ -2695,7 +2700,7 @@
         if (emergencyBtn) emergencyBtn.style.display = "inline-block";
         const execSubEl = document.getElementById("exec-subtext");
         if (execSubEl) {
-          execSubEl.textContent = `HOLDING (${(STATE.positions || []).length}/4) • TP +1.25%`;
+          execSubEl.textContent = `HOLDING (${(STATE.positions || []).length}/${MAX_OPEN_POSITIONS}) • TP +1.00%`;
           execSubEl.style.color = "#34d399";
         }
 
@@ -3417,30 +3422,41 @@
       render();
     });
 
-    // Quick Reset to $5 Demo Funds (Starter Practice)
-    const reset5Btn = document.getElementById("quick-reset-5-btn");
-    if (reset5Btn) {
-      reset5Btn.addEventListener("click", () => {
-        STATE.balance = 5.0;
-        STATE.startBalance = 5.0;
-        saveUserState();
-        logEvent("DEPOSIT", "DESK", "USDT", "+$5.00", "Starter practice balance set to $5.00 Demo Funds.", "100%");
-        modal.style.display = "none";
-        render();
-      });
+    function resetDemoAccount(amount) {
+      STATE.balance = amount;
+      STATE.startBalance = amount;
+      STATE.positions = [];
+      STATE.activeTrade = null;
+      STATE.tradeDuration = 0;
+      STATE.trades = 0;
+      STATE.wins = 0;
+      STATE.losses = 0;
+      STATE.botFleet = {
+        gambler: { name: "Trend Rider",  trades: 0, wins: 0, pnl: 0 },
+        house:   { name: "Dip Buyer",    trades: 0, wins: 0, pnl: 0 },
+        spy:     { name: "Smart Scalper", trades: 0, wins: 0, pnl: 0 }
+      };
+      localStorage.removeItem("grok_positions");
+      localStorage.removeItem("grok_active_trade");
+      localStorage.setItem("grok_total_trades", "0");
+      localStorage.setItem("grok_total_wins", "0");
+      localStorage.setItem("grok_total_losses", "0");
+      localStorage.setItem("grok_bot_fleet", JSON.stringify(STATE.botFleet));
+      localStorage.setItem("grok_start_capital", amount.toFixed(2));
+      saveUserState();
+      logEvent("RESET", "SYSTEM", "ALL", "+$0.00", `Account fresh reset to $${amount.toFixed(2)} Demo Funds. All old positions & stats cleared.`, "100%");
+      modal.style.display = "none";
+      render();
     }
 
-    // Quick Reset to $100 Demo Funds
+    const reset5Btn = document.getElementById("quick-reset-5-btn");
+    if (reset5Btn) {
+      reset5Btn.addEventListener("click", () => resetDemoAccount(100.0));
+    }
+
     const resetDemoBtn = document.getElementById("quick-reset-demo-btn");
     if (resetDemoBtn) {
-      resetDemoBtn.addEventListener("click", () => {
-        STATE.balance = 100.0;
-        STATE.startBalance = 100.0;
-        saveUserState();
-        logEvent("DEPOSIT", "DESK", "USDT", "+$100.00", "Practice balance reset to $100.00 Demo Funds.", "100%");
-        modal.style.display = "none";
-        render();
-      });
+      resetDemoBtn.addEventListener("click", () => resetDemoAccount(500.0));
     }
 
     // Toggle Pause/Resume Button
