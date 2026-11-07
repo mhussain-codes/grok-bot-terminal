@@ -1329,8 +1329,8 @@
       const rawTrade = localStorage.getItem("grok_active_trade");
       if (rawTrade) {
         savedTrade = JSON.parse(rawTrade);
-        // Clean old corrupt / legacy mock positions (e.g. 0.97x or 0.19x volume surge)
-        if (savedTrade && savedTrade.reason && (savedTrade.reason.includes("0.97x") || savedTrade.reason.includes("0.19x"))) {
+        // Clean old corrupt / legacy mock positions or stuck BNB positions (e.g. BNBUSDT @ 697.13)
+        if (savedTrade && (savedTrade.symbol === "BNBUSDT" || (savedTrade.entryPrice && savedTrade.entryPrice >= 695) || (savedTrade.reason && (savedTrade.reason.includes("0.97x") || savedTrade.reason.includes("0.19x"))))) {
           savedTrade = null;
           localStorage.removeItem("grok_active_trade");
         } else {
@@ -2827,16 +2827,14 @@
     const emergencyResetBtn = document.getElementById("emergency-reset-btn");
     if (emergencyResetBtn) {
       emergencyResetBtn.addEventListener("click", () => {
-        if (confirm("Reset active position? This will clear any stuck position state and let the bot start hunting fresh trades.")) {
-          const prevSymbol = STATE.activeTrade ? STATE.activeTrade.symbol : "COIN";
-          STATE.activeTrade = null;
-          STATE.tradeDuration = 0;
-          STATE.maxObservedPnl = 0.0;
-          localStorage.removeItem("grok_active_trade");
-          logEvent("RESET", "SYSTEM", prevSymbol, "$0.00", "Position manually cleared by user. Resumed scanning.", "0%");
-          saveUserState();
-          render();
-        }
+        const prevSymbol = STATE.activeTrade ? STATE.activeTrade.symbol : "COIN";
+        STATE.activeTrade = null;
+        STATE.tradeDuration = 0;
+        STATE.maxObservedPnl = 0.0;
+        localStorage.removeItem("grok_active_trade");
+        logEvent("RESET", "SYSTEM", prevSymbol, "$0.00", "Position manually cleared by user. Resumed scanning.", "0%");
+        saveUserState();
+        render();
       });
     }
 

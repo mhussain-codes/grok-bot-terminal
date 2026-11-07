@@ -27,6 +27,22 @@ SYMBOL_CONFIG = {
     "BNBUSDT": {"stepSize": 0.001,   "decimals": 3, "baseAsset": "BNB", "minNotional": 5.0}
 }
 
+def get_binance_server_time():
+    for base_url in BINANCE_ENDPOINTS:
+        try:
+            req = urllib.request.Request(f"{base_url}/api/v3/time", headers={
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            })
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                data = json.loads(resp.read().decode('utf-8'))
+                st = data.get("serverTime")
+                if st:
+                    return int(st)
+        except Exception:
+            continue
+    return int(time.time() * 1000)
+
+
 class handler(BaseHTTPRequestHandler):
     def _send_cors_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -60,8 +76,8 @@ class handler(BaseHTTPRequestHandler):
             return
 
         action = data.get("action", "test_connection")
-        api_key = data.get("apiKey", "").strip()
-        api_secret = data.get("apiSecret", "").strip()
+        api_key = data.get("apiKey", "").strip().replace("\r", "").replace("\n", "")
+        api_secret = data.get("apiSecret", "").strip().replace("\r", "").replace("\n", "")
 
         if not api_key or not api_secret:
             self._respond_json(400, {
@@ -78,8 +94,8 @@ class handler(BaseHTTPRequestHandler):
             self._respond_json(400, {"success": False, "error": f"Unknown action: {action}"})
 
     def handle_test_connection(self, api_key, api_secret):
-        timestamp = int(time.time() * 1000)
-        query_string = f"timestamp={timestamp}&recvWindow=5000"
+        timestamp = get_binance_server_time()
+        query_string = f"timestamp={timestamp}&recvWindow=60000"
         signature = hmac.new(api_secret.encode('utf-8'), query_string.encode('utf-8'), hashlib.sha256).hexdigest()
 
         last_error = None
@@ -156,8 +172,8 @@ class handler(BaseHTTPRequestHandler):
         })
 
     def _get_base_free_balance(self, api_key, api_secret, base_asset):
-        timestamp = int(time.time() * 1000)
-        query_string = f"timestamp={timestamp}&recvWindow=5000"
+        timestamp = get_binance_server_time()
+        query_string = f"timestamp={timestamp}&recvWindow=60000"
         signature = hmac.new(api_secret.encode('utf-8'), query_string.encode('utf-8'), hashlib.sha256).hexdigest()
 
         for base_url in BINANCE_ENDPOINTS:
@@ -197,8 +213,8 @@ class handler(BaseHTTPRequestHandler):
             "symbol": symbol,
             "side": side,
             "type": order_type,
-            "timestamp": int(time.time() * 1000),
-            "recvWindow": 5000
+            "timestamp": get_binance_server_time(),
+            "recvWindow": 60000
         }
 
         if side == "BUY":
@@ -272,6 +288,8 @@ class handler(BaseHTTPRequestHandler):
 
         err_msg = last_error.get("msg", "Order execution failed") if last_error else "Order failed"
         err_code = last_error.get("code", 500) if last_error else 500
+        if err_code == -2015 or "permissions" in str(err_msg).lower():
+            err_msg += " • (Fix: In your Binance API settings, check 'Enable Spot & Margin Trading'. If IP restriction is disabled, ensure key was saved with 2FA)."
         self._respond_json(200, {
             "success": False,
             "code": err_code,
