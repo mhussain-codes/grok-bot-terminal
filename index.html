@@ -1376,9 +1376,15 @@
     let userApiSecret = (activeUser && activeUser.apiSecret) ? activeUser.apiSecret : (localStorage.getItem("grok_user_api_secret") || "");
 
     const savedBal = localStorage.getItem("grok_user_balance");
-    // Frictionless onboarding: Default $100.00 Paper Balance so bots start trading immediately!
-    const initialBal = savedBal !== null ? Math.max(0, parseFloat(savedBal)) : 100.0;
-    if (savedBal === null) {
+    let initialBal = savedBal !== null ? Math.max(0, parseFloat(savedBal)) : 100.0;
+    // Auto-initialize clean $5.00 Micro Challenge if balance was set around $5
+    if (initialBal <= 5.05) {
+      initialBal = 5.00;
+      localStorage.setItem("grok_user_balance", "5.00");
+      localStorage.setItem("grok_start_capital", "5.00");
+      localStorage.removeItem("grok_positions");
+      localStorage.removeItem("grok_active_trade");
+    } else if (savedBal === null) {
       localStorage.setItem("grok_user_balance", "100.00");
     }
 
@@ -1400,7 +1406,11 @@
         }
       }
     } catch (e) {}
-    if (!savedPositions.length && savedTrade) {
+    if (initialBal <= 5.05) {
+      savedPositions = [];
+      savedTrade = null;
+      savedDuration = 0;
+    } else if (!savedPositions.length && savedTrade) {
       savedPositions = [savedTrade];
     }
     if (savedPositions.length) {
@@ -2305,9 +2315,9 @@
       }
 
       // =========================================================
-      // 4. SCAN & ENTER SPOT TRADES (UP TO 4 POSITIONS, SCORE >= 76)
+      // 4. SCAN & ENTER SPOT TRADES ($5 CHALLENGE & RUNNER ENGINE, SCORE >= 70)
       // =========================================================
-      if (STATE.balance >= 5.0) {
+      if (STATE.balance >= 4.50) {
         const score = STATE.confluenceScore || 0;
         const volRatio = STATE.market.volRatio || 1.0;
         const bidRatio = STATE.market.bidRatio || 0.50;
@@ -2315,12 +2325,11 @@
         const isBullishRibbon = STATE.market.ema7 > STATE.market.ema21;
         const isDeepOversoldDip = STATE.market.rsi <= 38 && (STATE.market.rsi >= (STATE.market.prevRsi || STATE.market.rsi));
 
-        // Professional Confluence Gate:
-        // Must have Score >= 76 AND volRatio >= 1.15 AND bidRatio >= 0.48 AND (Bullish Ribbon OR Oversold Bounce) AND NOT Disqualified
-        // ALSO: Last completed candle must be GREEN (buy volume, not sell dump)
+        // High-Probability Confluence Gate:
+        // Score >= 70 AND volRatio >= 0.85 (calibrated for current market) AND bidRatio >= 0.46
         const trendOrDipValid = isBullishRibbon || isDeepOversoldDip;
-        const lastCandleGreen = candleData.length >= 2 && candleData[candleData.length - 2].close >= candleData[candleData.length - 2].open;
-        const entryDisqualified = STATE.confluenceDisqualified || score < 76 || volRatio < 1.15 || bidRatio < 0.48 || !trendOrDipValid || STATE.market.rsi > 67.0 || !lastCandleGreen;
+        const lastCandleGreen = isDeepOversoldDip || (candleData.length >= 2 && candleData[candleData.length - 2].close >= candleData[candleData.length - 2].open);
+        const entryDisqualified = STATE.confluenceDisqualified || score < 70 || volRatio < 0.85 || bidRatio < 0.46 || !trendOrDipValid || STATE.market.rsi > 67.0 || !lastCandleGreen;
 
         if (alreadyHoldingCoin || entryDisqualified) {
           // Increment SKIPPED DUMPS on each evaluation cycle
@@ -2341,14 +2350,14 @@
                 skipReason = `Ask Wall Resistance (${Math.round((1 - bidRatio) * 100)}% Asks)`;
               } else if (!trendOrDipValid) {
                 skipReason = `Bearish Trend (EMA 7 < EMA 21 & No Dip)`;
-              } else if (volRatio < 1.15) {
-                skipReason = `Low Momentum Vol (${volRatio}x < 1.15x)`;
-              } else if (score < 76) {
-                skipReason = `Score ${score}/100 (Below 76 Grade A Threshold)`;
+              } else if (volRatio < 0.85) {
+                skipReason = `Low Vol (${volRatio}x < 0.85x)`;
+              } else if (score < 70) {
+                skipReason = `Score ${score}/100 (Below 70 Grade A Threshold)`;
               } else if (!lastCandleGreen) {
-                skipReason = `Red Candle (Sell Pressure Active)`;
+                skipReason = `Red Candle (Awaiting Green Confirmation)`;
               } else {
-                skipReason = `Score ${score}/100 (Filtering for High-Probability Setup)`;
+                skipReason = `Score ${score}/100 (Filtering A+ Setup)`;
               }
             }
 
@@ -2400,7 +2409,7 @@
         const committedCapital = (STATE.positions || []).reduce((sum, p) => sum + (p.sizeUsd || 0), 0);
         const availableBalance = Math.max(0, +(STATE.balance - committedCapital).toFixed(2));
 
-        if (availableBalance < 4.95) return; // Need at least $5 free capital
+        if (availableBalance < 4.50) return; // Need at least $4.50 free capital for $5 order
 
         // Standardized 22% Equity Sizing (matching screenshot: 22% of equity per trade)
         let sizeUsd = +(availableBalance * 0.22).toFixed(2);
