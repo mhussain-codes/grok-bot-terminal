@@ -1376,17 +1376,7 @@
     let userApiSecret = (activeUser && activeUser.apiSecret) ? activeUser.apiSecret : (localStorage.getItem("grok_user_api_secret") || "");
 
     const savedBal = localStorage.getItem("grok_user_balance");
-    let initialBal = savedBal !== null ? Math.max(0, parseFloat(savedBal)) : 100.0;
-    // Auto-initialize clean $5.00 Micro Challenge if balance was set around $5
-    if (initialBal <= 5.05) {
-      initialBal = 5.00;
-      localStorage.setItem("grok_user_balance", "5.00");
-      localStorage.setItem("grok_start_capital", "5.00");
-      localStorage.removeItem("grok_positions");
-      localStorage.removeItem("grok_active_trade");
-    } else if (savedBal === null) {
-      localStorage.setItem("grok_user_balance", "100.00");
-    }
+    let initialBal = savedBal !== null ? Math.max(0, parseFloat(savedBal)) : 5.00;
 
     // Restore active positions if page was refreshed during open trade(s)
     let savedPositions = [];
@@ -1406,11 +1396,7 @@
         }
       }
     } catch (e) {}
-    if (initialBal <= 5.05) {
-      savedPositions = [];
-      savedTrade = null;
-      savedDuration = 0;
-    } else if (!savedPositions.length && savedTrade) {
+    if (!savedPositions.length && savedTrade) {
       savedPositions = [savedTrade];
     }
     if (savedPositions.length) {
@@ -2156,6 +2142,7 @@
 
       isTradeActionInProgress = false;
       saveUserState();
+      render();
 
       // Sync real wallet balance from Binance
       if (currentTradingMode === "LIVE" && userApiKey && userApiSecret) {
@@ -2214,7 +2201,7 @@
       // 2. DYNAMIC ALPHA TRAILING STOP RUNNER ENGINE (LET WINNERS RUN)
       // =========================================================
       const FEE_PCT = 0.20; // 0.1% Buy + 0.1% Sell
-      const STOP_LOSS_NET = -1.00; // -1.00% Net Stop-Loss (gives price room to develop breakout)
+      const STOP_LOSS_NET = -1.50; // -1.50% Net Stop-Loss (gives spot trades room to breathe without getting stopped on 1m wicks)
 
       for (let i = STATE.positions.length - 1; i >= 0; i--) {
         const pos = STATE.positions[i];
@@ -2237,46 +2224,46 @@
           logEvent("HOLD", pos.bot, pos.symbol, `${pSign}${netPct}%`, `Holding @ $${fmtPrice(livePrice)} • Peak +${pos.peakNetPct}% (${mins}m held)`, `$${pos.sizeUsd.toFixed(2)}`);
         }
 
-        // 1. Dynamic Trailing Runner Exit (Does NOT cut winners! Trails behind peak):
+        // 1. Dynamic Trailing Runner Exit (Locks in peak profit as coin trends up):
         let hitTrailingProfit = false;
-        if (pos.peakNetPct >= 8.0) {
-          // Mega runner (+8% to +15%+): trail 1.5% from peak (locks in massive hundreds of dollars)
-          hitTrailingProfit = netPct <= (pos.peakNetPct - 1.50);
-        } else if (pos.peakNetPct >= 3.0) {
-          // Strong runner (+3% to +8%): trail 0.80% from peak
-          hitTrailingProfit = netPct <= (pos.peakNetPct - 0.80);
+        if (pos.peakNetPct >= 3.0) {
+          hitTrailingProfit = netPct <= (pos.peakNetPct - 0.70);
         } else if (pos.peakNetPct >= 1.20) {
-          // Standard breakout (+1.2% to +3%): trail 0.40% from peak
-          hitTrailingProfit = netPct <= (pos.peakNetPct - 0.40);
+          hitTrailingProfit = netPct <= (pos.peakNetPct - 0.35);
+        } else if (pos.peakNetPct >= 0.75) {
+          hitTrailingProfit = netPct <= (pos.peakNetPct - 0.20);
         }
 
         // 2. Early Breakeven Armor (Zero Loss Guarantee):
-        // As soon as peak reaches +0.45%, protect position from becoming a loss
-        const hitBreakevenLock = pos.peakNetPct >= 0.45 && netPct <= 0.10;
+        // Once peak hits +0.35%, protect trade from ever turning into a loss
+        const hitBreakevenLock = pos.peakNetPct >= 0.35 && netPct <= 0.05;
 
-        // 3. Time-Stop Capital Release:
-        // If held >= 30 mins and in profit >= +0.35%, exit and free capital
-        const hitTimeScalpWin = heldMinutes >= 30 && netPct >= 0.35;
+        // 3. High-Probability Target Scalp (+1.20% Net):
+        const hitTargetProfit = netPct >= 1.20;
 
-        // 4. Stale Chop Exit:
-        // If held >= 45 mins and negative <= -0.40%, close
-        const hitStaleExit = heldMinutes >= 45 && netPct <= -0.40;
+        // 4. Time-Stop Capital Release:
+        const hitTimeScalpWin = heldMinutes >= 25 && netPct >= 0.25;
 
-        // 5. Safety Stop Loss (-1.00% Net)
+        // 5. Stale Chop Exit:
+        const hitStaleExit = heldMinutes >= 40 && netPct <= -0.50;
+
+        // 6. Safety Stop Loss (-1.50% Net)
         const hitStopLoss = netPct <= STOP_LOSS_NET;
 
-        if (hitTrailingProfit || hitBreakevenLock || hitTimeScalpWin || hitStaleExit || hitStopLoss) {
+        if (hitTrailingProfit || hitBreakevenLock || hitTargetProfit || hitTimeScalpWin || hitStaleExit || hitStopLoss) {
           let exitReason = "";
-          if (hitTrailingProfit) {
+          if (hitTargetProfit) {
+            exitReason = `🎯 TARGET PROFIT HIT (+${netPct}% Net locked • Clean Spot Win)`;
+          } else if (hitTrailingProfit) {
             exitReason = `🚀 TRAILING STOP HIT (+${netPct}% Net locked • Peak +${pos.peakNetPct}%)`;
           } else if (hitBreakevenLock) {
             exitReason = `🛡️ BREAKEVEN DEFENSE (+${netPct}% Net locked • Zero Loss)`;
           } else if (hitTimeScalpWin) {
-            exitReason = `⏱️ TIME SCALP WIN (+${netPct}% Net • 30m profit release)`;
+            exitReason = `⏱️ TIME SCALP WIN (+${netPct}% Net • 25m profit release)`;
           } else if (hitStaleExit) {
-            exitReason = `⏳ STALE CHOP TIMEOUT (${netPct}% Net • 45m capital release)`;
+            exitReason = `⏳ STALE CHOP TIMEOUT (${netPct}% Net • 40m capital release)`;
           } else if (hitStopLoss) {
-            exitReason = `🛑 STOP 1% HIT (${netPct}% Net risk cut)`;
+            exitReason = `🛑 STOP 1.5% HIT (${netPct}% Net risk cut)`;
           }
 
           await closePosition(pos, exitReason, netUsd, netPct);
@@ -2569,6 +2556,12 @@
         STATE.activeTrade = null;
       }
 
+      // Compute total unrealized PnL and Live Equity across all open positions
+      const totalUnrealizedNetPnL = (STATE.positions || []).reduce((acc, p) => acc + (p.pnlDollars || 0), 0);
+      const liveEquity = +(STATE.balance + totalUnrealizedNetPnL).toFixed(2);
+      const eqSign = totalUnrealizedNetPnL >= 0 ? "+$" : "-$";
+      const maxPositions = STATE.balance >= 250 ? 4 : (STATE.balance >= 100 ? 3 : (STATE.balance >= 25 ? 2 : 1));
+
       // Dynamic Risk-Aware Sizing (mirrors actual tradingTick logic)
       const renderCommitted = (STATE.positions || []).reduce((sum, p) => sum + (p.sizeUsd || 0), 0);
       const renderAvailable = +(STATE.balance - renderCommitted).toFixed(2);
@@ -2598,11 +2591,6 @@
           progFill.style.boxShadow = liveEquity >= STATE.startBalance ? "0 0 10px rgba(16, 185, 129, 0.6)" : "none";
         }
       }
-
-      // Compute total unrealized PnL and Live Equity across all open positions
-      const totalUnrealizedNetPnL = (STATE.positions || []).reduce((acc, p) => acc + (p.pnlDollars || 0), 0);
-      const liveEquity = +(STATE.balance + totalUnrealizedNetPnL).toFixed(2);
-      const eqSign = totalUnrealizedNetPnL >= 0 ? "+$" : "-$";
 
       const balValEl = document.getElementById("balance-val");
       if (balValEl) {
@@ -2709,7 +2697,7 @@
         if (emergencyBtn) emergencyBtn.style.display = "inline-block";
         const execSubEl = document.getElementById("exec-subtext");
         if (execSubEl) {
-          execSubEl.textContent = `HOLDING (${(STATE.positions || []).length}/${MAX_OPEN_POSITIONS}) • TP +1.00%`;
+          execSubEl.textContent = `HOLDING (${(STATE.positions || []).length}/${maxPositions}) • TP +1.20%`;
           execSubEl.style.color = "#34d399";
         }
 
@@ -3412,23 +3400,13 @@
         errorMsg.textContent = "⚠️ Minimum capital is $5.00 USD (Binance Spot Min Notional)!";
         return;
       }
-      if (rawVal > 1000) {
-        errorMsg.textContent = "⚠️ Maximum deposit limit is $1,000.00 USD!";
-        return;
-      }
-      if (STATE.balance + rawVal > 1000) {
-        errorMsg.textContent = `⚠️ Total capital cannot exceed $1,000.00 USD! (Current: $${STATE.balance.toFixed(2)})`;
+      if (rawVal > 100000) {
+        errorMsg.textContent = "⚠️ Maximum capital limit is $100,000.00 USD!";
         return;
       }
 
       const val = +rawVal.toFixed(2);
-      STATE.balance = +(STATE.balance + val).toFixed(2);
-      if (STATE.startBalance === 0) STATE.startBalance = STATE.balance;
-      saveUserState();
-
-      logEvent("DEPOSIT", "DESK", "USDT", `+$${val.toFixed(2)}`, `Capital added ($${val.toFixed(2)}). Session: ${userSessionId}.`, "100%");
-      modal.style.display = "none";
-      render();
+      resetDemoAccount(val);
     });
 
     function resetDemoAccount(amount) {
