@@ -1066,7 +1066,7 @@
             <span class="agent-state-tag tag-cyan">ACTIVE</span>
           </div>
           <div class="agent-role">Buys low & auto-sells for profit</div>
-          <div class="agent-detail"><span class="cyan-txt">Target: +1.50% Net Profit</span><br><span id="exec-subtext">HUNTING ENTRY</span></div>
+          <div class="agent-detail"><span class="cyan-txt">Target: +0.75% Net Scalp</span><br><span id="exec-subtext">HUNTING ENTRY</span></div>
         </div>
 
         <!-- 5: PROFIT AUDITOR -->
@@ -1236,9 +1236,9 @@
               <div class="detail-label">Position Size:</div>
               <div class="detail-val" id="active-size">$5.29 (100% eq)</div>
               <div class="detail-label">Target Profit:</div>
-              <div class="detail-val green-txt" id="active-target">🎯 +1.50% Net (Auto-Sell)</div>
+              <div class="detail-val green-txt" id="active-target">🎯 +0.75% Net Scalp</div>
               <div class="detail-label">Safety Stop-Loss:</div>
-              <div class="detail-val red-txt" id="active-stop">🛑 -1.00% Max Risk</div>
+              <div class="detail-val red-txt" id="active-stop">🛑 -0.50% Stop-Loss</div>
               <div class="detail-label">Entry Reason:</div>
               <div class="detail-val blue-txt" id="active-reason" style="grid-column: span 1;">Waiting for A+ Confluence trigger...</div>
             </div>
@@ -1329,10 +1329,11 @@
       const rawTrade = localStorage.getItem("grok_active_trade");
       if (rawTrade) {
         savedTrade = JSON.parse(rawTrade);
-        // Clean old corrupt / legacy mock positions or stuck BNB positions (e.g. BNBUSDT @ 697.13)
-        if (savedTrade && (savedTrade.symbol === "BNBUSDT" || (savedTrade.entryPrice && savedTrade.entryPrice >= 695) || (savedTrade.reason && (savedTrade.reason.includes("0.97x") || savedTrade.reason.includes("0.19x"))))) {
+        // Clean old corrupt / legacy mock positions or stale stuck trades (e.g. BNBUSDT @ 697.13, ETHUSDT stuck @ 2248)
+        if (savedTrade && (savedTrade.symbol === "BNBUSDT" || (savedTrade.symbol === "ETHUSDT" && savedTrade.entryPrice >= 2245) || (savedTrade.entryPrice && savedTrade.entryPrice >= 695) || (savedTrade.reason && (savedTrade.reason.includes("0.97x") || savedTrade.reason.includes("0.19x"))))) {
           savedTrade = null;
           localStorage.removeItem("grok_active_trade");
+          localStorage.removeItem("grok_positions");
         } else {
           savedDuration = savedTrade.tradeDuration || 0;
         }
@@ -1382,11 +1383,21 @@
       confluenceDisqualifyReason: "",
       confluenceBreakdown: { rsiPts: 0, emaPts: 0, volPts: 0, depthPts: 0 },
       logs: savedLogs,
+      positions: savedTrade ? [savedTrade] : [],
+      maxPositions: 3,
       pairs: [
-        { symbol: "BTCUSDT", name: "Bitcoin", price: 77000.0 },
-        { symbol: "ETHUSDT", name: "Ethereum", price: 2450.0 },
-        { symbol: "SOLUSDT", name: "Solana", price: 165.0 },
-        { symbol: "BNBUSDT", name: "BNB", price: 585.0 }
+        { symbol: "BTCUSDT",  name: "Bitcoin",  price: 77000.0 },
+        { symbol: "ETHUSDT",  name: "Ethereum", price: 2450.0 },
+        { symbol: "SOLUSDT",  name: "Solana",   price: 165.0 },
+        { symbol: "BNBUSDT",  name: "BNB",      price: 585.0 },
+        { symbol: "XRPUSDT",  name: "XRP",      price: 0.55 },
+        { symbol: "DOGEUSDT", name: "Dogecoin", price: 0.15 },
+        { symbol: "SUIUSDT",  name: "Sui",      price: 2.10 },
+        { symbol: "ADAUSDT",  name: "Cardano",  price: 0.35 },
+        { symbol: "AVAXUSDT", name: "Avalanche",price: 28.0 },
+        { symbol: "LINKUSDT", name: "Chainlink",price: 12.5 },
+        { symbol: "PEPEUSDT", name: "Pepe",     price: 0.000009 },
+        { symbol: "WIFUSDT",  name: "dogwifhat", price: 2.40 }
       ],
       pairIdx: 0,
       market: {
@@ -1408,12 +1419,11 @@
       if (STATE.logs && STATE.logs.length) {
         localStorage.setItem("grok_terminal_logs", JSON.stringify(STATE.logs.slice(0, 30)));
       }
-      if (STATE.activeTrade) {
-        localStorage.setItem("grok_active_trade", JSON.stringify({
-          ...STATE.activeTrade,
-          tradeDuration: STATE.tradeDuration
-        }));
+      if (STATE.positions && STATE.positions.length) {
+        localStorage.setItem("grok_positions", JSON.stringify(STATE.positions));
+        localStorage.setItem("grok_active_trade", JSON.stringify(STATE.positions[0]));
       } else {
+        localStorage.removeItem("grok_positions");
         localStorage.removeItem("grok_active_trade");
       }
     }
@@ -1608,21 +1618,23 @@
         rsiDesc = `Neutral Consolidation (${rsi.toFixed(1)})`;
       }
 
-      // Pillar 2: EMA Trend Ribbon (25 pts max)
+      // Pillar 2: EMA Trend Ribbon (25 pts max) - Requires Genuine Positive Slope (>= 0.05%)
       let emaPts = 10;
       let emaDesc = "Flat Trend";
-      if (ema7 > ema21 && price >= ema7) {
+      const emaSpread = ema21 > 0 ? (ema7 - ema21) / ema21 : 0;
+
+      if (ema7 > ema21 && price >= ema7 && emaSpread >= 0.0005) {
         emaPts = 25;
-        emaDesc = "🟢 Bullish Golden Trend Alignment";
-      } else if (ema7 > ema21) {
+        emaDesc = `🟢 Bullish Golden Trend (+${(emaSpread * 100).toFixed(2)}% spread)`;
+      } else if (ema7 > ema21 && emaSpread >= 0.0002) {
         emaPts = 19;
-        emaDesc = "🟢 EMA 7/21 Bullish Cross";
+        emaDesc = `🟢 EMA 7/21 Bullish Cross (+${(emaSpread * 100).toFixed(2)}%)`;
       } else if (price > ema21) {
         emaPts = 14;
         emaDesc = "Supported Above EMA 21";
       } else {
         emaPts = 4;
-        emaDesc = "🔴 Below Trend (Wait for Base)";
+        emaDesc = "🔴 Below Trend (Flat / Bearish)";
       }
 
       // Pillar 3: Volume Surge (25 pts max) - Strict Real Volume Logic
@@ -1754,7 +1766,7 @@
       const emaValEl = document.getElementById("sig-ema-val");
       const emaDescEl = document.getElementById("sig-ema-desc");
       if (emaPtsEl) emaPtsEl.textContent = `${emaPts} / 25`;
-      const formatEma = val => (val >= 1000 ? Math.round(val).toLocaleString() : val.toFixed(2));
+      const formatEma = val => (typeof val === 'number' ? val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : val);
       if (emaValEl) emaValEl.textContent = `EMA 7: $${formatEma(ema7)} / 21: $${formatEma(ema21)}`;
       if (emaDescEl) emaDescEl.textContent = emaDesc;
 
@@ -1872,6 +1884,14 @@
       if (STATE.activeTrade) {
         STATE.tradeDuration++;
 
+        // Periodic Live Monitoring Log every 60 seconds while holding
+        if (STATE.tradeDuration % 60 === 0) {
+          const livePrice = (STATE.market && STATE.market.price > 0) ? STATE.market.price : STATE.activeTrade.currentPrice;
+          const mins = Math.floor(STATE.tradeDuration / 60);
+          const pSign = STATE.activeTrade.pnlPct >= 0 ? "+" : "";
+          logEvent("HOLD", STATE.activeTrade.bot, STATE.activeTrade.symbol, `${pSign}${STATE.activeTrade.pnlPct}%`, `Monitoring @ $${livePrice} • TP +0.75% / SL -0.50% (${mins}m held)`, `$${STATE.activeTrade.sizeUsd.toFixed(2)}`);
+        }
+
         // REAL Binance market price for the EXACT active trade symbol
         const livePrice = (STATE.market && STATE.market.price > 0) ? STATE.market.price : STATE.activeTrade.currentPrice;
         STATE.activeTrade.currentPrice = livePrice;
@@ -1902,22 +1922,26 @@
           renderCandlesticks();
         }
 
-        // STRICT REAL EXIT CRITERIA (Zero Timer Simulation):
-        // 1. Take Profit: +1.50% Net
-        // 2. Trailing Profit Lock: Lock in +1.00% Net if retracing from +1.20%
-        // 3. Stop Loss: -1.00% Net strict risk limit
-        const hitTakeProfit = netPct >= 1.50;
-        const hitTrailingStop = STATE.maxObservedPnl >= 1.20 && netPct <= 1.00;
-        const hitStopLoss = netPct <= -1.00;
+        // 1-MINUTE SCALPER REAL EXIT CRITERIA:
+        // 1. Scalp Take Profit: +0.75% Net (Fast micro-move exit)
+        // 2. Breakeven Trailing: Lock in +0.05% Net profit once trade reaches +0.35% Net
+        // 3. Strict Stop Loss: -0.50% Net (tight capital protection)
+        // 4. Stale Trade Killer: Dead sideways exit if held > 20 mins between -0.30% and +0.20%
+        const hitTakeProfit = netPct >= 0.75;
+        const hitBreakeven = STATE.maxObservedPnl >= 0.35 && netPct <= 0.05;
+        const hitStopLoss = netPct <= -0.50;
+        const hitStaleKiller = STATE.tradeDuration >= (20 * 60) && netPct >= -0.30 && netPct <= 0.20;
 
-        if (hitTakeProfit || hitTrailingStop || hitStopLoss) {
+        if (hitTakeProfit || hitBreakeven || hitStopLoss || hitStaleKiller) {
           let exitReason = "";
           if (hitTakeProfit) {
-            exitReason = `🎯 TAKE PROFIT (+${netPct}% Net after $${feesPaid} fee)`;
-          } else if (hitTrailingStop) {
-            exitReason = `🔒 TRAILING PROFIT LOCK (+${netPct}% Net locked)`;
+            exitReason = `🎯 SCALP TAKE PROFIT (+${netPct}% Net)`;
+          } else if (hitBreakeven) {
+            exitReason = `🛡️ BREAKEVEN PROTECT (+${netPct}% Net locked)`;
           } else if (hitStopLoss) {
-            exitReason = `🛑 STOP LOSS (${netPct}% Net risk control)`;
+            exitReason = `🛑 SCALP STOP LOSS (${netPct}% Net risk control)`;
+          } else if (hitStaleKiller) {
+            exitReason = `⏱️ STALE TRADE KILLER (${netPct}% Net - 20m sideways release)`;
           }
 
           // If LIVE mode, send real SELL order to Binance and verify execution
@@ -2050,22 +2074,22 @@
         let botKey = "house";
         let reason = "";
 
-        if (STATE.market.rsi <= 44 && STATE.market.bidRatio >= 0.52) {
+        if (STATE.market.rsi <= 35 && STATE.market.bidRatio >= 0.50) {
           chosenBot = "Dip Buyer";
           botKey = "house";
-          reason = `A+ Oversold Dip (RSI ${STATE.market.rsi.toFixed(1)}) + ${Math.round(STATE.market.bidRatio * 100)}% Whale Buy Support`;
-        } else if (STATE.market.ema7 > STATE.market.ema21 && volRatio >= 1.25) {
+          reason = `A+ Oversold Dip (RSI ${STATE.market.rsi.toFixed(1)} <= 35) + ${Math.round(STATE.market.bidRatio * 100)}% Whale Buy Support`;
+        } else if (STATE.market.ema7 > STATE.market.ema21 && volRatio >= 1.20) {
           chosenBot = "Trend Rider";
           botKey = "gambler";
-          reason = `A+ Bullish EMA Cross + ${volRatio}x Buying Inflow`;
-        } else if (STATE.market.bidRatio >= 0.55) {
+          reason = `A+ Bullish Trend Alignment + ${volRatio}x Volume Surge`;
+        } else if (STATE.market.bidRatio >= 0.54) {
           chosenBot = "Smart Scalper";
           botKey = "spy";
           reason = `A+ Whale Depth Absorption (${Math.round(STATE.market.bidRatio * 100)}% Bids)`;
         } else {
-          chosenBot = "Quant Scalper";
-          botKey = "house";
-          reason = `A+ Confluence Setup (${score}/100 pts) + Positive Momentum`;
+          chosenBot = "Smart Scalper";
+          botKey = "spy";
+          reason = `A+ Confluence Setup (${score}/100 pts) + Momentum`;
         }
 
         // Safe Sizing: $10.00 recommended safe size, or full balance if $5-$10 starter
@@ -2358,10 +2382,13 @@
         }
       }
 
-      // Dynamic Money Manager description in Left Sidebar
+      // Dynamic Money Manager description in Left Sidebar (Dynamically scales with wallet)
       const sizerDetail = document.getElementById("sizer-detail");
       if (sizerDetail) {
-        if (STATE.balance >= 10.0) {
+        if (STATE.balance >= 50.0) {
+          const orderSz = (STATE.balance * 0.20).toFixed(2);
+          sizerDetail.innerHTML = `Max 20% equity • Up to 3 positions<br><span id="sizer-subtext">$${orderSz} order size</span>`;
+        } else if (STATE.balance >= 10.0) {
           sizerDetail.innerHTML = `Min safe size: $10.00 • Max 20% equity<br><span id="sizer-subtext">$10.00 safe order</span>`;
         } else if (STATE.balance >= 5.0) {
           sizerDetail.innerHTML = `Starter Micro-Size: $${STATE.balance.toFixed(2)} (100% eq)<br><span id="sizer-subtext">Covers $5.00 min with safe buffer</span>`;
@@ -2370,15 +2397,18 @@
         }
       }
 
-      // Terminal logs
+      // Terminal logs (Auto-scroll to top so latest logs are always visible first)
       const term = document.getElementById("night-log-terminal");
-      term.innerHTML = STATE.logs.slice(0, 15).map(l => {
-        const color = l.type === "SOLD" || l.type === "EXIT" || l.type === "BINANCE_SELL"
-          ? (l.pnl_num >= 0 ? "green-txt" : "red-txt") 
-          : (l.type === "BOUGHT" || l.type === "BINANCE_LIVE" ? "cyan-txt" : "yellow-txt");
-        const botTag = l.bot ? `[${l.bot}] ` : '';
-        return `<div class="term-line"><span style="color:#64748b;">${l.time}</span> <span class="${color} bold">${l.type}</span> <span style="color:#60a5fa;">${botTag}</span><b>${l.token}</b> <span class="${color}">${l.pnl}</span> <span style="color:#94a3b8;">${l.reason}</span> <span style="color:#64748b;">${l.size}</span></div>`;
-      }).join("");
+      if (term) {
+        term.innerHTML = STATE.logs.slice(0, 25).map(l => {
+          const color = (l.type === "SOLD" || l.type === "EXIT" || l.type === "BINANCE_SELL")
+            ? (l.pnl_num >= 0 ? "green-txt" : "red-txt") 
+            : (l.type === "BOUGHT" || l.type === "BINANCE_LIVE" ? "cyan-txt" : (l.type === "SCAN" ? "blue-txt" : (l.type === "HOLD" ? "cyan-txt" : "yellow-txt")));
+          const botTag = l.bot ? `[${l.bot}] ` : '';
+          return `<div class="term-line"><span style="color:#64748b;">${l.time}</span> <span class="${color} bold">${l.type}</span> <span style="color:#60a5fa;">${botTag}</span><b>${l.token}</b> <span class="${color}">${l.pnl}</span> <span style="color:#94a3b8;">${l.reason}</span> <span style="color:#64748b;">${l.size}</span></div>`;
+        }).join("");
+        term.scrollTop = 0;
+      }
 
       // Ledger table (Fix Issue #6: clearly display Win/Loss tags)
       const rows = document.getElementById("ledger-rows");
@@ -2877,14 +2907,17 @@
             saveUserState();
             render();
 
-            let msg = `✅ Authenticated! Real USDT Balance: $${detectedBal.toFixed(2)} USDT • Spot Trading: ${data.canTrade ? 'Active' : 'Disabled'}`;
-            if (detectedBal >= 5.0) {
-              msg += ` • Ready for live auto-trading!`;
+            if (detectedBal < 5.0) {
+              apiStatus.innerHTML = `⚠️ <b>Connected, but Spot Wallet shows $${detectedBal.toFixed(2)} USDT.</b><br>
+              <div style="margin-top:6px; padding:8px; background:rgba(234,179,8,0.15); border:1px solid #eab308; border-radius:4px; color:#fef08a; line-height:1.4;">
+                💡 <b>Funding Wallet Notice:</b> Binance deposits usually arrive in your <b>Funding Wallet</b>.<br>
+                Open Binance App ➔ <b>Wallets</b> ➔ <b>Transfer</b> ➔ Transfer USDT from <b>Funding Wallet to Spot Wallet</b> to enable live trading!
+              </div>`;
+              apiStatus.style.color = "#fef08a";
             } else {
-              msg += ` • (Note: Binance requires min $5 USDT to execute spot orders)`;
+              apiStatus.textContent = `✅ Authenticated! Real Spot USDT Balance: $${detectedBal.toFixed(2)} USDT • Spot Trading: ${data.canTrade ? 'Active' : 'Disabled'} • Ready for live auto-trading!`;
+              apiStatus.style.color = "#34d399";
             }
-            apiStatus.textContent = msg;
-            apiStatus.style.color = "#34d399";
           } else {
             const errStr = data.error || 'Authentication failed';
             if (errStr.includes("restricted location")) {

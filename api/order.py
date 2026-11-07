@@ -21,10 +21,18 @@ BINANCE_ENDPOINTS = [
 
 # Exact stepSize and precision for Binance Spot target pairs
 SYMBOL_CONFIG = {
-    "BTCUSDT": {"stepSize": 0.00001, "decimals": 5, "baseAsset": "BTC", "minNotional": 5.0},
-    "ETHUSDT": {"stepSize": 0.0001,  "decimals": 4, "baseAsset": "ETH", "minNotional": 5.0},
-    "SOLUSDT": {"stepSize": 0.001,   "decimals": 3, "baseAsset": "SOL", "minNotional": 5.0},
-    "BNBUSDT": {"stepSize": 0.001,   "decimals": 3, "baseAsset": "BNB", "minNotional": 5.0}
+    "BTCUSDT":  {"stepSize": 0.00001, "decimals": 5, "baseAsset": "BTC",  "minNotional": 5.0},
+    "ETHUSDT":  {"stepSize": 0.0001,  "decimals": 4, "baseAsset": "ETH",  "minNotional": 5.0},
+    "SOLUSDT":  {"stepSize": 0.001,   "decimals": 3, "baseAsset": "SOL",  "minNotional": 5.0},
+    "BNBUSDT":  {"stepSize": 0.001,   "decimals": 3, "baseAsset": "BNB",  "minNotional": 5.0},
+    "XRPUSDT":  {"stepSize": 0.1,     "decimals": 1, "baseAsset": "XRP",  "minNotional": 5.0},
+    "DOGEUSDT": {"stepSize": 1.0,     "decimals": 0, "baseAsset": "DOGE", "minNotional": 5.0},
+    "SUIUSDT":  {"stepSize": 0.1,     "decimals": 1, "baseAsset": "SUI",  "minNotional": 5.0},
+    "ADAUSDT":  {"stepSize": 0.1,     "decimals": 1, "baseAsset": "ADA",  "minNotional": 5.0},
+    "AVAXUSDT": {"stepSize": 0.01,    "decimals": 2, "baseAsset": "AVAX", "minNotional": 5.0},
+    "LINKUSDT": {"stepSize": 0.01,    "decimals": 2, "baseAsset": "LINK", "minNotional": 5.0},
+    "PEPEUSDT": {"stepSize": 1000.0,  "decimals": 0, "baseAsset": "PEPE", "minNotional": 5.0},
+    "WIFUSDT":  {"stepSize": 0.1,     "decimals": 1, "baseAsset": "WIF",  "minNotional": 5.0}
 }
 
 def get_binance_server_time():
